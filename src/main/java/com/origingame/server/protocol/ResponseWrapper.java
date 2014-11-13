@@ -18,6 +18,8 @@ public class ResponseWrapper {
 
     private Message message;
 
+    public ResponseWrapper() {}
+
     public ResponseWrapper(GameProtocol protocol) {
         this.protocol = protocol;
         Preconditions.checkArgument(GameProtocol.Type.RESPONSE.equals(protocol.getType()));

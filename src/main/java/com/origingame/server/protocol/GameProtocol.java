@@ -11,13 +11,14 @@ import io.netty.buffer.ByteBuf;
  */
 public class GameProtocol {
 
-    public static final int HEAD_LENGTH = 4 + 4 + 1 + 1 + 1;
+    public static final int HEAD_LENGTH = 4 + 4 + 4 + 1 + 1 + 1;
 
 
     private GameProtocol() {}
 
-    private GameProtocol(int dataLength, int id, Phase phase, Type type, Status status, byte[] data) {
+    private GameProtocol(int dataLength, int sessionId, int id, Phase phase, Type type, Status status, byte[] data) {
         this.dataLength = dataLength;
+        this.sessionId = sessionId;
         this.id = id;
         this.phase = phase;
         this.type = type;
@@ -28,7 +29,10 @@ public class GameProtocol {
     /** 消息长度 4byte **/
     private int dataLength;
 
-    /** 请求/响应ID 4byte **/
+    /** 会话id 4byte **/
+    private int sessionId;
+
+    /** 请求/响应序号 4byte **/
     private int id;
 
     /** 当前协议阶段(0x0F握手请求，0x1F明文传输，0x2F加密传输) 1byte **/
@@ -48,6 +52,7 @@ public class GameProtocol {
         if(in.readableBytes() < HEAD_LENGTH) return null;
         int originReaderIndex = in.readerIndex();
         int dataLength = in.readInt();
+        int sessionId = in.readInt();
         int id = in.readInt();
         Phase phase = Phase.valueOf(UnsignedBytes.toInt(in.readByte()));
         Type type = Type.valueOf(UnsignedBytes.toInt(in.readByte()));
@@ -62,12 +67,13 @@ public class GameProtocol {
             data = new byte[dataLength];
             in.readBytes(data, 0, dataLength);
         }
-        GameProtocol protocol = new GameProtocol(dataLength, id, phase, type, status, data);
+        GameProtocol protocol = new GameProtocol(dataLength, sessionId, id, phase, type, status, data);
         return protocol;
     }
 
     public void encode(ByteBuf out) {
         out.writeInt(dataLength);
+        out.writeInt(sessionId);
         out.writeInt(id);
         out.writeByte((byte)phase.value);
         out.writeByte((byte) type.value);
@@ -121,6 +127,15 @@ public class GameProtocol {
 
         /** 不支持的消息类型 **/
         UNKNOWN_MESSAGE_TYPE(0x05),
+
+        /** 无效的会话 **/
+        INVALID_SESSION_ID(0x06),
+
+        /** 请求序号已失效 **/
+        INVALID_ID(0x07),
+
+        /** 握手失败 **/
+        HANDSHAKE_FAILED(0x08),
 
         /** 其他错误 **/
         OTHER_ERROR(0xFF);
@@ -195,6 +210,10 @@ public class GameProtocol {
         return status;
     }
 
+    public int getSessionId() {
+        return sessionId;
+    }
+
     public static Builder newBuilder() {
         return Builder.create();
     }
@@ -226,6 +245,11 @@ public class GameProtocol {
             return this;
         }
 
+        public Builder setSessionId(int sessionId) {
+            protocol.sessionId = sessionId;
+            return this;
+        }
+
         public Builder setMessage(BaseMsgProtos.RequestMsg requestMsg) {
             if(protocol.data != null || protocol.dataLength != 0) {
                 throw new GameProtocolException("创建BlasterProtocol失败,为protocol添加message的时候发现内部data或messageType不为空");
@@ -254,6 +278,7 @@ public class GameProtocol {
 
         public GameProtocol build() {
             if(Type.REQUEST.equals(protocol.type)) {
+                //TODO 生成消息序号
 //                protocol.id = IdGenerator.getRequestId();
             } else {
                 if(protocol.id < 1) {

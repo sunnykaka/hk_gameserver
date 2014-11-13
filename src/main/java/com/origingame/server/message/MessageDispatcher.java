@@ -1,6 +1,8 @@
 package com.origingame.server.message;
 
+import com.origingame.server.context.GameContext;
 import com.origingame.server.protocol.GameProtocol;
+import com.origingame.server.protocol.ResponseWrapper;
 import io.netty.channel.Channel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,7 +23,7 @@ public class MessageDispatcher {
         return INSTANCE;
     }
 
-//    MessageReceiver blasterReceiver = MessageReceiver.getInstance();
+    MessageReceiver messageReceiver = MessageReceiver.getInstance();
 //    BlasterSender blasterSender = BlasterSender.getInstance();
 
     /**
@@ -30,6 +32,10 @@ public class MessageDispatcher {
      * @param protocol
      */
     public void receive(Channel channel, GameProtocol protocol) {
+        GameContext ctx = new GameContext(channel);
+
+        ResponseWrapper response = messageReceiver.receive(ctx, protocol);
+
 //        ResponseWrapper response = null;
 //        try {
 //            response = blasterReceiver.receive(protocol);
