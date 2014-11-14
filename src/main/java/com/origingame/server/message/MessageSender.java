@@ -1,57 +1,45 @@
-//package com.origingame.server.message;
-//
-//import com.rpg.rocket.blaster.context.IdContext;
-//import com.rpg.rocket.blaster.context.MessageContext;
-//import com.rpg.rocket.blaster.protocol.BlasterProtocol;
-//import com.rpg.rocket.blaster.protocol.RequestWrapper;
-//import com.rpg.rocket.blaster.protocol.ResponseWrapper;
-//import com.rpg.rocket.blaster.util.BlasterConstants;
-//import com.rpg.rocket.blaster.util.Clock;
-//import io.netty.channel.Channel;
-//import io.netty.channel.ChannelFuture;
-//import io.netty.channel.ChannelFutureListener;
-//import org.slf4j.Logger;
-//import org.slf4j.LoggerFactory;
-//
-//import java.util.concurrent.TimeUnit;
-//import java.util.concurrent.TransferQueue;
-//
-///**
-// * 消息发送者
-// * User: liubin
-// * Date: 14-3-3
-// */
-//public class BlasterSender {
-//
-//    private static final Logger log = LoggerFactory.getLogger(BlasterSender.class);
-//
-//    private static final BlasterSender INSTANCE = new BlasterSender();
-//    private BlasterSender() {}
-//    public static final BlasterSender getInstance() {
-//        return INSTANCE;
-//    }
-//
-//    /**
-//     * 发送响应
-//     * @param channel
-//     * @param response
-//     */
-//    public void sendResponse(Channel channel, ResponseWrapper response) {
-//        BlasterProtocol protocol = response.getProtocol();
+package com.origingame.server.message;
+
+import com.origingame.server.context.GameContext;
+import com.origingame.server.protocol.GameProtocol;
+import com.origingame.server.protocol.ResponseWrapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+/**
+* 消息发送者
+* User: liubin
+* Date: 14-3-3
+*/
+public class MessageSender {
+
+    private static final Logger log = LoggerFactory.getLogger(MessageSender.class);
+
+    private static final MessageSender INSTANCE = new MessageSender();
+    private MessageSender() {}
+    public static final MessageSender getInstance() {
+        return INSTANCE;
+    }
+
+    /**
+     * 发送响应
+     * @param ctx
+     */
+    public void sendResponse(GameContext ctx) {
+        ResponseWrapper response = ctx.getResponse();
+        GameProtocol protocol = response.getProtocol();
 //        if(protocol.getId() <= 0) {
 //            //id无效,无需返回结果
 //            log.warn("接收到id小于1的消息,id[{}],无法返回消息,消息内容:{}", protocol.getId(), response.toString());
 //            return;
 //        }
-//        if(log.isDebugEnabled()) {
-//            log.debug("准备发送响应, id[{}], response[{}]", new Object[]{protocol.getId(), response});
-//        }
-//
-//        //XXX 为什么在这里用write就发送不了请求,即时设置了TCP_NODELAY也不行?
-//        //answer:因为write方法只是将消息加入了待发送队列,消息没有调用flush是不会发送的
-//        channel.writeAndFlush(protocol);
-//    }
-//
+        if(log.isDebugEnabled()) {
+            log.debug("准备发送响应, id[{}], response[{}]", new Object[]{protocol.getId(), response});
+        }
+
+        ctx.getChannel().writeAndFlush(protocol);
+    }
+
 //    /**
 //     * 发送请求
 //     * @param channel
@@ -111,8 +99,8 @@
 //        }
 //
 //    }
-//
-//
+
+
 //    private static class ChannelWriteFinishListener implements ChannelFutureListener{
 //
 //        private int id;
@@ -145,6 +133,6 @@
 //                    BlasterProtocol.Status.REQUEST_FAILED, null, null, null);
 //        }
 //    }
-//
-//
-//}
+
+
+}

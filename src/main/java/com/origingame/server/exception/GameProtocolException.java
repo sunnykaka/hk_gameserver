@@ -37,5 +37,11 @@ public class GameProtocolException extends GameException {
         this.protocol = protocol;
     }
 
+    public GameProtocol.Status getStatus() {
+        return status;
+    }
 
+    public GameProtocol getProtocol() {
+        return protocol;
+    }
 }

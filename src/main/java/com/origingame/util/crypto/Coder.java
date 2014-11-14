@@ -1,4 +1,4 @@
-package com.origingame.util;
+package com.origingame.util.crypto;
 
 import java.security.MessageDigest;
  

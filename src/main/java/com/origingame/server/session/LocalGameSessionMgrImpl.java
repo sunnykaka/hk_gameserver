@@ -41,7 +41,7 @@ public class LocalGameSessionMgrImpl {
 
     }
 
-    public GameSession init(GameContext ctx, byte[] publicKey, int id) {
+    public GameSession init(GameContext ctx, byte[] publicKey) {
         GameSession gameSession = new GameSession();
         gameSession.setPublicKey(publicKey);
         gameSession.setSessionId(IdGenerator.incrSessionId(ctx.getJedis()));

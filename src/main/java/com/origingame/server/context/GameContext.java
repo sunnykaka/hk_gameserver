@@ -33,8 +33,36 @@ public class GameContext {
 
     private Jedis jedis;
 
+    private boolean isRequestMessage = false;
+
     public GameContext(Channel channel) {
         this.channel = channel;
+    }
+
+    public GameContext(Channel channel, GameProtocol protocol) {
+        this.channel = channel;
+        if(GameProtocol.Type.REQUEST.equals(protocol.getType())) {
+            isRequestMessage = true;
+            this.request = new RequestWrapper(this, protocol);
+            int sessionId = protocol.getSessionId();
+            if(sessionId > 0) {
+                this.session = gameSessionMgr.load(sessionId);
+            }
+        } else {
+
+        }
+    }
+
+    public void setSession(GameSession session) {
+        this.session = session;
+    }
+
+    public void setRequest(RequestWrapper request) {
+        this.request = request;
+    }
+
+    public void setResponse(ResponseWrapper response) {
+        this.response = response;
     }
 
     public GameSession getSession() {

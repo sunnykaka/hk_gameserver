@@ -5,11 +5,8 @@ import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.protobuf.Message;
 import com.origingame.message.BaseMsgProtos;
 import com.origingame.message.HandShakeProtos;
-import com.origingame.server.context.GameContext;
 import com.origingame.server.exception.GameProtocolException;
-import com.origingame.server.session.GameSession;
-import com.origingame.server.session.LocalGameSessionMgrImpl;
-import io.netty.channel.Channel;
+import com.origingame.util.crypto.CryptoContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,70 +24,69 @@ public class RequestWrapper {
 
     private Message message;
 
-    private LocalGameSessionMgrImpl gameSessionMgr = LocalGameSessionMgrImpl.getInstance();
-
-    public RequestWrapper() {}
+//    public RequestWrapper(GameProtocol protocol) {
+//        this.protocol = protocol;
+//        Preconditions.checkArgument(GameProtocol.Type.REQUEST.equals(protocol.getType()));
+//        byte[] data = protocol.getData();
+//        if(data == null) return;
+//        try {
+//            this.requestMsg = BaseMsgProtos.RequestMsg.parseFrom(data);
+//        } catch (InvalidProtocolBufferException e) {
+//            log.warn("", e);
+//            throw new GameProtocolException(GameProtocol.Status.DATA_CORRUPT, protocol);
+//        }
+//
+//        this.message = ProtocolUtil.parseMessageFromDataAndType(requestMsg.getMessageType(), requestMsg.getMessage().toByteArray());
+//
+//    }
 
     public RequestWrapper(GameProtocol protocol) {
         this.protocol = protocol;
-        Preconditions.checkArgument(GameProtocol.Type.REQUEST.equals(protocol.getType()));
-        byte[] data = protocol.getData();
-        if(data == null) return;
-        //TODO 不允许data为空
-        try {
-            this.requestMsg = BaseMsgProtos.RequestMsg.parseFrom(data);
-        } catch (InvalidProtocolBufferException e) {
-            log.warn("", e);
-            throw new GameProtocolException(GameProtocol.Status.DATA_CORRUPT, protocol);
-        }
 
-        //TODO 根据消息类型反序列化消息
-//        this.message = ProtocolUtil.parseMessageFromDataAndType(requestMsg.getMessageType(), requestMsg.getMessage().toByteArray());
-
+        init();
     }
 
-    public static RequestWrapper parseFromHandShake(GameContext ctx, GameProtocol protocol) {
-        RequestWrapper request = new RequestWrapper();
-        return request.initRequest(ctx, protocol);
-    }
+//    public static RequestWrapper parseFromHandShake(GameContext ctx, GameProtocol protocol) {
+//        RequestWrapper request = new RequestWrapper();
+//        return request.initRequest(ctx, protocol);
+//    }
 
-    private RequestWrapper initRequest(GameContext ctx, GameProtocol protocol) {
+    public RequestWrapper init() {
         Preconditions.checkArgument(GameProtocol.Type.REQUEST.equals(protocol.getType()));
-        this.protocol = protocol;
         byte[] data = protocol.getData();
-        if(data == null) {
-            throw new GameProtocolException(GameProtocol.Status.HANDSHAKE_FAILED, protocol);
+        if(data == null || data.length == 0) {
+            throw new GameProtocolException(GameProtocol.Status.REQUEST_MESSAGE_EMPTY, protocol);
         }
 
-        int sessionId = protocol.getSessionId();
-        int id = protocol.getId();
-        GameSession gameSession = null;
-        HandShakeProtos.HandShakeReq handShakeReq;
-
-        if(sessionId > 0) {
-            gameSession = gameSessionMgr.load(sessionId);
-        }
-
-        try {
-            this.requestMsg = BaseMsgProtos.RequestMsg.parseFrom(data);
-            byte[] handShakeMessage = getRequestMsg().getMessage().toByteArray();
-            handShakeReq = HandShakeProtos.HandShakeReq.parseFrom(handShakeMessage);
-
-        } catch (InvalidProtocolBufferException e) {
-            log.warn("", e);
-            throw new GameProtocolException(GameProtocol.Status.DATA_CORRUPT, protocol);
-        }
-
-        byte[] publicKey = handShakeReq.getPublicKey().toByteArray();
-        if(gameSession != null && gameSession.hasPublicKey(publicKey)) {
-
-        } else {
-            if(gameSession != null) {
-                gameSessionMgr.invalid(gameSession);
-            }
-            gameSession = gameSessionMgr.init(ctx, publicKey, id);
-        }
-
+//        switch (protocol.getPhase()) {
+//            case HAND_SHAKE: {
+//                HandShakeProtos.HandShakeReq handShakeReq;
+//
+//                try {
+//                    this.requestMsg = BaseMsgProtos.RequestMsg.parseFrom(data);
+//                    byte[] handShakeMessage = getRequestMsg().getMessage().toByteArray();
+//                    handShakeReq = HandShakeProtos.HandShakeReq.parseFrom(handShakeMessage);
+//                    this.message = handShakeReq;
+//
+//                } catch (InvalidProtocolBufferException e) {
+//                    log.warn("", e);
+//                    throw new GameProtocolException(GameProtocol.Status.DATA_CORRUPT, protocol);
+//                }
+//
+//                break;
+//            }
+//            case PLAIN_TEXT: {
+//                break;
+//            }
+//            case CIPHER_TEXT: {
+//
+//
+//
+//                break;
+//            }
+//            default:
+//                throw new GameProtocolException(GameProtocol.Status.INVALID_PHASE, protocol);
+//        }
 
         return this;
     }
@@ -138,5 +134,37 @@ public class RequestWrapper {
                 ", requestMsg=" + requestMsg +
                 ", message=" + message +
                 '}';
+    }
+
+    public void parseHandShakeMessage() {
+
+        try {
+            this.requestMsg = BaseMsgProtos.RequestMsg.parseFrom(protocol.getData());
+            byte[] handShakeMessage = requestMsg.getMessage().toByteArray();
+            this.message = HandShakeProtos.HandShakeReq.parseFrom(handShakeMessage);
+
+        } catch (InvalidProtocolBufferException e) {
+            log.warn("", e);
+            throw new GameProtocolException(GameProtocol.Status.DATA_CORRUPT, protocol);
+        }
+
+    }
+
+    public void parseCipherMessage(CryptoContext cryptoContext) {
+
+        byte[] data = protocol.getData();
+        data = cryptoContext.decrypt(data);
+
+        try {
+            this.requestMsg = BaseMsgProtos.RequestMsg.parseFrom(data);
+            this.message = ProtocolUtil.parseMessageFromDataAndType(requestMsg.getMessageType(), requestMsg.getMessage().toByteArray());
+
+        } catch (InvalidProtocolBufferException e) {
+            log.warn("", e);
+            throw new GameProtocolException(GameProtocol.Status.DATA_CORRUPT, protocol);
+        }
+
+
+
     }
 }

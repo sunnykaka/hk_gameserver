@@ -3,6 +3,7 @@ package com.origingame.server.protocol;
 import com.google.common.primitives.UnsignedBytes;
 import com.origingame.message.BaseMsgProtos;
 import com.origingame.server.exception.GameProtocolException;
+import com.origingame.util.crypto.CryptoContext;
 import io.netty.buffer.ByteBuf;
 
 /**
@@ -137,7 +138,11 @@ public class GameProtocol {
         /** 握手失败 **/
         HANDSHAKE_FAILED(0x08),
 
-        /** 其他错误 **/
+        /** 请求数据为空 **/
+        REQUEST_MESSAGE_EMPTY(0x09),
+
+
+        /** 服务器内部错误 **/
         OTHER_ERROR(0xFF);
 
         public int value;
@@ -250,26 +255,32 @@ public class GameProtocol {
             return this;
         }
 
-        public Builder setMessage(BaseMsgProtos.RequestMsg requestMsg) {
+        public Builder setMessage(BaseMsgProtos.RequestMsg requestMsg, CryptoContext cryptoContext) {
             if(protocol.data != null || protocol.dataLength != 0) {
                 throw new GameProtocolException("创建BlasterProtocol失败,为protocol添加message的时候发现内部data或messageType不为空");
             }
             protocol.type = Type.REQUEST;
             if(requestMsg != null) {
                 byte[] data = requestMsg.toByteArray();
+                if(cryptoContext != null) {
+                    data = cryptoContext.encrypt(data);
+                }
                 protocol.data = data;
                 protocol.dataLength = data.length;
             }
             return this;
         }
 
-        public Builder setMessage(BaseMsgProtos.ResponseMsg responseMsg) {
+        public Builder setMessage(BaseMsgProtos.ResponseMsg responseMsg, CryptoContext cryptoContext) {
             if(protocol.data != null || protocol.dataLength != 0) {
                 throw new GameProtocolException("创建BlasterProtocol失败,为protocol添加message的时候发现内部data或messageType不为空");
             }
             protocol.type = Type.RESPONSE;
             if(responseMsg != null) {
                 byte[] data = responseMsg.toByteArray();
+                if(cryptoContext != null) {
+                    data = cryptoContext.encrypt(data);
+                }
                 protocol.data = data;
                 protocol.dataLength = data.length;
             }

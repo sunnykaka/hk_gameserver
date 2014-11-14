@@ -1,9 +1,8 @@
 package com.origingame.server;
 
 
-import com.origingame.util.AES;
-import com.origingame.util.Coder;
-import com.origingame.util.RSA;
+import com.origingame.util.crypto.AES;
+import com.origingame.util.crypto.RSA;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 
@@ -65,7 +64,7 @@ public class EncryptionTest {
 
         byte[] passwordKey = AES.initPasswordKey();
 
-        after = new String(AES.decrypt(AES.encryp(before.getBytes(Charset.forName("UTF-8")), passwordKey), passwordKey), Charset.forName("UTF-8"));
+        after = new String(AES.decrypt(AES.encrypt(before.getBytes(Charset.forName("UTF-8")), passwordKey), passwordKey), Charset.forName("UTF-8"));
 
         assertThat(after, is(before));
 

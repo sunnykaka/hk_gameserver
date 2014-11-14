@@ -1,6 +1,7 @@
 package com.origingame.server.message;
 
 import com.origingame.server.context.GameContext;
+import com.origingame.server.exception.GameProtocolException;
 import com.origingame.server.protocol.GameProtocol;
 import com.origingame.server.protocol.ResponseWrapper;
 import io.netty.channel.Channel;
@@ -24,6 +25,7 @@ public class MessageDispatcher {
     }
 
     MessageReceiver messageReceiver = MessageReceiver.getInstance();
+    MessageSender messageSender = MessageSender.getInstance();
 //    BlasterSender blasterSender = BlasterSender.getInstance();
 
     /**
@@ -32,9 +34,37 @@ public class MessageDispatcher {
      * @param protocol
      */
     public void receive(Channel channel, GameProtocol protocol) {
-        GameContext ctx = new GameContext(channel);
 
-        ResponseWrapper response = messageReceiver.receive(ctx, protocol);
+        ResponseWrapper response = null;
+        GameContext ctx = null;
+        try {
+            ctx = new GameContext(channel, protocol);
+
+            response = messageReceiver.receive(ctx, protocol);
+
+        } catch (GameProtocolException e) {
+            log.error(e.toString());
+            if(GameProtocol.Type.REQUEST.equals(protocol.getType())) {
+                GameProtocol.Status status = e.getStatus();
+                response = ResponseWrapper.createProtocolErrorResponse(ctx, status == null ? GameProtocol.Status.OTHER_ERROR : status);
+            }
+        } catch (Exception e) {
+            log.error("对收到的消息进行解析的时候发生错误", e);
+            if(GameProtocol.Type.REQUEST.equals(protocol.getType())) {
+
+                response = ResponseWrapper.createProtocolErrorResponse(ctx, GameProtocol.Status.OTHER_ERROR);
+            }
+        } finally  {
+            //TODO ctx, session 的一些提交和清理工作
+        }
+
+        ctx.setResponse(response);
+
+        if(response != null) {
+            messageSender.sendResponse(ctx);
+        }
+
+
 
 //        ResponseWrapper response = null;
 //        try {
