@@ -1,5 +1,11 @@
 package com.origingame.server.session;
 
+import com.origingame.config.GlobalConfig;
+import com.origingame.server.context.GameContext;
+import com.origingame.server.util.RedisUtil;
+import com.origingame.util.World;
+import redis.clients.jedis.Jedis;
+
 import java.util.Arrays;
 
 /**
@@ -80,5 +86,20 @@ public class GameSession {
 
     public boolean hasPublicKey(byte[] publicKey) {
         return Arrays.equals(this.publicKey, publicKey);
+    }
+
+    public static GameSession load(GameContext ctx, int sessionId) {
+        Jedis jedis = ctx.getJedis();
+
+
+        jedis.hgetAll(RedisUtil.buildKey("session", String.valueOf(sessionId)));
+
+//        GameSession session = sessionMap.get(sessionId);
+//        if(session.getLastTime() + GlobalConfig.GAME_SESSION_TIMEOUT * 1000 < World.now().getTime()) {
+//            sessionMap.remove(sessionId);
+//            return null;
+//        }
+
+        return null;
     }
 }

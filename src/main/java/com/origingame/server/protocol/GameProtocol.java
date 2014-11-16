@@ -115,32 +115,37 @@ public class GameProtocol {
     public enum Status {
 
         /** 成功 **/
-        SUCCESS(0x01),
+        SUCCESS(0),
 
         /** 解密失败 **/
-        DECIPHER_FAILED(0x02),
+        DECIPHER_FAILED(1),
 
         /** 数据损坏 **/
-        DATA_CORRUPT(0x03),
+        DATA_CORRUPT(2),
 
         /** 不支持的协议阶段 **/
-        INVALID_PHASE(0x04),
+        INVALID_PHASE(3),
 
         /** 不支持的消息类型 **/
-        UNKNOWN_MESSAGE_TYPE(0x05),
+        UNKNOWN_MESSAGE_TYPE(4),
 
         /** 无效的会话 **/
-        INVALID_SESSION_ID(0x06),
+        INVALID_SESSION_ID(5),
 
-        /** 请求序号已失效 **/
-        INVALID_ID(0x07),
+        /** 无效的请求序号 **/
+        INVALID_ID(6),
 
         /** 握手失败 **/
-        HANDSHAKE_FAILED(0x08),
+        HANDSHAKE_FAILED(7),
 
         /** 请求数据为空 **/
-        REQUEST_MESSAGE_EMPTY(0x09),
+        REQUEST_MESSAGE_EMPTY(8),
 
+        /** 重复的请求 **/
+        REPEAT_ID(9),
+
+        /** session校验失败, 玩家ID与登录时不匹配 **/
+        INVALID_PLAYER_ID_IN_SESSION(10),
 
         /** 服务器内部错误 **/
         OTHER_ERROR(0xFF);

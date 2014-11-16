@@ -22,13 +22,17 @@ public final class BaseMsgProtos {
      */
     UNKNOWN_ERROR(1, 1),
     /**
+     * <code>NO_ACTION_FOR_MESSAGE_TYPE = 2;</code>
+     */
+    NO_ACTION_FOR_MESSAGE_TYPE(2, 2),
+    /**
      * <code>USERNAME_NOT_EXIST = 1000;</code>
      */
-    USERNAME_NOT_EXIST(2, 1000),
+    USERNAME_NOT_EXIST(3, 1000),
     /**
      * <code>PASSWORD_INCORRECT = 1001;</code>
      */
-    PASSWORD_INCORRECT(3, 1001),
+    PASSWORD_INCORRECT(4, 1001),
     ;
 
     /**
@@ -39,6 +43,10 @@ public final class BaseMsgProtos {
      * <code>UNKNOWN_ERROR = 1;</code>
      */
     public static final int UNKNOWN_ERROR_VALUE = 1;
+    /**
+     * <code>NO_ACTION_FOR_MESSAGE_TYPE = 2;</code>
+     */
+    public static final int NO_ACTION_FOR_MESSAGE_TYPE_VALUE = 2;
     /**
      * <code>USERNAME_NOT_EXIST = 1000;</code>
      */
@@ -55,6 +63,7 @@ public final class BaseMsgProtos {
       switch (value) {
         case 0: return SUCCESS;
         case 1: return UNKNOWN_ERROR;
+        case 2: return NO_ACTION_FOR_MESSAGE_TYPE;
         case 1000: return USERNAME_NOT_EXIST;
         case 1001: return PASSWORD_INCORRECT;
         default: return null;
@@ -108,10 +117,10 @@ public final class BaseMsgProtos {
     // @@protoc_insertion_point(enum_scope:com.origingame.message.ResponseStatus)
   }
 
-  public interface RequestMsgOrBuilder
-      extends com.google.protobuf.MessageOrBuilder {
+  public interface RequestMsgOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:com.origingame.message.RequestMsg)
+      com.google.protobuf.MessageOrBuilder {
 
-    // required string message_type = 1;
     /**
      * <code>required string message_type = 1;</code>
      */
@@ -126,7 +135,6 @@ public final class BaseMsgProtos {
     com.google.protobuf.ByteString
         getMessageTypeBytes();
 
-    // required bytes message = 2;
     /**
      * <code>required bytes message = 2;</code>
      */
@@ -136,7 +144,6 @@ public final class BaseMsgProtos {
      */
     com.google.protobuf.ByteString getMessage();
 
-    // optional int32 player_id = 3;
     /**
      * <code>optional int32 player_id = 3;</code>
      */
@@ -146,7 +153,6 @@ public final class BaseMsgProtos {
      */
     int getPlayerId();
 
-    // optional string device_id = 4;
     /**
      * <code>optional string device_id = 4;</code>
      */
@@ -165,8 +171,9 @@ public final class BaseMsgProtos {
    * Protobuf type {@code com.origingame.message.RequestMsg}
    */
   public static final class RequestMsg extends
-      com.google.protobuf.GeneratedMessage
-      implements RequestMsgOrBuilder {
+      com.google.protobuf.GeneratedMessage implements
+      // @@protoc_insertion_point(message_implements:com.origingame.message.RequestMsg)
+      RequestMsgOrBuilder {
     // Use RequestMsg.newBuilder() to construct.
     private RequestMsg(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
       super(builder);
@@ -213,8 +220,9 @@ public final class BaseMsgProtos {
               break;
             }
             case 10: {
+              com.google.protobuf.ByteString bs = input.readBytes();
               bitField0_ |= 0x00000001;
-              messageType_ = input.readBytes();
+              messageType_ = bs;
               break;
             }
             case 18: {
@@ -228,8 +236,9 @@ public final class BaseMsgProtos {
               break;
             }
             case 34: {
+              com.google.protobuf.ByteString bs = input.readBytes();
               bitField0_ |= 0x00000008;
-              deviceId_ = input.readBytes();
+              deviceId_ = bs;
               break;
             }
           }
@@ -272,7 +281,6 @@ public final class BaseMsgProtos {
     }
 
     private int bitField0_;
-    // required string message_type = 1;
     public static final int MESSAGE_TYPE_FIELD_NUMBER = 1;
     private java.lang.Object messageType_;
     /**
@@ -315,7 +323,6 @@ public final class BaseMsgProtos {
       }
     }
 
-    // required bytes message = 2;
     public static final int MESSAGE_FIELD_NUMBER = 2;
     private com.google.protobuf.ByteString message_;
     /**
@@ -331,7 +338,6 @@ public final class BaseMsgProtos {
       return message_;
     }
 
-    // optional int32 player_id = 3;
     public static final int PLAYER_ID_FIELD_NUMBER = 3;
     private int playerId_;
     /**
@@ -347,7 +353,6 @@ public final class BaseMsgProtos {
       return playerId_;
     }
 
-    // optional string device_id = 4;
     public static final int DEVICE_ID_FIELD_NUMBER = 4;
     private java.lang.Object deviceId_;
     /**
@@ -399,7 +404,8 @@ public final class BaseMsgProtos {
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
-      if (isInitialized != -1) return isInitialized == 1;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
 
       if (!hasMessageType()) {
         memoizedIsInitialized = 0;
@@ -535,8 +541,9 @@ public final class BaseMsgProtos {
      * Protobuf type {@code com.origingame.message.RequestMsg}
      */
     public static final class Builder extends
-        com.google.protobuf.GeneratedMessage.Builder<Builder>
-       implements com.origingame.message.BaseMsgProtos.RequestMsgOrBuilder {
+        com.google.protobuf.GeneratedMessage.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:com.origingame.message.RequestMsg)
+        com.origingame.message.BaseMsgProtos.RequestMsgOrBuilder {
       public static final com.google.protobuf.Descriptors.Descriptor
           getDescriptor() {
         return com.origingame.message.BaseMsgProtos.internal_static_com_origingame_message_RequestMsg_descriptor;
@@ -688,7 +695,6 @@ public final class BaseMsgProtos {
       }
       private int bitField0_;
 
-      // required string message_type = 1;
       private java.lang.Object messageType_ = "";
       /**
        * <code>required string message_type = 1;</code>
@@ -702,9 +708,12 @@ public final class BaseMsgProtos {
       public java.lang.String getMessageType() {
         java.lang.Object ref = messageType_;
         if (!(ref instanceof java.lang.String)) {
-          java.lang.String s = ((com.google.protobuf.ByteString) ref)
-              .toStringUtf8();
-          messageType_ = s;
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          if (bs.isValidUtf8()) {
+            messageType_ = s;
+          }
           return s;
         } else {
           return (java.lang.String) ref;
@@ -762,7 +771,6 @@ public final class BaseMsgProtos {
         return this;
       }
 
-      // required bytes message = 2;
       private com.google.protobuf.ByteString message_ = com.google.protobuf.ByteString.EMPTY;
       /**
        * <code>required bytes message = 2;</code>
@@ -798,7 +806,6 @@ public final class BaseMsgProtos {
         return this;
       }
 
-      // optional int32 player_id = 3;
       private int playerId_ ;
       /**
        * <code>optional int32 player_id = 3;</code>
@@ -831,7 +838,6 @@ public final class BaseMsgProtos {
         return this;
       }
 
-      // optional string device_id = 4;
       private java.lang.Object deviceId_ = "";
       /**
        * <code>optional string device_id = 4;</code>
@@ -845,9 +851,12 @@ public final class BaseMsgProtos {
       public java.lang.String getDeviceId() {
         java.lang.Object ref = deviceId_;
         if (!(ref instanceof java.lang.String)) {
-          java.lang.String s = ((com.google.protobuf.ByteString) ref)
-              .toStringUtf8();
-          deviceId_ = s;
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          if (bs.isValidUtf8()) {
+            deviceId_ = s;
+          }
           return s;
         } else {
           return (java.lang.String) ref;
@@ -916,10 +925,10 @@ public final class BaseMsgProtos {
     // @@protoc_insertion_point(class_scope:com.origingame.message.RequestMsg)
   }
 
-  public interface ResponseMsgOrBuilder
-      extends com.google.protobuf.MessageOrBuilder {
+  public interface ResponseMsgOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:com.origingame.message.ResponseMsg)
+      com.google.protobuf.MessageOrBuilder {
 
-    // optional string message_type = 1;
     /**
      * <code>optional string message_type = 1;</code>
      */
@@ -934,7 +943,6 @@ public final class BaseMsgProtos {
     com.google.protobuf.ByteString
         getMessageTypeBytes();
 
-    // optional bytes message = 2;
     /**
      * <code>optional bytes message = 2;</code>
      */
@@ -944,7 +952,6 @@ public final class BaseMsgProtos {
      */
     com.google.protobuf.ByteString getMessage();
 
-    // required .com.origingame.message.ResponseStatus status = 3;
     /**
      * <code>required .com.origingame.message.ResponseStatus status = 3;</code>
      */
@@ -954,7 +961,6 @@ public final class BaseMsgProtos {
      */
     com.origingame.message.BaseMsgProtos.ResponseStatus getStatus();
 
-    // optional string msg = 4;
     /**
      * <code>optional string msg = 4;</code>
      */
@@ -973,8 +979,9 @@ public final class BaseMsgProtos {
    * Protobuf type {@code com.origingame.message.ResponseMsg}
    */
   public static final class ResponseMsg extends
-      com.google.protobuf.GeneratedMessage
-      implements ResponseMsgOrBuilder {
+      com.google.protobuf.GeneratedMessage implements
+      // @@protoc_insertion_point(message_implements:com.origingame.message.ResponseMsg)
+      ResponseMsgOrBuilder {
     // Use ResponseMsg.newBuilder() to construct.
     private ResponseMsg(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
       super(builder);
@@ -1021,8 +1028,9 @@ public final class BaseMsgProtos {
               break;
             }
             case 10: {
+              com.google.protobuf.ByteString bs = input.readBytes();
               bitField0_ |= 0x00000001;
-              messageType_ = input.readBytes();
+              messageType_ = bs;
               break;
             }
             case 18: {
@@ -1042,8 +1050,9 @@ public final class BaseMsgProtos {
               break;
             }
             case 34: {
+              com.google.protobuf.ByteString bs = input.readBytes();
               bitField0_ |= 0x00000008;
-              msg_ = input.readBytes();
+              msg_ = bs;
               break;
             }
           }
@@ -1086,7 +1095,6 @@ public final class BaseMsgProtos {
     }
 
     private int bitField0_;
-    // optional string message_type = 1;
     public static final int MESSAGE_TYPE_FIELD_NUMBER = 1;
     private java.lang.Object messageType_;
     /**
@@ -1129,7 +1137,6 @@ public final class BaseMsgProtos {
       }
     }
 
-    // optional bytes message = 2;
     public static final int MESSAGE_FIELD_NUMBER = 2;
     private com.google.protobuf.ByteString message_;
     /**
@@ -1145,7 +1152,6 @@ public final class BaseMsgProtos {
       return message_;
     }
 
-    // required .com.origingame.message.ResponseStatus status = 3;
     public static final int STATUS_FIELD_NUMBER = 3;
     private com.origingame.message.BaseMsgProtos.ResponseStatus status_;
     /**
@@ -1161,7 +1167,6 @@ public final class BaseMsgProtos {
       return status_;
     }
 
-    // optional string msg = 4;
     public static final int MSG_FIELD_NUMBER = 4;
     private java.lang.Object msg_;
     /**
@@ -1213,7 +1218,8 @@ public final class BaseMsgProtos {
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
-      if (isInitialized != -1) return isInitialized == 1;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
 
       if (!hasStatus()) {
         memoizedIsInitialized = 0;
@@ -1345,8 +1351,9 @@ public final class BaseMsgProtos {
      * Protobuf type {@code com.origingame.message.ResponseMsg}
      */
     public static final class Builder extends
-        com.google.protobuf.GeneratedMessage.Builder<Builder>
-       implements com.origingame.message.BaseMsgProtos.ResponseMsgOrBuilder {
+        com.google.protobuf.GeneratedMessage.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:com.origingame.message.ResponseMsg)
+        com.origingame.message.BaseMsgProtos.ResponseMsgOrBuilder {
       public static final com.google.protobuf.Descriptors.Descriptor
           getDescriptor() {
         return com.origingame.message.BaseMsgProtos.internal_static_com_origingame_message_ResponseMsg_descriptor;
@@ -1494,7 +1501,6 @@ public final class BaseMsgProtos {
       }
       private int bitField0_;
 
-      // optional string message_type = 1;
       private java.lang.Object messageType_ = "";
       /**
        * <code>optional string message_type = 1;</code>
@@ -1508,9 +1514,12 @@ public final class BaseMsgProtos {
       public java.lang.String getMessageType() {
         java.lang.Object ref = messageType_;
         if (!(ref instanceof java.lang.String)) {
-          java.lang.String s = ((com.google.protobuf.ByteString) ref)
-              .toStringUtf8();
-          messageType_ = s;
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          if (bs.isValidUtf8()) {
+            messageType_ = s;
+          }
           return s;
         } else {
           return (java.lang.String) ref;
@@ -1568,7 +1577,6 @@ public final class BaseMsgProtos {
         return this;
       }
 
-      // optional bytes message = 2;
       private com.google.protobuf.ByteString message_ = com.google.protobuf.ByteString.EMPTY;
       /**
        * <code>optional bytes message = 2;</code>
@@ -1604,7 +1612,6 @@ public final class BaseMsgProtos {
         return this;
       }
 
-      // required .com.origingame.message.ResponseStatus status = 3;
       private com.origingame.message.BaseMsgProtos.ResponseStatus status_ = com.origingame.message.BaseMsgProtos.ResponseStatus.SUCCESS;
       /**
        * <code>required .com.origingame.message.ResponseStatus status = 3;</code>
@@ -1640,7 +1647,6 @@ public final class BaseMsgProtos {
         return this;
       }
 
-      // optional string msg = 4;
       private java.lang.Object msg_ = "";
       /**
        * <code>optional string msg = 4;</code>
@@ -1654,9 +1660,12 @@ public final class BaseMsgProtos {
       public java.lang.String getMsg() {
         java.lang.Object ref = msg_;
         if (!(ref instanceof java.lang.String)) {
-          java.lang.String s = ((com.google.protobuf.ByteString) ref)
-              .toStringUtf8();
-          msg_ = s;
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          if (bs.isValidUtf8()) {
+            msg_ = s;
+          }
           return s;
         } else {
           return (java.lang.String) ref;
@@ -1725,12 +1734,12 @@ public final class BaseMsgProtos {
     // @@protoc_insertion_point(class_scope:com.origingame.message.ResponseMsg)
   }
 
-  private static com.google.protobuf.Descriptors.Descriptor
+  private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_com_origingame_message_RequestMsg_descriptor;
   private static
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_com_origingame_message_RequestMsg_fieldAccessorTable;
-  private static com.google.protobuf.Descriptors.Descriptor
+  private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_com_origingame_message_ResponseMsg_descriptor;
   private static
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
@@ -1750,35 +1759,36 @@ public final class BaseMsgProtos {
       "\022\021\n\tdevice_id\030\004 \001(\t\"y\n\013ResponseMsg\022\024\n\014me" +
       "ssage_type\030\001 \001(\t\022\017\n\007message\030\002 \001(\014\0226\n\006sta" +
       "tus\030\003 \002(\0162&.com.origingame.message.Respo" +
-      "nseStatus\022\013\n\003msg\030\004 \001(\t*b\n\016ResponseStatus" +
-      "\022\013\n\007SUCCESS\020\000\022\021\n\rUNKNOWN_ERROR\020\001\022\027\n\022USER" +
-      "NAME_NOT_EXIST\020\350\007\022\027\n\022PASSWORD_INCORRECT\020" +
-      "\351\007B\017B\rBaseMsgProtos"
+      "nseStatus\022\013\n\003msg\030\004 \001(\t*\202\001\n\016ResponseStatu" +
+      "s\022\013\n\007SUCCESS\020\000\022\021\n\rUNKNOWN_ERROR\020\001\022\036\n\032NO_" +
+      "ACTION_FOR_MESSAGE_TYPE\020\002\022\027\n\022USERNAME_NO" +
+      "T_EXIST\020\350\007\022\027\n\022PASSWORD_INCORRECT\020\351\007B\017B\rB",
+      "aseMsgProtos"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
-      new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
-        public com.google.protobuf.ExtensionRegistry assignDescriptors(
-            com.google.protobuf.Descriptors.FileDescriptor root) {
-          descriptor = root;
-          internal_static_com_origingame_message_RequestMsg_descriptor =
-            getDescriptor().getMessageTypes().get(0);
-          internal_static_com_origingame_message_RequestMsg_fieldAccessorTable = new
-            com.google.protobuf.GeneratedMessage.FieldAccessorTable(
-              internal_static_com_origingame_message_RequestMsg_descriptor,
-              new java.lang.String[] { "MessageType", "Message", "PlayerId", "DeviceId", });
-          internal_static_com_origingame_message_ResponseMsg_descriptor =
-            getDescriptor().getMessageTypes().get(1);
-          internal_static_com_origingame_message_ResponseMsg_fieldAccessorTable = new
-            com.google.protobuf.GeneratedMessage.FieldAccessorTable(
-              internal_static_com_origingame_message_ResponseMsg_descriptor,
-              new java.lang.String[] { "MessageType", "Message", "Status", "Msg", });
-          return null;
-        }
-      };
+        new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
+          public com.google.protobuf.ExtensionRegistry assignDescriptors(
+              com.google.protobuf.Descriptors.FileDescriptor root) {
+            descriptor = root;
+            return null;
+          }
+        };
     com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
         new com.google.protobuf.Descriptors.FileDescriptor[] {
         }, assigner);
+    internal_static_com_origingame_message_RequestMsg_descriptor =
+      getDescriptor().getMessageTypes().get(0);
+    internal_static_com_origingame_message_RequestMsg_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_com_origingame_message_RequestMsg_descriptor,
+        new java.lang.String[] { "MessageType", "Message", "PlayerId", "DeviceId", });
+    internal_static_com_origingame_message_ResponseMsg_descriptor =
+      getDescriptor().getMessageTypes().get(1);
+    internal_static_com_origingame_message_ResponseMsg_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_com_origingame_message_ResponseMsg_descriptor,
+        new java.lang.String[] { "MessageType", "Message", "Status", "Msg", });
   }
 
   // @@protoc_insertion_point(outer_class_scope)

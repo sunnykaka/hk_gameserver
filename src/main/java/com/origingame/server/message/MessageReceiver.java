@@ -4,7 +4,10 @@ import com.google.protobuf.ByteString;
 import com.google.protobuf.Message;
 import com.origingame.message.BaseMsgProtos;
 import com.origingame.message.HandShakeProtos;
+import com.origingame.server.action.ActionResolver;
 import com.origingame.server.context.GameContext;
+import com.origingame.server.exception.GameBusinessException;
+import com.origingame.server.exception.GameException;
 import com.origingame.server.exception.GameProtocolException;
 import com.origingame.server.protocol.GameProtocol;
 import com.origingame.server.protocol.RequestWrapper;
@@ -15,6 +18,8 @@ import com.origingame.util.crypto.AES;
 import com.origingame.util.crypto.CryptoContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.lang.reflect.Method;
 
 /**
  * 消息接收者
@@ -32,6 +37,7 @@ public class MessageReceiver {
     }
 
     private LocalGameSessionMgrImpl gameSessionMgr = LocalGameSessionMgrImpl.getInstance();
+    private ActionResolver actionResolver = ActionResolver.getInstance();
 
 //    private MessageHandlerRegistry messageHandlerRegistry = MessageHandlerRegistry.getInstance();
 
@@ -125,78 +131,67 @@ public class MessageReceiver {
 
             }
             case PLAIN_TEXT: {
-                break;
+                throw new GameProtocolException(GameProtocol.Status.INVALID_PHASE, protocol);
             }
             case CIPHER_TEXT: {
                 if(session == null) {
                     throw new GameProtocolException(GameProtocol.Status.INVALID_SESSION_ID, protocol);
                 }
                 //TODO 检验session合法性
+                ctx.checkSession(protocol.getId(), request.getRequestMsg().getPlayerId(),
+                        request.getRequestMsg().getDeviceId());
+
 
                 byte[] passwordKey = session.getPasswordKey();
                 request.parseCipherMessage(CryptoContext.createAESCrypto(passwordKey));
-                BaseMsgProtos.RequestMsg requestMsg = request.getRequestMsg();
-                Message message = request.getMessage();
 
-                System.out.println(String.format("接收到业务消息:[%s], 类型:[%s], 长度[%d]", message.toString(), requestMsg.getMessageType(), message.getSerializedSize()));
-
-                //TODO 对message的业务处理
+                //对message的业务处理
+                return executeAction(ctx, request.getMessage());
 
 
-
-
-//                CryptoContext.createRSAServerCrypto()
-
-
-                break;
             }
             default:
                 throw new GameProtocolException(GameProtocol.Status.INVALID_PHASE, protocol);
         }
 
+    }
 
 
-        BaseMsgProtos.RequestMsg requestMsg = request.getRequestMsg();
-        Message message = request.getMessage();
+    private ResponseWrapper executeAction(GameContext ctx, Message message) {
 
-//        MessageRequestHandler messageRequestHandler = messageHandlerRegistry.getMessageRequestHandler(requestMsg.getMessageType());
-//        if(messageRequestHandler == null) {
-//            log.warn("接收到类型为[{}]的消息,但是没有对应的请求处理器,消息内容:{}", requestMsg.getMessageType(), request.toString());
-//            return null;
-//        }
-//
-//        Message result = null;
-//        boolean exceptionCaught = false;
-//        BaseMsgProtos.ResponseStatus responseStatus = BaseMsgProtos.ResponseStatus.UNKNOWN_ERROR;
-//        String responseMsg = null;
-//
-//        try {
-//            if(log.isDebugEnabled()) {
-//                log.debug("执行请求,requestId[{}], request[{}]", id, request);
-//            }
-//            //执行业务处理
-////            result = messageRequestHandler.handleRequest(request.getRequestInfo(), message);
-//            responseStatus = BaseMsgProtos.ResponseStatus.SUCCESS;
-//        } catch (GameBusinessException e) {
-//            exceptionCaught = true;
-//            if(e.getResponseStatus() != null) {
-//                responseStatus = e.getResponseStatus();
-//            }
-//            responseMsg = e.getMsg();
-//        } catch (Exception e) {
-//            exceptionCaught = true;
-//            log.error("", e);
-//        }
+        RequestWrapper request = ctx.getRequest();
+        BaseMsgProtos.ResponseStatus responseStatus = BaseMsgProtos.ResponseStatus.UNKNOWN_ERROR;
+
+        Message result = null;
+        String responseMsg = null;
+
+        try {
+            if(log.isDebugEnabled()) {
+                log.debug("接收到业务消息:sessionId[{}], id:[{}], playerId[{}], requestMsg[{}]",
+                        request.getProtocol().getSessionId(), request.getProtocol().getId(),
+                                request.getRequestMsg().getPlayerId(), request.getRequestMsg());
+            }
+            //执行业务处理
+            result = actionResolver.executeAction0(ctx, message);
+            responseStatus = BaseMsgProtos.ResponseStatus.SUCCESS;
+        } catch (GameBusinessException e) {
+            if(e.getResponseStatus() != null) {
+                responseStatus = e.getResponseStatus();
+            }
+            responseMsg = e.getMsg();
+        } catch (Exception e) {
+            log.error("", e);
+        }
 //        if(!exceptionCaught && result == null) {
 //            //无响应消息
 //            return null;
 //        }
-//
-//        return new ResponseWrapper(protocol.getPhase(), id, GameProtocol.Status.SUCCESS, responseStatus, responseMsg, result);
 
-        return null;
+        return ResponseWrapper.createRequestResponse(ctx, responseStatus, responseMsg, result,
+                CryptoContext.createAESCrypto(ctx.getSession().getPasswordKey()));
+
+
     }
-
 
     /**
      * 处理响应消息

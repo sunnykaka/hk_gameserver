@@ -3,7 +3,9 @@ package com.origingame.server.session;
 import com.origingame.config.GlobalConfig;
 import com.origingame.server.context.GameContext;
 import com.origingame.server.util.IdGenerator;
+import com.origingame.server.util.RedisUtil;
 import com.origingame.util.World;
+import org.apache.commons.lang3.StringUtils;
 import redis.clients.jedis.Jedis;
 
 import java.util.concurrent.ConcurrentHashMap;
@@ -41,10 +43,26 @@ public class LocalGameSessionMgrImpl {
 
     }
 
+    public void invalid(int previousSessionId) {
+        sessionMap.remove(previousSessionId);
+
+    }
+
     public GameSession init(GameContext ctx, byte[] publicKey) {
         GameSession gameSession = new GameSession();
         gameSession.setPublicKey(publicKey);
-        gameSession.setSessionId(IdGenerator.incrSessionId(ctx.getJedis()));
+        gameSession.setSessionId(IdGenerator.nextSessionId(ctx.getJedis()));
         return gameSession;
     }
+
+
+    public int getSessionIdByPlayerId(GameContext ctx, int playerId) {
+
+        Jedis jedis = ctx.getJedis();
+        String sessionId = jedis.hget(RedisUtil.buildKey("player_id", String.valueOf(playerId)), "session_id");
+        return StringUtils.isBlank(sessionId) ? 0 : Integer.valueOf(sessionId);
+
+    }
+
+
 }

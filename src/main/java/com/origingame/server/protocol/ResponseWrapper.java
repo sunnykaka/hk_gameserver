@@ -75,6 +75,11 @@ public class ResponseWrapper {
         return new ResponseWrapper(ctx, status, null, null, null, null);
     }
 
+    public static ResponseWrapper createRequestResponse(GameContext ctx, BaseMsgProtos.ResponseStatus responseStatus, String responseMsg, Message result, CryptoContext cryptoContext) {
+
+        return new ResponseWrapper(ctx, GameProtocol.Status.SUCCESS, responseStatus, responseMsg, result, cryptoContext);
+    }
+
 
     private ResponseWrapper(GameContext ctx, GameProtocol.Status status, BaseMsgProtos.ResponseStatus responseStatus,
                            String msg, Message message, CryptoContext cryptoContext) {
@@ -128,4 +133,6 @@ public class ResponseWrapper {
                 ", message=" + message +
                 '}';
     }
+
+
 }

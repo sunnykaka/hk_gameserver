@@ -1,11 +1,16 @@
 package com.origingame.server;
 
 
+import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.beanutils.BeanUtilsBean2;
+import org.apache.commons.beanutils.ConvertUtilsBean;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 
+import java.lang.reflect.InvocationTargetException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.util.Map;
 
 /**
  * Unit test for simple App.
@@ -82,5 +87,42 @@ public class PlainTest {
         }
         s += "]";
         System.out.println(s);
+    }
+
+    @Test
+    public void test() throws InvocationTargetException, IllegalAccessException {
+        MyBean myBean = new MyBean();
+        myBean.setName("你好");
+        myBean.setAge(18);
+
+        Map map = (Map) new ConvertUtilsBean().convert(myBean, Map.class);
+        MyBean myBean2 = new MyBean();
+        BeanUtils.populate(myBean2, map);
+
+        System.out.println(myBean2.getName());
+        System.out.println(myBean2.getAge());
+
+    }
+
+    static class MyBean {
+        private String name;
+
+        private int age;
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        public int getAge() {
+            return age;
+        }
+
+        public void setAge(int age) {
+            this.age = age;
+        }
     }
 }
