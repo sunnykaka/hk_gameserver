@@ -1,9 +1,7 @@
 package com.origingame.server;
 
 
-import org.apache.commons.beanutils.BeanUtils;
-import org.apache.commons.beanutils.BeanUtilsBean2;
-import org.apache.commons.beanutils.ConvertUtilsBean;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 
@@ -95,9 +93,10 @@ public class PlainTest {
         myBean.setName("你好");
         myBean.setAge(18);
 
-        Map map = (Map) new ConvertUtilsBean().convert(myBean, Map.class);
-        MyBean myBean2 = new MyBean();
-        BeanUtils.populate(myBean2, map);
+        ObjectMapper m = new ObjectMapper();
+        Map<String,Object> props = m.convertValue(myBean, Map.class);
+
+        MyBean myBean2 = m.convertValue(props, MyBean.class);
 
         System.out.println(myBean2.getName());
         System.out.println(myBean2.getAge());
