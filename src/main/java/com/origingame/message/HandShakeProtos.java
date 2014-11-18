@@ -8,10 +8,10 @@ public final class HandShakeProtos {
   public static void registerAllExtensions(
       com.google.protobuf.ExtensionRegistry registry) {
   }
-  public interface HandShakeReqOrBuilder extends
-      // @@protoc_insertion_point(interface_extends:com.origingame.message.HandShakeReq)
-      com.google.protobuf.MessageOrBuilder {
+  public interface HandShakeReqOrBuilder
+      extends com.google.protobuf.MessageOrBuilder {
 
+    // required bytes public_key = 1;
     /**
      * <code>required bytes public_key = 1;</code>
      */
@@ -25,9 +25,8 @@ public final class HandShakeProtos {
    * Protobuf type {@code com.origingame.message.HandShakeReq}
    */
   public static final class HandShakeReq extends
-      com.google.protobuf.GeneratedMessage implements
-      // @@protoc_insertion_point(message_implements:com.origingame.message.HandShakeReq)
-      HandShakeReqOrBuilder {
+      com.google.protobuf.GeneratedMessage
+      implements HandShakeReqOrBuilder {
     // Use HandShakeReq.newBuilder() to construct.
     private HandShakeReq(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
       super(builder);
@@ -118,6 +117,7 @@ public final class HandShakeProtos {
     }
 
     private int bitField0_;
+    // required bytes public_key = 1;
     public static final int PUBLIC_KEY_FIELD_NUMBER = 1;
     private com.google.protobuf.ByteString publicKey_;
     /**
@@ -139,8 +139,7 @@ public final class HandShakeProtos {
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
-      if (isInitialized == 1) return true;
-      if (isInitialized == 0) return false;
+      if (isInitialized != -1) return isInitialized == 1;
 
       if (!hasPublicKey()) {
         memoizedIsInitialized = 0;
@@ -251,9 +250,8 @@ public final class HandShakeProtos {
      * Protobuf type {@code com.origingame.message.HandShakeReq}
      */
     public static final class Builder extends
-        com.google.protobuf.GeneratedMessage.Builder<Builder> implements
-        // @@protoc_insertion_point(builder_implements:com.origingame.message.HandShakeReq)
-        com.origingame.message.HandShakeProtos.HandShakeReqOrBuilder {
+        com.google.protobuf.GeneratedMessage.Builder<Builder>
+       implements com.origingame.message.HandShakeProtos.HandShakeReqOrBuilder {
       public static final com.google.protobuf.Descriptors.Descriptor
           getDescriptor() {
         return com.origingame.message.HandShakeProtos.internal_static_com_origingame_message_HandShakeReq_descriptor;
@@ -370,6 +368,7 @@ public final class HandShakeProtos {
       }
       private int bitField0_;
 
+      // required bytes public_key = 1;
       private com.google.protobuf.ByteString publicKey_ = com.google.protobuf.ByteString.EMPTY;
       /**
        * <code>required bytes public_key = 1;</code>
@@ -416,10 +415,10 @@ public final class HandShakeProtos {
     // @@protoc_insertion_point(class_scope:com.origingame.message.HandShakeReq)
   }
 
-  public interface HandShakeRespOrBuilder extends
-      // @@protoc_insertion_point(interface_extends:com.origingame.message.HandShakeResp)
-      com.google.protobuf.MessageOrBuilder {
+  public interface HandShakeRespOrBuilder
+      extends com.google.protobuf.MessageOrBuilder {
 
+    // required int32 session_id = 1;
     /**
      * <code>required int32 session_id = 1;</code>
      */
@@ -429,6 +428,7 @@ public final class HandShakeProtos {
      */
     int getSessionId();
 
+    // required bytes password_key = 2;
     /**
      * <code>required bytes password_key = 2;</code>
      */
@@ -442,9 +442,8 @@ public final class HandShakeProtos {
    * Protobuf type {@code com.origingame.message.HandShakeResp}
    */
   public static final class HandShakeResp extends
-      com.google.protobuf.GeneratedMessage implements
-      // @@protoc_insertion_point(message_implements:com.origingame.message.HandShakeResp)
-      HandShakeRespOrBuilder {
+      com.google.protobuf.GeneratedMessage
+      implements HandShakeRespOrBuilder {
     // Use HandShakeResp.newBuilder() to construct.
     private HandShakeResp(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
       super(builder);
@@ -540,6 +539,7 @@ public final class HandShakeProtos {
     }
 
     private int bitField0_;
+    // required int32 session_id = 1;
     public static final int SESSION_ID_FIELD_NUMBER = 1;
     private int sessionId_;
     /**
@@ -555,6 +555,7 @@ public final class HandShakeProtos {
       return sessionId_;
     }
 
+    // required bytes password_key = 2;
     public static final int PASSWORD_KEY_FIELD_NUMBER = 2;
     private com.google.protobuf.ByteString passwordKey_;
     /**
@@ -577,8 +578,7 @@ public final class HandShakeProtos {
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
-      if (isInitialized == 1) return true;
-      if (isInitialized == 0) return false;
+      if (isInitialized != -1) return isInitialized == 1;
 
       if (!hasSessionId()) {
         memoizedIsInitialized = 0;
@@ -700,9 +700,8 @@ public final class HandShakeProtos {
      * Protobuf type {@code com.origingame.message.HandShakeResp}
      */
     public static final class Builder extends
-        com.google.protobuf.GeneratedMessage.Builder<Builder> implements
-        // @@protoc_insertion_point(builder_implements:com.origingame.message.HandShakeResp)
-        com.origingame.message.HandShakeProtos.HandShakeRespOrBuilder {
+        com.google.protobuf.GeneratedMessage.Builder<Builder>
+       implements com.origingame.message.HandShakeProtos.HandShakeRespOrBuilder {
       public static final com.google.protobuf.Descriptors.Descriptor
           getDescriptor() {
         return com.origingame.message.HandShakeProtos.internal_static_com_origingame_message_HandShakeResp_descriptor;
@@ -832,6 +831,7 @@ public final class HandShakeProtos {
       }
       private int bitField0_;
 
+      // required int32 session_id = 1;
       private int sessionId_ ;
       /**
        * <code>required int32 session_id = 1;</code>
@@ -864,6 +864,7 @@ public final class HandShakeProtos {
         return this;
       }
 
+      // required bytes password_key = 2;
       private com.google.protobuf.ByteString passwordKey_ = com.google.protobuf.ByteString.EMPTY;
       /**
        * <code>required bytes password_key = 2;</code>
@@ -910,12 +911,12 @@ public final class HandShakeProtos {
     // @@protoc_insertion_point(class_scope:com.origingame.message.HandShakeResp)
   }
 
-  private static final com.google.protobuf.Descriptors.Descriptor
+  private static com.google.protobuf.Descriptors.Descriptor
     internal_static_com_origingame_message_HandShakeReq_descriptor;
   private static
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_com_origingame_message_HandShakeReq_fieldAccessorTable;
-  private static final com.google.protobuf.Descriptors.Descriptor
+  private static com.google.protobuf.Descriptors.Descriptor
     internal_static_com_origingame_message_HandShakeResp_descriptor;
   private static
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
@@ -936,31 +937,30 @@ public final class HandShakeProtos {
       "key\030\002 \002(\014B\021B\017HandShakeProtos"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
-        new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
-          public com.google.protobuf.ExtensionRegistry assignDescriptors(
-              com.google.protobuf.Descriptors.FileDescriptor root) {
-            descriptor = root;
-            return null;
-          }
-        };
+      new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
+        public com.google.protobuf.ExtensionRegistry assignDescriptors(
+            com.google.protobuf.Descriptors.FileDescriptor root) {
+          descriptor = root;
+          internal_static_com_origingame_message_HandShakeReq_descriptor =
+            getDescriptor().getMessageTypes().get(0);
+          internal_static_com_origingame_message_HandShakeReq_fieldAccessorTable = new
+            com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+              internal_static_com_origingame_message_HandShakeReq_descriptor,
+              new java.lang.String[] { "PublicKey", });
+          internal_static_com_origingame_message_HandShakeResp_descriptor =
+            getDescriptor().getMessageTypes().get(1);
+          internal_static_com_origingame_message_HandShakeResp_fieldAccessorTable = new
+            com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+              internal_static_com_origingame_message_HandShakeResp_descriptor,
+              new java.lang.String[] { "SessionId", "PasswordKey", });
+          return null;
+        }
+      };
     com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
         new com.google.protobuf.Descriptors.FileDescriptor[] {
           com.origingame.message.BaseMsgProtos.getDescriptor(),
         }, assigner);
-    internal_static_com_origingame_message_HandShakeReq_descriptor =
-      getDescriptor().getMessageTypes().get(0);
-    internal_static_com_origingame_message_HandShakeReq_fieldAccessorTable = new
-      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
-        internal_static_com_origingame_message_HandShakeReq_descriptor,
-        new java.lang.String[] { "PublicKey", });
-    internal_static_com_origingame_message_HandShakeResp_descriptor =
-      getDescriptor().getMessageTypes().get(1);
-    internal_static_com_origingame_message_HandShakeResp_fieldAccessorTable = new
-      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
-        internal_static_com_origingame_message_HandShakeResp_descriptor,
-        new java.lang.String[] { "SessionId", "PasswordKey", });
-    com.origingame.message.BaseMsgProtos.getDescriptor();
   }
 
   // @@protoc_insertion_point(outer_class_scope)

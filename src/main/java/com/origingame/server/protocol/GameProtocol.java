@@ -129,13 +129,13 @@ public class GameProtocol {
         /** 不支持的消息类型 **/
         UNKNOWN_MESSAGE_TYPE(4),
 
-        /** 无效的会话 **/
+        /** 无效的会话,建议客户端重新握手**/
         INVALID_SESSION_ID(5),
 
-        /** 无效的请求序号 **/
+        /** 无效的请求序号,建议客户端重新握手 **/
         INVALID_ID(6),
 
-        /** 握手失败 **/
+        /** 握手失败,建议客户端重新握手 **/
         HANDSHAKE_FAILED(7),
 
         /** 请求数据为空 **/
@@ -144,7 +144,7 @@ public class GameProtocol {
         /** 重复的请求 **/
         REPEAT_ID(9),
 
-        /** session校验失败, 玩家ID与登录时不匹配 **/
+        /** session校验失败, 玩家ID与登录时不匹配,建议客户端重新握手 **/
         INVALID_PLAYER_ID_IN_SESSION(10),
 
         /** 服务器内部错误 **/

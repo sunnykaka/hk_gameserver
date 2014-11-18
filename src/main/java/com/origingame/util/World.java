@@ -13,6 +13,10 @@ public class World {
 
     private static JedisPool jedisPool;
 
+    static {
+        init();
+    }
+
     public static Date now() {
         return new Date();
     }
@@ -25,7 +29,7 @@ public class World {
         return jedisPool.getResource();
     }
 
-    public static void closeConnection(Jedis jedis) {
+    public static void returnConnection(Jedis jedis) {
         jedisPool.returnResource(jedis);
     }
 

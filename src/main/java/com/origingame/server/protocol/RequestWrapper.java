@@ -5,6 +5,7 @@ import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.protobuf.Message;
 import com.origingame.message.BaseMsgProtos;
 import com.origingame.message.HandShakeProtos;
+import com.origingame.server.exception.CryptoException;
 import com.origingame.server.exception.GameProtocolException;
 import com.origingame.util.crypto.CryptoContext;
 import org.slf4j.Logger;
@@ -152,13 +153,16 @@ public class RequestWrapper {
 
     public void parseCipherMessage(CryptoContext cryptoContext) {
 
-        byte[] data = protocol.getData();
-        data = cryptoContext.decrypt(data);
 
         try {
+            byte[] data = protocol.getData();
+            data = cryptoContext.decrypt(data);
             this.requestMsg = BaseMsgProtos.RequestMsg.parseFrom(data);
             this.message = ProtocolUtil.parseMessageFromDataAndType(requestMsg.getMessageType(), requestMsg.getMessage().toByteArray());
 
+        } catch (CryptoException e) {
+            log.warn("", e);
+            throw new GameProtocolException(GameProtocol.Status.DECIPHER_FAILED, protocol);
         } catch (InvalidProtocolBufferException e) {
             log.warn("", e);
             throw new GameProtocolException(GameProtocol.Status.DATA_CORRUPT, protocol);

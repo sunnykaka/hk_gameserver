@@ -40,7 +40,7 @@ public class GameContext {
             this.request = new RequestWrapper(protocol);
             int sessionId = protocol.getSessionId();
             if(sessionId > 0) {
-                this.session = gameSessionMgr.load(sessionId);
+                this.session = GameSession.load(this,sessionId);
             }
         } else {
 
@@ -96,24 +96,30 @@ public class GameContext {
 
         if(session != null && id > 0) {
             //如果session为null或者id等于0,则为握手请求,可以不校验
-            if(id <= session.getLastId()) {
+            if(id <= session.getBuilder().getLastId()) {
                 throw new GameProtocolException(GameProtocol.Status.REPEAT_ID, protocol);
             }
-            if(session.getPlayerId() > 0) {
-                if(playerId != session.getPlayerId()) {
+            if(session.getBuilder().getPlayerId() > 0) {
+                if(playerId != session.getBuilder().getPlayerId()) {
                     throw new GameProtocolException(GameProtocol.Status.INVALID_PLAYER_ID_IN_SESSION, protocol);
                 }
-                //校验玩家id没有对应其他session
-                int previousSessionId = gameSessionMgr.getSessionIdByPlayerId(this, session.getPlayerId());
-                if(previousSessionId > 0) {
-                    //使session失效
-                    gameSessionMgr.invalid(previousSessionId);
-                }
+//                //校验玩家id没有对应其他session
+//                int previousSessionId = gameSessionMgr.getSessionIdByPlayerId(this, session.getModel().getPlayerId());
+//                if(previousSessionId > 0) {
+//                    //使原session失效
+//                    GameSession.invalid(this, previousSessionId);
+//                }
             }
 
 
         }
 
 
+    }
+
+    public void destroy() {
+        if(jedis != null) {
+            World.returnConnection(jedis);
+        }
     }
 }

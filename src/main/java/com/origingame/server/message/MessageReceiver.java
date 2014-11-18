@@ -9,6 +9,7 @@ import com.origingame.server.context.GameContext;
 import com.origingame.server.exception.GameBusinessException;
 import com.origingame.server.exception.GameException;
 import com.origingame.server.exception.GameProtocolException;
+import com.origingame.server.lock.RedisLock;
 import com.origingame.server.protocol.GameProtocol;
 import com.origingame.server.protocol.RequestWrapper;
 import com.origingame.server.protocol.ResponseWrapper;
@@ -42,63 +43,6 @@ public class MessageReceiver {
 //    private MessageHandlerRegistry messageHandlerRegistry = MessageHandlerRegistry.getInstance();
 
     /**
-     * 接收消息
-     *
-     * @param ctx
-     * @param protocol
-     * @return
-     * @throws GameProtocolException
-     */
-    public ResponseWrapper receive(GameContext ctx, GameProtocol protocol) throws GameProtocolException {
-
-
-
-        if(GameProtocol.Type.REQUEST.equals(protocol.getType())) {
-
-            //接收到的是请求消息,执行对应业务逻辑,如果有需要,返回响应结果
-            return handleRequest(ctx);
-
-        } else {
-
-            //接收到的是响应消息,查看是否注册了回调函数,有的话进行处理
-            handleResponse(new ResponseWrapper(protocol));
-            return null;
-        }
-
-//
-//        int id = protocol.getId();
-//        int sessionId = protocol.getSessionId();
-//
-//        if(log.isDebugEnabled()) {
-//            log.debug("接收到{}, sessionId[{}], id[{}], protocol[{}]", (GameProtocol.Type.REQUEST.equals(protocol.getType()) ? "请求" : "响应"), sessionId, id, protocol);
-//        }
-//
-//        boolean decipher = false;
-//
-//
-//
-//
-//
-//
-//        if(decipher) {
-//        }
-//
-//        if(GameProtocol.Type.REQUEST.equals(protocol.getType())) {
-//
-//            //接收到的是请求消息,执行对应业务逻辑,如果有需要,返回响应结果
-//            return handleRequest(new RequestWrapper(protocol));
-//
-//        } else {
-//
-//            //接收到的是响应消息,查看是否注册了回调函数,有的话进行处理
-//            handleResponse(new ResponseWrapper(protocol));
-//            return null;
-//        }
-
-
-    }
-
-    /**
      * 处理请求消息
      * @param ctx
      * @return
@@ -113,21 +57,22 @@ public class MessageReceiver {
                 request.parseHandShakeMessage();
 
                 HandShakeProtos.HandShakeReq handShakeReq = (HandShakeProtos.HandShakeReq) request.getMessage();
-                byte[] publicKey = handShakeReq.getPublicKey().toByteArray();
+                ByteString publicKey = handShakeReq.getPublicKey();
                 if(session == null || !session.hasPublicKey(publicKey)) {
                     //根据sessionId和publicKey没有找到原来的密码记录,生成新的密码,并记录到session
                     if(session != null) {
-                        gameSessionMgr.invalid(session);
+                        session.invalid();
                     }
-                    session = gameSessionMgr.init(ctx, publicKey);
+                    session = GameSession.create(ctx, publicKey);
+                    ctx.setSession(session);
                     byte[] passwordKey = AES.initPasswordKey();
-                    session.setPasswordKey(passwordKey);
+                    session.getBuilder().setPasswordKey(ByteString.copyFrom(passwordKey));
                 }
 
                 HandShakeProtos.HandShakeResp.Builder handShakeRespBuilder = HandShakeProtos.HandShakeResp.newBuilder();
-                handShakeRespBuilder.setSessionId(session.getSessionId());
-                handShakeRespBuilder.setPasswordKey(ByteString.copyFrom(session.getPasswordKey()));
-                return ResponseWrapper.createHandShakeSuccessResponse(ctx, handShakeRespBuilder.build(), CryptoContext.createRSAServerCrypto(publicKey));
+                handShakeRespBuilder.setSessionId(session.getBuilder().getId());
+                handShakeRespBuilder.setPasswordKey(session.getBuilder().getPasswordKey());
+                return ResponseWrapper.createHandShakeSuccessResponse(ctx, handShakeRespBuilder.build(), CryptoContext.createRSAServerCrypto(publicKey.toByteArray()));
 
             }
             case PLAIN_TEXT: {
@@ -137,17 +82,15 @@ public class MessageReceiver {
                 if(session == null) {
                     throw new GameProtocolException(GameProtocol.Status.INVALID_SESSION_ID, protocol);
                 }
-                //TODO 检验session合法性
+                //检验session合法性
                 ctx.checkSession(protocol.getId(), request.getRequestMsg().getPlayerId(),
                         request.getRequestMsg().getDeviceId());
 
-
-                byte[] passwordKey = session.getPasswordKey();
+                byte[] passwordKey = session.getBuilder().getPasswordKey().toByteArray();
                 request.parseCipherMessage(CryptoContext.createAESCrypto(passwordKey));
 
                 //对message的业务处理
                 return executeAction(ctx, request.getMessage());
-
 
             }
             default:
@@ -182,14 +125,14 @@ public class MessageReceiver {
         } catch (Exception e) {
             log.error("", e);
         }
+
 //        if(!exceptionCaught && result == null) {
 //            //无响应消息
 //            return null;
 //        }
 
         return ResponseWrapper.createRequestResponse(ctx, responseStatus, responseMsg, result,
-                CryptoContext.createAESCrypto(ctx.getSession().getPasswordKey()));
-
+                CryptoContext.createAESCrypto(ctx.getSession().getBuilder().getPasswordKey().toByteArray()));
 
     }
 

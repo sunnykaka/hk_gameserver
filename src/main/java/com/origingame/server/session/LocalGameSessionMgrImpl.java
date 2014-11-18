@@ -29,17 +29,17 @@ public class LocalGameSessionMgrImpl {
 
     public GameSession load(int sessionId) {
         GameSession session = sessionMap.get(sessionId);
-        if(session.getLastTime() + GlobalConfig.GAME_SESSION_TIMEOUT * 1000 < World.now().getTime()) {
-            sessionMap.remove(sessionId);
-            return null;
-        }
+//        if(session.getLastTime() + GlobalConfig.GAME_SESSION_TIMEOUT * 1000 < World.now().getTime()) {
+//            sessionMap.remove(sessionId);
+//            return null;
+//        }
 
         return session;
     }
 
     public void invalid(GameSession gameSession) {
 
-        sessionMap.remove(gameSession.getSessionId());
+//        sessionMap.remove(gameSession.getSessionId());
 
     }
 
@@ -49,20 +49,21 @@ public class LocalGameSessionMgrImpl {
     }
 
     public GameSession init(GameContext ctx, byte[] publicKey) {
-        GameSession gameSession = new GameSession();
-        gameSession.setPublicKey(publicKey);
-        gameSession.setSessionId(IdGenerator.nextSessionId(ctx.getJedis()));
-        return gameSession;
+//        GameSession gameSession = new GameSession();
+//        gameSession.setPublicKey(publicKey);
+//        gameSession.setSessionId(IdGenerator.nextSessionId(ctx.getJedis()));
+//        return gameSession;
+        return null;
     }
 
 
-    public int getSessionIdByPlayerId(GameContext ctx, int playerId) {
-
-        Jedis jedis = ctx.getJedis();
-        String sessionId = jedis.hget(RedisUtil.buildKey("player_id", String.valueOf(playerId)), "session_id");
-        return StringUtils.isBlank(sessionId) ? 0 : Integer.valueOf(sessionId);
-
-    }
-
+//    public int getSessionIdByPlayerId(GameContext ctx, int playerId) {
+//
+//        Jedis jedis = ctx.getJedis();
+//        String sessionId = jedis.hget(RedisUtil.buildKey("player_id", String.valueOf(playerId)), "session_id");
+//        return StringUtils.isBlank(sessionId) ? 0 : Integer.valueOf(sessionId);
+//
+//    }
+//
 
 }

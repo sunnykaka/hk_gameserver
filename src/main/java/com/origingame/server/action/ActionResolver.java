@@ -4,9 +4,11 @@ import com.google.protobuf.Message;
 import com.origingame.message.BaseMsgProtos;
 import com.origingame.server.action.annotation.Action;
 import com.origingame.server.action.annotation.MessageType;
+import com.origingame.server.action.annotation.Readonly;
 import com.origingame.server.context.GameContext;
 import com.origingame.server.exception.GameBusinessException;
 import com.origingame.server.exception.GameException;
+import com.origingame.server.lock.RedisLock;
 import com.origingame.server.protocol.RequestWrapper;
 import com.origingame.server.util.WalkPackageUtil;
 import org.slf4j.Logger;
@@ -16,9 +18,7 @@ import org.springframework.core.type.classreading.MetadataReader;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * User: Liub
@@ -39,6 +39,7 @@ public class ActionResolver {
     private Map<String, Method> actionMethodMap = new HashMap<>();
     private Map<String, String> messageTypeActionRelationMap = new HashMap<>();
     private Map<String, Object> actionObjectMap = new HashMap<>();
+    private Set<String> readonlyActionMethodSet = new HashSet<>();
 
 
 
@@ -69,12 +70,16 @@ public class ActionResolver {
                         throw new GameException(String.format("Action[%s],method[%s]对应的messageTypes内容为空",
                                 actionClass.getName(), method.getName()));
                     }
+                    boolean readonly = method.isAnnotationPresent(Readonly.class);
                     for(String messageType : messageTypes) {
                         if(actionMethodMap.put(messageType, method) != null) {
                             throw new GameException(String.format("Action[%s],method[%s]对应的messageType[%s]重复定义",
                                     actionClass.getName(), method.getName(), messageType));
                         }
                         messageTypeActionRelationMap.put(messageType, actionClass.getName());
+                        if(readonly) {
+                            readonlyActionMethodSet.add(messageType);
+                        }
                     }
                 }
                 actionObjectMap.put(actionClass.getName(), actionClass.newInstance());
@@ -104,12 +109,24 @@ public class ActionResolver {
                     actionClassName, actionMethod.getName(), message);
         }
 
-        //执行方法
-        Message result = (Message)actionMethod.invoke(actionObject, ctx, message);
+        int playerId = request.getRequestMsg().getPlayerId();
+        boolean needLock = playerId > 0 && !readonlyActionMethodSet.contains(messageType);
+        RedisLock lock = null;
 
-        return result;
-
-
+        try {
+            if(needLock) {
+                //对playerId加互斥锁
+                lock = RedisLock.newLock(ctx.getJedis(), "player", String.valueOf(playerId));
+                lock.lock();
+            }
+            //执行方法
+            Message result = (Message)actionMethod.invoke(actionObject, ctx, message);
+            return result;
+        } finally {
+            if(lock != null) {
+                lock.release();
+            }
+        }
     }
 
 

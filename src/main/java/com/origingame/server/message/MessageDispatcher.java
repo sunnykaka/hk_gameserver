@@ -4,6 +4,8 @@ import com.origingame.server.context.GameContext;
 import com.origingame.server.exception.GameProtocolException;
 import com.origingame.server.protocol.GameProtocol;
 import com.origingame.server.protocol.ResponseWrapper;
+import com.origingame.server.session.GameSession;
+import com.origingame.util.World;
 import io.netty.channel.Channel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,7 +28,6 @@ public class MessageDispatcher {
 
     MessageReceiver messageReceiver = MessageReceiver.getInstance();
     MessageSender messageSender = MessageSender.getInstance();
-//    BlasterSender blasterSender = BlasterSender.getInstance();
 
     /**
      * 接收响应
@@ -35,27 +36,57 @@ public class MessageDispatcher {
      */
     public void receive(Channel channel, GameProtocol protocol) {
 
+        if(GameProtocol.Type.REQUEST.equals(protocol.getType())) {
+
+            //接收到的是请求消息,执行对应业务逻辑,如果有需要,返回响应结果
+            receiveRequest(channel, protocol);
+
+        } else {
+
+            //接收到的是响应消息,查看是否注册了回调函数,有的话进行处理
+            receiveResponse(channel, protocol);
+        }
+
+    }
+
+    private void receiveResponse(Channel channel, GameProtocol protocol) {
+        messageReceiver.handleResponse(new ResponseWrapper(protocol));
+    }
+
+    private void receiveRequest(Channel channel, GameProtocol protocol) {
         ResponseWrapper response = null;
         GameContext ctx = null;
+        boolean protocolErrorHappened = false;
         try {
             ctx = new GameContext(channel, protocol);
 
-            response = messageReceiver.receive(ctx, protocol);
+            response = messageReceiver.handleRequest(ctx);
 
         } catch (GameProtocolException e) {
             log.error(e.toString());
-            if(GameProtocol.Type.REQUEST.equals(protocol.getType())) {
-                GameProtocol.Status status = e.getStatus();
-                response = ResponseWrapper.createProtocolErrorResponse(ctx, status == null ? GameProtocol.Status.OTHER_ERROR : status);
-            }
+            GameProtocol.Status status = e.getStatus();
+            response = ResponseWrapper.createProtocolErrorResponse(ctx, status == null ? GameProtocol.Status.OTHER_ERROR : status);
+            protocolErrorHappened = true;
         } catch (Exception e) {
             log.error("对收到的消息进行解析的时候发生错误", e);
-            if(GameProtocol.Type.REQUEST.equals(protocol.getType())) {
-
-                response = ResponseWrapper.createProtocolErrorResponse(ctx, GameProtocol.Status.OTHER_ERROR);
-            }
+            response = ResponseWrapper.createProtocolErrorResponse(ctx, GameProtocol.Status.OTHER_ERROR);
+            protocolErrorHappened = true;
         } finally  {
             //TODO ctx, session 的一些提交和清理工作
+            if(!protocolErrorHappened && ctx != null) {
+                GameSession session = ctx.getSession();
+                if(session != null && session.getBuilder() != null) {
+                    session.getBuilder().setLastTime(World.now().getTime());
+                    int id = ctx.getRequest().getProtocol().getId();
+                    if(id > 0) {
+                        session.getBuilder().setLastId(id);
+                    }
+                    session.save();
+                }
+            }
+            if(ctx != null) {
+                ctx.destroy();
+            }
         }
 
         ctx.setResponse(response);
@@ -64,27 +95,6 @@ public class MessageDispatcher {
             messageSender.sendResponse(ctx);
         }
 
-
-
-//        ResponseWrapper response = null;
-//        try {
-//            response = blasterReceiver.receive(protocol);
-//        } catch (BlasterProtocolException e) {
-//            if(BlasterProtocol.Type.REQUEST.equals(protocol.getType())) {
-//                BlasterProtocol.Status status = e.getStatus();
-//                if(status == null) {
-//                    status = BlasterProtocol.Status.OTHER;
-//                }
-//                response = new ResponseWrapper(BlasterConstants.PROTOCOL_VERSION, BlasterProtocol.Phase.PLAINTEXT, protocol.getId(), status, null, null, null);
-//            }
-//            log.warn(e.toString());
-//        } catch (Exception e) {
-//            log.error("对收到的消息进行解析的时候发生错误", e);
-//        }
-//
-//        if(response != null) {
-//            blasterSender.sendResponse(channel, response);
-//        }
     }
 
 //    /**
