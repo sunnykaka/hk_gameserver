@@ -3,8 +3,9 @@ package com.origingame.server;
 
 import com.origingame.util.crypto.AES;
 import com.origingame.util.crypto.RSA;
-import org.testng.annotations.BeforeTest;
-import org.testng.annotations.Test;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
 
 import java.nio.charset.Charset;
 import java.security.KeyPair;
@@ -19,12 +20,11 @@ import static org.hamcrest.Matchers.*;
 /**
  * Unit test for simple App.
  */
-@Test
 public class EncryptionTest {
 
     public static final String KEY_ALGORTHM="RSA";//
 
-    @BeforeTest
+    @Before
     public void init() {
         System.out.println("before");
     }

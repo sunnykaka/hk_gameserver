@@ -2,7 +2,7 @@ package com.origingame.server.lock;
 
 import com.origingame.config.GlobalConfig;
 import com.origingame.server.util.RedisUtil;
-import com.origingame.util.World;
+import com.origingame.server.main.World;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import redis.clients.jedis.Jedis;
@@ -11,9 +11,9 @@ import redis.clients.jedis.Jedis;
  * User: Liub
  * Date: 2014/11/18
  */
-public class RedisLock {
+public class PlayerDbLock {
 
-    private static final Logger log = LoggerFactory.getLogger(RedisLock.class);
+    private static final Logger log = LoggerFactory.getLogger(PlayerDbLock.class);
 
     private Jedis jedis;
 
@@ -29,10 +29,10 @@ public class RedisLock {
 
     private static final long estimateLatencyMilliseconds = 50;
 
-    private RedisLock() {}
+    private PlayerDbLock() {}
 
-    public static RedisLock newLock(Jedis jedis, String key, String id) {
-        RedisLock lock = new RedisLock();
+    public static PlayerDbLock newLock(Jedis jedis, String key, String id) {
+        PlayerDbLock lock = new PlayerDbLock();
         lock.jedis = jedis;
 //        lock.id = id;
 //        lock.key = key;

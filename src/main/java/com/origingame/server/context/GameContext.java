@@ -1,18 +1,15 @@
 package com.origingame.server.context;
 
-import com.google.protobuf.Message;
-import com.origingame.message.BaseMsgProtos;
+import com.origingame.server.dao.DbMediator;
 import com.origingame.server.exception.GameProtocolException;
 import com.origingame.server.protocol.GameProtocol;
 import com.origingame.server.protocol.RequestWrapper;
 import com.origingame.server.protocol.ResponseWrapper;
 import com.origingame.server.session.GameSession;
 import com.origingame.server.session.LocalGameSessionMgrImpl;
-import com.origingame.util.World;
 import io.netty.channel.Channel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import redis.clients.jedis.Jedis;
 
 /**
  * User: Liub
@@ -32,11 +29,12 @@ public class GameContext {
 
     private ResponseWrapper response;
 
-    private Jedis jedis;
+    private DbMediator dbMediator;
 
     public GameContext(Channel channel, GameProtocol protocol) {
         this.channel = channel;
         if(GameProtocol.Type.REQUEST.equals(protocol.getType())) {
+            this.dbMediator = new DbMediator();
             this.request = new RequestWrapper(protocol);
             int sessionId = protocol.getSessionId();
             if(sessionId > 0) {
@@ -75,11 +73,8 @@ public class GameContext {
         return response;
     }
 
-    public Jedis getJedis() {
-        if(jedis == null) {
-            jedis = World.getConnection();
-        }
-        return jedis;
+    public DbMediator getDbMediator() {
+        return dbMediator;
     }
 
     public void checkSession(int id, int playerId, String deviceId) {
@@ -118,8 +113,6 @@ public class GameContext {
     }
 
     public void destroy() {
-        if(jedis != null) {
-            World.returnConnection(jedis);
-        }
+        dbMediator.close();
     }
 }

@@ -2,19 +2,11 @@ package com.origingame.server;
 
 
 import com.google.protobuf.ByteString;
+import com.origingame.server.dao.ServerPersistenceResolver;
 import com.origingame.server.model.GameSessionProtos;
-import com.origingame.util.World;
-import com.origingame.util.crypto.AES;
-import com.origingame.util.crypto.RSA;
-import org.testng.annotations.BeforeTest;
-import org.testng.annotations.Test;
+import com.origingame.server.main.World;
+import org.junit.*;
 import redis.clients.jedis.Jedis;
-
-import java.nio.charset.Charset;
-import java.security.KeyPair;
-import java.security.KeyPairGenerator;
-import java.security.interfaces.RSAPrivateKey;
-import java.security.interfaces.RSAPublicKey;
 
 import static org.hamcrest.MatcherAssert.*;
 import static org.hamcrest.Matchers.*;
@@ -23,20 +15,29 @@ import static org.hamcrest.Matchers.*;
 /**
  * Unit test for simple App.
  */
-@Test
 public class RedisTest {
 
-    private static Jedis jedis = World.getConnection();
-    public void init() {
+
+    @BeforeClass
+    public static void init() {
         System.out.println("before");
+        World.getInstance().init();
     }
 
-
+    @AfterClass
+    public static void destroy() {
+        System.out.println("after");
+        World.getInstance().destroy();
+    }
 
     @Test
     public void test() throws Exception{
 
+        World.getInstance().init();
+
         int id = 1;
+        Jedis jedis = ServerPersistenceResolver.getInstance().selectPlayerDb(id).getJedis();
+
         String password = "密码";
         String deviceId = "你好啊";
         GameSessionProtos.GameSessionModel.Builder gameSessionBuilder = GameSessionProtos.GameSessionModel.newBuilder();
@@ -56,6 +57,10 @@ public class RedisTest {
 
     @Test
     public void test2() throws Exception{
+
+        World.getInstance().init();
+
+        Jedis jedis = ServerPersistenceResolver.getInstance().selectCenterDb().getJedis();
 
         byte[] bytes = jedis.get("not:exist:key".getBytes("ISO8859-1"));
         System.out.println(bytes);

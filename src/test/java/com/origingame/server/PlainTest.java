@@ -2,8 +2,10 @@ package com.origingame.server;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.testng.annotations.BeforeTest;
-import org.testng.annotations.Test;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Ignore;
+import org.junit.Test;
 
 import java.lang.reflect.InvocationTargetException;
 import java.nio.ByteBuffer;
@@ -13,15 +15,15 @@ import java.util.Map;
 /**
  * Unit test for simple App.
  */
-@Test
 public class PlainTest {
 
-    @BeforeTest
+    @Before
     public void init() {
         System.out.println("before");
     }
 
-    @Test(enabled = false)
+    @Test
+    @Ignore
     public void testApp() {
         print1(13);
     }

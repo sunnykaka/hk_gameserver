@@ -5,7 +5,7 @@ import com.origingame.server.exception.GameProtocolException;
 import com.origingame.server.protocol.GameProtocol;
 import com.origingame.server.protocol.ResponseWrapper;
 import com.origingame.server.session.GameSession;
-import com.origingame.util.World;
+import com.origingame.server.main.World;
 import io.netty.channel.Channel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

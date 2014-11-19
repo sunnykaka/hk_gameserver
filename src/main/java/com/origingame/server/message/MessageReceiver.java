@@ -7,9 +7,7 @@ import com.origingame.message.HandShakeProtos;
 import com.origingame.server.action.ActionResolver;
 import com.origingame.server.context.GameContext;
 import com.origingame.server.exception.GameBusinessException;
-import com.origingame.server.exception.GameException;
 import com.origingame.server.exception.GameProtocolException;
-import com.origingame.server.lock.RedisLock;
 import com.origingame.server.protocol.GameProtocol;
 import com.origingame.server.protocol.RequestWrapper;
 import com.origingame.server.protocol.ResponseWrapper;
@@ -19,8 +17,6 @@ import com.origingame.util.crypto.AES;
 import com.origingame.util.crypto.CryptoContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.lang.reflect.Method;
 
 /**
  * 消息接收者

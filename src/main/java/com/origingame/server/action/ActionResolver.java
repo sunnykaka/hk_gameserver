@@ -8,7 +8,7 @@ import com.origingame.server.action.annotation.Readonly;
 import com.origingame.server.context.GameContext;
 import com.origingame.server.exception.GameBusinessException;
 import com.origingame.server.exception.GameException;
-import com.origingame.server.lock.RedisLock;
+import com.origingame.server.lock.PlayerDbLock;
 import com.origingame.server.protocol.RequestWrapper;
 import com.origingame.server.util.WalkPackageUtil;
 import org.slf4j.Logger;
@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * User: Liub
@@ -29,22 +30,20 @@ public class ActionResolver {
     private static final Logger log = LoggerFactory.getLogger(ActionResolver.class);
 
     private static ActionResolver INSTANCE = new ActionResolver();
-
     private ActionResolver() {}
-
     public static ActionResolver getInstance() {
         return INSTANCE;
     }
+
+    private AtomicBoolean initialized = new AtomicBoolean(false);
 
     private Map<String, Method> actionMethodMap = new HashMap<>();
     private Map<String, String> messageTypeActionRelationMap = new HashMap<>();
     private Map<String, Object> actionObjectMap = new HashMap<>();
     private Set<String> readonlyActionMethodSet = new HashSet<>();
 
-
-
     public void init() {
-
+        if(!initialized.compareAndSet(false, true)) return;
         try {
             List<Class> actionClassList = WalkPackageUtil.findTypes("/com/origingame/business",
                     new WalkPackageUtil.CandidateFinder() {
@@ -111,12 +110,12 @@ public class ActionResolver {
 
         int playerId = request.getRequestMsg().getPlayerId();
         boolean needLock = playerId > 0 && !readonlyActionMethodSet.contains(messageType);
-        RedisLock lock = null;
+        PlayerDbLock lock = null;
 
         try {
             if(needLock) {
                 //对playerId加互斥锁
-                lock = RedisLock.newLock(ctx.getJedis(), "player", String.valueOf(playerId));
+                lock = PlayerDbLock.newLock(ctx.getDbMediator().selectPlayerDb(playerId).getJedis(), "player", String.valueOf(playerId));
                 lock.lock();
             }
             //执行方法
