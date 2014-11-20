@@ -23,6 +23,7 @@ public class ServerMain {
         World.getInstance().init();
         NettyGameServer gameServer = new NettyGameServer(port);
         gameServer.start();
+
     }
 
     private void init() {
