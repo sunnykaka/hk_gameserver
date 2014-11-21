@@ -255,6 +255,13 @@ public class GameProtocol {
             return this;
         }
 
+        public Builder setRequestId(int id) {
+            protocol.type = Type.REQUEST;
+            protocol.id = id;
+            return this;
+        }
+
+
         public Builder setSessionId(int sessionId) {
             protocol.sessionId = sessionId;
             return this;

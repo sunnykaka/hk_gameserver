@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<server-persistence>
+
+    <db-list>
+        <db name="db1" ip="192.168.131.128" port="6379" db="1" />
+        <db name="db2" ip="192.168.131.128" port="6380" db="1" />
+        <db name="db3" ip="192.168.131.128" port="6381" db="1" />
+    </db-list>
+    <center-db ref="db1" />
+    <player-db-list shard-size="32" round-step="100">
+        <player-db ref="db2" />
+        <player-db ref="db3" />
+    </player-db-list>
+
+
+</server-persistence>

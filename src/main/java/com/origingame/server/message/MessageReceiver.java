@@ -9,7 +9,7 @@ import com.origingame.server.context.GameContext;
 import com.origingame.server.exception.GameBusinessException;
 import com.origingame.server.exception.GameProtocolException;
 import com.origingame.server.protocol.GameProtocol;
-import com.origingame.server.protocol.RequestWrapper;
+import com.origingame.server.protocol.ServerRequestWrapper;
 import com.origingame.server.protocol.ResponseWrapper;
 import com.origingame.server.session.GameSession;
 import com.origingame.server.session.LocalGameSessionMgrImpl;
@@ -44,7 +44,7 @@ public class MessageReceiver {
      * @return
      */
     protected ResponseWrapper handleRequest(GameContext ctx) {
-        RequestWrapper request = ctx.getRequest();
+        ServerRequestWrapper request = ctx.getRequest();
         GameSession session = ctx.getSession();
         GameProtocol protocol = request.getProtocol();
 
@@ -80,7 +80,7 @@ public class MessageReceiver {
                 }
                 //检验session合法性
                 ctx.checkSession(protocol.getId(), request.getRequestMsg().getPlayerId(),
-                        request.getRequestMsg().getDeviceId());
+                        request.getDeviceId());
 
                 byte[] passwordKey = session.getBuilder().getPasswordKey().toByteArray();
                 request.parseCipherMessage(CryptoContext.createAESCrypto(passwordKey));
@@ -98,7 +98,7 @@ public class MessageReceiver {
 
     private ResponseWrapper executeAction(GameContext ctx, Message message) {
 
-        RequestWrapper request = ctx.getRequest();
+        ServerRequestWrapper request = ctx.getRequest();
         BaseMsgProtos.ResponseStatus responseStatus = BaseMsgProtos.ResponseStatus.UNKNOWN_ERROR;
 
         Message result = null;
@@ -108,7 +108,7 @@ public class MessageReceiver {
             if(log.isDebugEnabled()) {
                 log.debug("接收到业务消息:sessionId[{}], id:[{}], playerId[{}], requestMsg[{}]",
                         request.getProtocol().getSessionId(), request.getProtocol().getId(),
-                                request.getRequestMsg().getPlayerId(), request.getRequestMsg());
+                                request.getPlayerId(), request.getRequestMsg());
             }
             //执行业务处理
             result = actionResolver.executeAction0(ctx, message);

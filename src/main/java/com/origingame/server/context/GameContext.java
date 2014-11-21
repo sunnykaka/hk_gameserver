@@ -3,7 +3,7 @@ package com.origingame.server.context;
 import com.origingame.server.dao.DbMediator;
 import com.origingame.server.exception.GameProtocolException;
 import com.origingame.server.protocol.GameProtocol;
-import com.origingame.server.protocol.RequestWrapper;
+import com.origingame.server.protocol.ServerRequestWrapper;
 import com.origingame.server.protocol.ResponseWrapper;
 import com.origingame.server.session.GameSession;
 import com.origingame.server.session.LocalGameSessionMgrImpl;
@@ -25,7 +25,7 @@ public class GameContext {
 
     private LocalGameSessionMgrImpl gameSessionMgr = LocalGameSessionMgrImpl.getInstance();
 
-    private RequestWrapper request;
+    private ServerRequestWrapper request;
 
     private ResponseWrapper response;
 
@@ -35,7 +35,7 @@ public class GameContext {
         this.channel = channel;
         if(GameProtocol.Type.REQUEST.equals(protocol.getType())) {
             this.dbMediator = new DbMediator();
-            this.request = new RequestWrapper(protocol);
+            this.request = ServerRequestWrapper.fromProtocol(channel, protocol);
             int sessionId = protocol.getSessionId();
             if(sessionId > 0) {
                 this.session = GameSession.load(this,sessionId);
@@ -49,7 +49,7 @@ public class GameContext {
         this.session = session;
     }
 
-    public void setRequest(RequestWrapper request) {
+    public void setRequest(ServerRequestWrapper request) {
         this.request = request;
     }
 
@@ -65,7 +65,7 @@ public class GameContext {
         return channel;
     }
 
-    public RequestWrapper getRequest() {
+    public ServerRequestWrapper getRequest() {
         return request;
     }
 

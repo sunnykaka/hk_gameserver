@@ -7,6 +7,6 @@ import java.lang.annotation.*;
  @Documented
  public @interface MessageType {
 
-    String[] value() default {};
+    String[] value();
 
 }

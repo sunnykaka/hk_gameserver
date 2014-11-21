@@ -17,4 +17,12 @@ public class GlobalConfig {
     public static final int LOCK_SPIN_MAX_COUNT = 7;
 
     public static final int LOCK_EXPIRE_TIME_IN_SECONDS = 30;
+
+    public static final String ACTION_BASE_PACKAGE = "com.origingame.business";
+
+    public static final String SERVER_PERSISTENCE_FILE_PATH = "server-persistence.xml";
+
+    public static final String PROTOBUF_MESSAGE_PACKAGE_NAME = "com.origingame.message.";
+
 }
+

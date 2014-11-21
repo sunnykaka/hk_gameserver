@@ -34,27 +34,30 @@ public class ServerPersistenceResolver {
 
     private AtomicBoolean initialized = new AtomicBoolean(false);
 
-    private Map<String, JedisPool> realDbMap = new HashMap<>();
+    protected Map<String, JedisPool> realDbMap = new HashMap<>();
 
-    private JedisPool centerDbPool;
+    protected JedisPool centerDbPool;
 
-    private List<JedisPool> playerShardPool = new ArrayList<>();
+    protected List<JedisPool> playerShardPool = new ArrayList<>();
 
-    private int playerRoundStep;
+    protected int playerRoundStep;
 
-    private int playerShardSize;
+    protected int playerShardSize;
 
-    private int playerDbSize;
+    protected int playerDbSize;
 
-    public void init() {
+    public void init(String configFilePath) {
         if (!initialized.compareAndSet(false, true)) return;
 
         try {
             JAXBContext jaxbContext = JAXBContext.newInstance(ServerPersistence.class);
             Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
-            ServerPersistence serverPersistence = (ServerPersistence) jaxbUnmarshaller.unmarshal(Thread.currentThread().getContextClassLoader().getResourceAsStream("server-persistence.xml"));
+            log.info("读取文件[{}]的dao层配置", configFilePath);
+            ServerPersistence serverPersistence = (ServerPersistence) jaxbUnmarshaller.unmarshal(Thread.currentThread().getContextClassLoader().getResourceAsStream(configFilePath));
 
             ServerPersistence.DbList dbList = serverPersistence.getDbList();
+            Preconditions.checkState(!dbList.getDb().isEmpty());
+            log.info("实际物理db数量: {}", dbList.getDb().size());
             for(ServerPersistence.DbList.Db db : dbList.getDb()) {
                 JedisPool jedisPool = new JedisPool(new GenericObjectPool.Config(), db.getIp(), db.getPort(), 2000, db.getPassword(), db.getDb());
                 realDbMap.put(db.getName(), jedisPool);
@@ -63,6 +66,7 @@ public class ServerPersistenceResolver {
             ServerPersistence.CenterDb centerDb = serverPersistence.getCenterDb();
             centerDbPool = realDbMap.get(centerDb.getRef());
             Preconditions.checkNotNull(centerDbPool);
+            log.info("centerDb name: {}", centerDb.getRef());
 
             ServerPersistence.PlayerDbList playerDbList = serverPersistence.getPlayerDbList();
             playerDbSize = playerDbList.getPlayerDb().size();
@@ -74,6 +78,8 @@ public class ServerPersistenceResolver {
 
             //举个栗子.playerDbSize配置的是32,而playerDb只配两个,其实是每个playerDb要承担16个虚拟节点的工作.(有可能这两个playerDb还只对应一个物理节点,my god..)
             int playerDbMapCount = playerShardSize / playerDbSize;
+            log.info("playerDbSize[{}], playerRoundStep[{}], playerShardSize[{}], playerDbMapCount[{}]", playerDbSize, playerRoundStep, playerShardSize, playerDbMapCount);
+
             for(ServerPersistence.PlayerDbList.PlayerDb playerDb : playerDbList.getPlayerDb()) {
                 JedisPool jedisPool = realDbMap.get(playerDb.getRef());
                 for (int j = 0; j < playerDbMapCount; j++) {
@@ -110,9 +116,6 @@ public class ServerPersistenceResolver {
     }
 
     public void destroy() {
-        if(centerDbPool != null) {
-            centerDbPool.destroy();
-        }
         for(JedisPool jedisPool : realDbMap.values()) {
             jedisPool.destroy();
         }

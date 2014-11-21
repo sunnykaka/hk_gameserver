@@ -3,6 +3,7 @@ package com.origingame.server.message;
 import com.origingame.server.context.GameContext;
 import com.origingame.server.exception.GameProtocolException;
 import com.origingame.server.protocol.GameProtocol;
+import com.origingame.server.protocol.ServerRequestWrapper;
 import com.origingame.server.protocol.ResponseWrapper;
 import com.origingame.server.session.GameSession;
 import com.origingame.server.main.World;
@@ -97,16 +98,13 @@ public class MessageDispatcher {
 
     }
 
-//    /**
-//     * 发送请求
-//     * @param channel
-//     * @param request
-//     * @param async
-//     * @param messageResponseHandler
-//     */
-//    public void request(Channel channel, RequestWrapper request, final boolean async, MessageResponseHandler messageResponseHandler) {
-//        blasterSender.sendRequest(channel, request, async, messageResponseHandler);
-//    }
+    /**
+     * 发送请求(同步调用)
+     * @param request
+     */
+    public ResponseWrapper request(ServerRequestWrapper request) {
+        return messageSender.sendRequest(request);
+    }
 
 
 }

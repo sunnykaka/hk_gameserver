@@ -1,5 +1,6 @@
 package com.origingame.server.main;
 
+import com.origingame.config.GlobalConfig;
 import com.origingame.server.action.ActionResolver;
 import com.origingame.server.dao.ServerPersistenceResolver;
 
@@ -24,9 +25,9 @@ public class World {
         if(!initialized.compareAndSet(false, true)) return;
 
         //初始化Action信息
-        ActionResolver.getInstance().init();
+        ActionResolver.getInstance().init(GlobalConfig.ACTION_BASE_PACKAGE);
         //初始化数据库连接
-        ServerPersistenceResolver.getInstance().init();
+        ServerPersistenceResolver.getInstance().init(GlobalConfig.SERVER_PERSISTENCE_FILE_PATH);
 
     }
 

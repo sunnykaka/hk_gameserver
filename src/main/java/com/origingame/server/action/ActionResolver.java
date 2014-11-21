@@ -9,7 +9,7 @@ import com.origingame.server.context.GameContext;
 import com.origingame.server.exception.GameBusinessException;
 import com.origingame.server.exception.GameException;
 import com.origingame.server.lock.PlayerDbLock;
-import com.origingame.server.protocol.RequestWrapper;
+import com.origingame.server.protocol.ServerRequestWrapper;
 import com.origingame.server.util.WalkPackageUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,20 +37,26 @@ public class ActionResolver {
 
     private AtomicBoolean initialized = new AtomicBoolean(false);
 
-    private Map<String, Method> actionMethodMap = new HashMap<>();
-    private Map<String, String> messageTypeActionRelationMap = new HashMap<>();
-    private Map<String, Object> actionObjectMap = new HashMap<>();
-    private Set<String> readonlyActionMethodSet = new HashSet<>();
+    /** key:messageType, value:actionMethod */
+    protected Map<String, Method> actionMethodMap = new HashMap<>();
+    /** key:messageType, value:actionClassName */
+    protected Map<String, String> messageTypeActionRelationMap = new HashMap<>();
+    /** key:actionClassName, value:ActionInstance */
+    protected Map<String, Object> actionObjectMap = new HashMap<>();
+    /** readonly messageType set */
+    protected Set<String> readonlyActionMethodSet = new HashSet<>();
 
-    public void init() {
+    public void init(String basePackage) {
         if(!initialized.compareAndSet(false, true)) return;
         try {
-            List<Class> actionClassList = WalkPackageUtil.findTypes("/com/origingame/business",
+            log.info("搜寻{}目录下的Action类", basePackage);
+            List<Class> actionClassList = WalkPackageUtil.findTypes(basePackage,
                     new WalkPackageUtil.CandidateFinder() {
                         @Override
                         public Class findCandidate(MetadataReader metadataReader) throws ClassNotFoundException {
                             Class c = Class.forName(metadataReader.getClassMetadata().getClassName());
                             if (c.getAnnotation(Action.class) != null) {
+                                log.info("搜寻到Action类: {}", c.getName());
                                 return c;
                             }
                             return null;
@@ -79,6 +85,7 @@ public class ActionResolver {
                         if(readonly) {
                             readonlyActionMethodSet.add(messageType);
                         }
+                        log.info("解析得到messageType[{}]对应Action类[{}] {}", messageType, actionClass.getName(), readonly ? "只读" : "");
                     }
                 }
                 actionObjectMap.put(actionClass.getName(), actionClass.newInstance());
@@ -94,8 +101,8 @@ public class ActionResolver {
     public Message executeAction0(GameContext ctx, Message message)
             throws InvocationTargetException, IllegalAccessException {
 
-        RequestWrapper request = ctx.getRequest();
-        String messageType = request.getRequestMsg().getMessageType();
+        ServerRequestWrapper request = ctx.getRequest();
+        String messageType = request.getMessageType();
         Method actionMethod = actionMethodMap.get(messageType);
         if(actionMethod == null) {
             throw new GameBusinessException(BaseMsgProtos.ResponseStatus.NO_ACTION_FOR_MESSAGE_TYPE);
@@ -108,7 +115,7 @@ public class ActionResolver {
                     actionClassName, actionMethod.getName(), message);
         }
 
-        int playerId = request.getRequestMsg().getPlayerId();
+        int playerId = request.getPlayerId();
         boolean needLock = playerId > 0 && !readonlyActionMethodSet.contains(messageType);
         PlayerDbLock lock = null;
 

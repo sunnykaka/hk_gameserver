@@ -8,6 +8,7 @@ import com.origingame.message.HandShakeProtos;
 import com.origingame.server.exception.CryptoException;
 import com.origingame.server.exception.GameProtocolException;
 import com.origingame.util.crypto.CryptoContext;
+import io.netty.channel.Channel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,15 +16,19 @@ import org.slf4j.LoggerFactory;
  * User: liubin
  * Date: 14-3-4
  */
-public class RequestWrapper {
+public class ServerRequestWrapper {
 
-    private static final Logger log = LoggerFactory.getLogger(RequestWrapper.class);
+    private static final Logger log = LoggerFactory.getLogger(ServerRequestWrapper.class);
 
     private GameProtocol protocol;
 
     private BaseMsgProtos.RequestMsg requestMsg;
 
+    private BaseMsgProtos.RequestMsg.Builder requestMsgBuilder;
+
     private Message message;
+
+    private Channel channel;
 
 //    public RequestWrapper(GameProtocol protocol) {
 //        this.protocol = protocol;
@@ -41,10 +46,29 @@ public class RequestWrapper {
 //
 //    }
 
-    public RequestWrapper(GameProtocol protocol) {
-        this.protocol = protocol;
+    public static ServerRequestWrapper fromProtocol(Channel channel, GameProtocol protocol) {
 
-        init();
+        Preconditions.checkArgument(GameProtocol.Type.REQUEST.equals(protocol.getType()));
+        byte[] data = protocol.getData();
+        if(data == null || data.length == 0) {
+            throw new GameProtocolException(GameProtocol.Status.REQUEST_MESSAGE_EMPTY, protocol);
+        }
+
+        ServerRequestWrapper request = new ServerRequestWrapper();
+        request.protocol = protocol;
+        request.channel = channel;
+
+        return request;
+    }
+
+    public static ServerRequestWrapper fromMessage(Message message) {
+        ServerRequestWrapper request = new ServerRequestWrapper();
+        request.requestMsgBuilder = BaseMsgProtos.RequestMsg.newBuilder();
+        if(message != null) {
+            request.requestMsgBuilder.setMessage(message.toByteString());
+            request.requestMsgBuilder.setMessageType(message.getDescriptorForType().getFullName());
+        }
+        return request;
     }
 
 //    public static RequestWrapper parseFromHandShake(GameContext ctx, GameProtocol protocol) {
@@ -52,12 +76,8 @@ public class RequestWrapper {
 //        return request.initRequest(ctx, protocol);
 //    }
 
-    public RequestWrapper init() {
-        Preconditions.checkArgument(GameProtocol.Type.REQUEST.equals(protocol.getType()));
-        byte[] data = protocol.getData();
-        if(data == null || data.length == 0) {
-            throw new GameProtocolException(GameProtocol.Status.REQUEST_MESSAGE_EMPTY, protocol);
-        }
+    public ServerRequestWrapper init() {
+
 
 //        switch (protocol.getPhase()) {
 //            case HAND_SHAKE: {
@@ -128,6 +148,54 @@ public class RequestWrapper {
         return message;
     }
 
+    public Channel getChannel() {
+        return channel;
+    }
+
+    public String getMessageType() {
+        if(requestMsg != null) {
+            return requestMsg.getMessageType();
+        } else if(requestMsgBuilder != null) {
+            return requestMsgBuilder.getMessageType();
+        } else {
+            return null;
+        }
+    }
+
+    public int getPlayerId() {
+        if(requestMsg != null) {
+            return requestMsg.getPlayerId();
+        } else if(requestMsgBuilder != null) {
+            return requestMsgBuilder.getPlayerId();
+        } else {
+            return 0;
+        }
+    }
+
+    public String getDeviceId() {
+        if(requestMsg != null) {
+            return requestMsg.getDeviceId();
+        } else if(requestMsgBuilder != null) {
+            return requestMsgBuilder.getDeviceId();
+        } else {
+            return null;
+        }
+    }
+
+
+    public ServerRequestWrapper setPlayerId(int playerId) {
+        requestMsgBuilder.setPlayerId(playerId);
+        return this;
+    }
+
+    public ServerRequestWrapper setDeviceId(String deviceId) {
+        requestMsgBuilder.setDeviceId(deviceId);
+        return this;
+    }
+
+
+
+
     @Override
     public String toString() {
         return "RequestWrapper{" +
@@ -152,7 +220,6 @@ public class RequestWrapper {
     }
 
     public void parseCipherMessage(CryptoContext cryptoContext) {
-
 
         try {
             byte[] data = protocol.getData();

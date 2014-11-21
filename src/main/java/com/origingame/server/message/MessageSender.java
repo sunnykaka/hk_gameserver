@@ -2,9 +2,15 @@ package com.origingame.server.message;
 
 import com.origingame.server.context.GameContext;
 import com.origingame.server.protocol.GameProtocol;
+import com.origingame.server.protocol.ServerRequestWrapper;
 import com.origingame.server.protocol.ResponseWrapper;
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelFutureListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
 * 消息发送者
@@ -20,6 +26,7 @@ public class MessageSender {
     public static final MessageSender getInstance() {
         return INSTANCE;
     }
+
 
     /**
      * 发送响应
@@ -38,6 +45,15 @@ public class MessageSender {
         }
 
         ctx.getChannel().writeAndFlush(protocol);
+    }
+
+    public ResponseWrapper sendRequest(ServerRequestWrapper request) {
+        final int id = requestId.incrementAndGet();
+        Channel channel = request.getChannel();
+
+        channel.writeAndFlush(request.getProtocol()).addListener(new ChannelWriteFinishListener(id));
+
+
     }
 
 //    /**
@@ -101,38 +117,38 @@ public class MessageSender {
 //    }
 
 
-//    private static class ChannelWriteFinishListener implements ChannelFutureListener{
-//
-//        private int id;
-//
-//        private ChannelWriteFinishListener(int id) {
-//            this.id = id;
-//        }
-//
-//        @Override
-//        public void operationComplete(ChannelFuture future) throws Exception {
-//            if(log.isDebugEnabled()) {
-//                log.debug("发送请求结束, id[{}], success[{}]", new Object[]{id, future.isSuccess()});
-//            }
-//            if(future.isSuccess()) {
-//                return;
-//            }
-//            log.warn("发送请求信息失败, requestId[{}]", id);
-//            ResponseWrapper response = createSendRequestFailedResponse(id);
-//            MessageReceiver.getInstance().handleResponse(response);
-//        }
-//
-//
-//        /**
-//         * 创建发送消息失败的响应
-//         * @param id
-//         * @return
-//         */
-//        private ResponseWrapper createSendRequestFailedResponse(int id) {
-//            return new ResponseWrapper(BlasterConstants.PROTOCOL_VERSION, BlasterProtocol.Phase.PLAINTEXT, id,
-//                    BlasterProtocol.Status.REQUEST_FAILED, null, null, null);
-//        }
-//    }
+    private static class ChannelWriteFinishListener implements ChannelFutureListener {
+
+        private int id;
+
+        private ChannelWriteFinishListener(int id) {
+            this.id = id;
+        }
+
+        @Override
+        public void operationComplete(ChannelFuture future) throws Exception {
+            if(log.isDebugEnabled()) {
+                log.debug("发送请求结束, id[{}], success[{}]", new Object[]{id, future.isSuccess()});
+            }
+            if(future.isSuccess()) {
+                return;
+            }
+            log.warn("发送请求信息失败, requestId[{}]", id);
+            ResponseWrapper response = createSendRequestFailedResponse(id);
+            MessageReceiver.getInstance().handleResponse(response);
+        }
+
+
+        /**
+         * 创建发送消息失败的响应
+         * @param id
+         * @return
+         */
+        private ResponseWrapper createSendRequestFailedResponse(int id) {
+            return new ResponseWrapper(BlasterConstants.PROTOCOL_VERSION, BlasterProtocol.Phase.PLAINTEXT, id,
+                    BlasterProtocol.Status.REQUEST_FAILED, null, null, null);
+        }
+    }
 
 
 }
