@@ -24,5 +24,9 @@ public class GlobalConfig {
 
     public static final String PROTOBUF_MESSAGE_PACKAGE_NAME = "com.origingame.message.";
 
+    public static final long CLIENT_REQUEST_TIMEOUT = 20000L;
+
+
+
 }
 

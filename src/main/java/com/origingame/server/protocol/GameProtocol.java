@@ -2,7 +2,7 @@ package com.origingame.server.protocol;
 
 import com.google.common.primitives.UnsignedBytes;
 import com.origingame.message.BaseMsgProtos;
-import com.origingame.server.exception.GameProtocolException;
+import com.origingame.exception.GameProtocolException;
 import com.origingame.util.crypto.CryptoContext;
 import io.netty.buffer.ByteBuf;
 
@@ -14,6 +14,7 @@ public class GameProtocol {
 
     public static final int HEAD_LENGTH = 4 + 4 + 4 + 1 + 1 + 1;
 
+    public static final GameProtocol REQUEST_FAILED = new GameProtocol();
 
     private GameProtocol() {}
 

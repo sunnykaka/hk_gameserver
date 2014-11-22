@@ -1,6 +1,6 @@
 package com.origingame.util.crypto;
 
-import com.origingame.server.exception.CryptoException;
+import com.origingame.exception.CryptoException;
 
 /**
  * User: Liub

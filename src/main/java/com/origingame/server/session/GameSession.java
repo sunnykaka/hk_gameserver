@@ -3,7 +3,7 @@ package com.origingame.server.session;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.origingame.server.context.GameContext;
-import com.origingame.server.exception.GameDaoException;
+import com.origingame.exception.GameDaoException;
 import com.origingame.server.model.GameSessionProtos;
 import com.origingame.server.util.IdGenerator;
 import com.origingame.server.util.RedisUtil;

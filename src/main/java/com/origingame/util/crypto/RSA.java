@@ -1,12 +1,14 @@
 package com.origingame.util.crypto;
 
-import com.origingame.server.exception.CryptoException;
+import com.origingame.exception.CryptoException;
 
-import java.math.BigInteger;
 import java.security.*;
+import java.security.interfaces.RSAPrivateKey;
+import java.security.interfaces.RSAPublicKey;
 import java.security.spec.PKCS8EncodedKeySpec;
-import java.security.spec.RSAPublicKeySpec;
 import java.security.spec.X509EncodedKeySpec;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.crypto.Cipher;
 
@@ -14,10 +16,12 @@ public class RSA {
 
     public static final String KEY_ALGORITHM = "RSA";
 
+    public static final int KEY_SIZE = 1024;
+
     /**
      * 用公钥加密
      * @param data  加密数据
-     * @param key   密钥
+     * @param keyBytes   密钥
      * @return
      * @throws Exception
      */
@@ -43,7 +47,7 @@ public class RSA {
     /**
      * 用公钥解密
      * @param data  加密数据
-     * @param key   密钥
+     * @param keyBytes   密钥
      * @return
      * @throws Exception
      */
@@ -68,7 +72,7 @@ public class RSA {
     /**
      * 用私钥加密
      * @param data  加密数据
-     * @param key   密钥
+     * @param keyBytes   密钥
      * @return
      * @throws Exception
      */
@@ -92,8 +96,8 @@ public class RSA {
     }
 
     /**
-     * 用私钥解密<span style="color:#000000;"></span> * @param data  加密数据
-     * @param key   密钥
+     * 用私钥解密
+     * @param keyBytes   密钥
      * @return
      * @throws Exception
      */
@@ -110,6 +114,34 @@ public class RSA {
             cipher.init(Cipher.DECRYPT_MODE, privateKey);
 
             return cipher.doFinal(data);
+        } catch (Exception e) {
+            throw new CryptoException(e);
+        }
+    }
+
+    /**
+     * 初始化密钥
+     *
+     * @return
+     * @throws Exception
+     */
+    public static Object[] initKey() {
+        try {
+            KeyPairGenerator keyPairGen = KeyPairGenerator
+                    .getInstance(KEY_ALGORITHM);
+            keyPairGen.initialize(KEY_SIZE);
+
+            KeyPair keyPair = keyPairGen.generateKeyPair();
+
+            // 公钥
+            RSAPublicKey publicKey = (RSAPublicKey) keyPair.getPublic();
+
+            // 私钥
+            RSAPrivateKey privateKey = (RSAPrivateKey) keyPair.getPrivate();
+
+            Map<String, Object> keyMap = new HashMap<String, Object>(2);
+
+            return new Object[]{publicKey.getEncoded(), privateKey.getEncoded()};
         } catch (Exception e) {
             throw new CryptoException(e);
         }

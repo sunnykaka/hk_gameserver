@@ -9,7 +9,11 @@ import org.junit.BeforeClass;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
+
 /**
+ *
+ *
  * User: Liub
  * Date: 2014/11/21
  */
@@ -32,9 +36,9 @@ public abstract class BaseNettyTest {
         World.getInstance().destroy();
     }
 
-    protected Channel initClient() throws InterruptedException {
-        NettyGameClient client = new NettyGameClient();
-        Channel channel = client.connect(host, port);
+    protected Channel initClient() throws InterruptedException, IOException {
+        NettyGameClient client = new NettyGameClient(host, port);
+        Channel channel = client.start();
         return channel;
     }
 

@@ -1,10 +1,11 @@
 package com.origingame.server.message;
 
+import com.origingame.client.protocol.ClientRequestWrapper;
+import com.origingame.client.protocol.ClientResponseWrapper;
 import com.origingame.server.context.GameContext;
-import com.origingame.server.exception.GameProtocolException;
+import com.origingame.exception.GameProtocolException;
 import com.origingame.server.protocol.GameProtocol;
-import com.origingame.server.protocol.ServerRequestWrapper;
-import com.origingame.server.protocol.ResponseWrapper;
+import com.origingame.server.protocol.ServerResponseWrapper;
 import com.origingame.server.session.GameSession;
 import com.origingame.server.main.World;
 import io.netty.channel.Channel;
@@ -51,11 +52,11 @@ public class MessageDispatcher {
     }
 
     private void receiveResponse(Channel channel, GameProtocol protocol) {
-        messageReceiver.handleResponse(new ResponseWrapper(protocol));
+        messageReceiver.handleResponse(channel, protocol);
     }
 
     private void receiveRequest(Channel channel, GameProtocol protocol) {
-        ResponseWrapper response = null;
+        ServerResponseWrapper response = null;
         GameContext ctx = null;
         boolean protocolErrorHappened = false;
         try {
@@ -66,11 +67,11 @@ public class MessageDispatcher {
         } catch (GameProtocolException e) {
             log.error(e.toString());
             GameProtocol.Status status = e.getStatus();
-            response = ResponseWrapper.createProtocolErrorResponse(ctx, status == null ? GameProtocol.Status.OTHER_ERROR : status);
+            response = ServerResponseWrapper.createProtocolErrorResponse(ctx, status == null ? GameProtocol.Status.OTHER_ERROR : status);
             protocolErrorHappened = true;
         } catch (Exception e) {
             log.error("对收到的消息进行解析的时候发生错误", e);
-            response = ResponseWrapper.createProtocolErrorResponse(ctx, GameProtocol.Status.OTHER_ERROR);
+            response = ServerResponseWrapper.createProtocolErrorResponse(ctx, GameProtocol.Status.OTHER_ERROR);
             protocolErrorHappened = true;
         } finally  {
             //TODO ctx, session 的一些提交和清理工作
@@ -102,7 +103,7 @@ public class MessageDispatcher {
      * 发送请求(同步调用)
      * @param request
      */
-    public ResponseWrapper request(ServerRequestWrapper request) {
+    public ClientResponseWrapper request(ClientRequestWrapper request) {
         return messageSender.sendRequest(request);
     }
 

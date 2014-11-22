@@ -1,7 +1,7 @@
 package com.origingame.server.protocol;
 
 import com.google.protobuf.Message;
-import com.origingame.server.exception.GameProtocolException;
+import com.origingame.exception.GameProtocolException;
 import com.origingame.server.registry.DescriptorRegistry;
 
 import java.lang.reflect.InvocationTargetException;

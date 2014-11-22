@@ -2,7 +2,7 @@ package com.origingame.server.registry;
 
 import com.google.protobuf.Descriptors;
 import com.google.protobuf.Message;
-import com.origingame.server.exception.GameException;
+import com.origingame.exception.GameException;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;

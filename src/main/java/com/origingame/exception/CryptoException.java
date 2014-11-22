@@ -1,4 +1,4 @@
-package com.origingame.server.exception;
+package com.origingame.exception;
 
 public class CryptoException extends GameException {
 

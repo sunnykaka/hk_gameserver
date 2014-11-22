@@ -5,14 +5,14 @@ import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.protobuf.Message;
 import com.origingame.message.BaseMsgProtos;
 import com.origingame.server.context.GameContext;
-import com.origingame.server.exception.GameProtocolException;
+import com.origingame.exception.GameProtocolException;
 import com.origingame.util.crypto.CryptoContext;
 
 /**
  * User: liubin
  * Date: 14-3-4
  */
-public class ResponseWrapper {
+public class ServerResponseWrapper {
 
     private GameProtocol protocol;
 
@@ -20,9 +20,9 @@ public class ResponseWrapper {
 
     private Message message;
 
-    public ResponseWrapper() {}
+    public ServerResponseWrapper() {}
 
-    public ResponseWrapper(GameProtocol protocol) {
+    public ServerResponseWrapper(GameProtocol protocol) {
         this.protocol = protocol;
         Preconditions.checkArgument(GameProtocol.Type.RESPONSE.equals(protocol.getType()));
         byte[] data = protocol.getData();
@@ -67,22 +67,22 @@ public class ResponseWrapper {
 //        this.protocol = protocol.build();
 //    }
 
-    public static ResponseWrapper createHandShakeSuccessResponse(GameContext ctx, Message message, CryptoContext cryptoContext) {
-        return new ResponseWrapper(ctx, GameProtocol.Status.SUCCESS, BaseMsgProtos.ResponseStatus.SUCCESS, null, message, cryptoContext);
+    public static ServerResponseWrapper createHandShakeSuccessResponse(GameContext ctx, Message message, CryptoContext cryptoContext) {
+        return new ServerResponseWrapper(ctx, GameProtocol.Status.SUCCESS, BaseMsgProtos.ResponseStatus.SUCCESS, null, message, cryptoContext);
     }
 
-    public static ResponseWrapper createProtocolErrorResponse(GameContext ctx, GameProtocol.Status status) {
-        return new ResponseWrapper(ctx, status, null, null, null, null);
+    public static ServerResponseWrapper createProtocolErrorResponse(GameContext ctx, GameProtocol.Status status) {
+        return new ServerResponseWrapper(ctx, status, null, null, null, null);
     }
 
-    public static ResponseWrapper createRequestResponse(GameContext ctx, BaseMsgProtos.ResponseStatus responseStatus, String responseMsg, Message result, CryptoContext cryptoContext) {
+    public static ServerResponseWrapper createRequestResponse(GameContext ctx, BaseMsgProtos.ResponseStatus responseStatus, String responseMsg, Message result, CryptoContext cryptoContext) {
 
-        return new ResponseWrapper(ctx, GameProtocol.Status.SUCCESS, responseStatus, responseMsg, result, cryptoContext);
+        return new ServerResponseWrapper(ctx, GameProtocol.Status.SUCCESS, responseStatus, responseMsg, result, cryptoContext);
     }
 
 
-    private ResponseWrapper(GameContext ctx, GameProtocol.Status status, BaseMsgProtos.ResponseStatus responseStatus,
-                           String msg, Message message, CryptoContext cryptoContext) {
+    private ServerResponseWrapper(GameContext ctx, GameProtocol.Status status, BaseMsgProtos.ResponseStatus responseStatus,
+                                  String msg, Message message, CryptoContext cryptoContext) {
         Preconditions.checkNotNull(status);
 
         GameProtocol requestProtocol = ctx.getRequest().getProtocol();
@@ -127,7 +127,7 @@ public class ResponseWrapper {
 
     @Override
     public String toString() {
-        return "ResponseWrapper{" +
+        return "ServerResponseWrapper{" +
                 "protocol=" + protocol +
                 ", responseMsg=" + responseMsg +
                 ", message=" + message +

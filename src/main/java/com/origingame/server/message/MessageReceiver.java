@@ -2,21 +2,26 @@ package com.origingame.server.message;
 
 import com.google.protobuf.ByteString;
 import com.google.protobuf.Message;
+import com.origingame.client.context.RequestChannelContext;
 import com.origingame.message.BaseMsgProtos;
 import com.origingame.message.HandShakeProtos;
 import com.origingame.server.action.ActionResolver;
 import com.origingame.server.context.GameContext;
-import com.origingame.server.exception.GameBusinessException;
-import com.origingame.server.exception.GameProtocolException;
+import com.origingame.exception.GameBusinessException;
+import com.origingame.exception.GameProtocolException;
 import com.origingame.server.protocol.GameProtocol;
 import com.origingame.server.protocol.ServerRequestWrapper;
-import com.origingame.server.protocol.ResponseWrapper;
+import com.origingame.server.protocol.ServerResponseWrapper;
 import com.origingame.server.session.GameSession;
 import com.origingame.server.session.LocalGameSessionMgrImpl;
 import com.origingame.util.crypto.AES;
 import com.origingame.util.crypto.CryptoContext;
+import io.netty.channel.Channel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TransferQueue;
 
 /**
  * 消息接收者
@@ -43,7 +48,7 @@ public class MessageReceiver {
      * @param ctx
      * @return
      */
-    protected ResponseWrapper handleRequest(GameContext ctx) {
+    protected ServerResponseWrapper handleRequest(GameContext ctx) {
         ServerRequestWrapper request = ctx.getRequest();
         GameSession session = ctx.getSession();
         GameProtocol protocol = request.getProtocol();
@@ -68,7 +73,7 @@ public class MessageReceiver {
                 HandShakeProtos.HandShakeResp.Builder handShakeRespBuilder = HandShakeProtos.HandShakeResp.newBuilder();
                 handShakeRespBuilder.setSessionId(session.getBuilder().getId());
                 handShakeRespBuilder.setPasswordKey(session.getBuilder().getPasswordKey());
-                return ResponseWrapper.createHandShakeSuccessResponse(ctx, handShakeRespBuilder.build(), CryptoContext.createRSAServerCrypto(publicKey.toByteArray()));
+                return ServerResponseWrapper.createHandShakeSuccessResponse(ctx, handShakeRespBuilder.build(), CryptoContext.createRSAServerCrypto(publicKey.toByteArray()));
 
             }
             case PLAIN_TEXT: {
@@ -96,7 +101,7 @@ public class MessageReceiver {
     }
 
 
-    private ResponseWrapper executeAction(GameContext ctx, Message message) {
+    private ServerResponseWrapper executeAction(GameContext ctx, Message message) {
 
         ServerRequestWrapper request = ctx.getRequest();
         BaseMsgProtos.ResponseStatus responseStatus = BaseMsgProtos.ResponseStatus.UNKNOWN_ERROR;
@@ -127,20 +132,42 @@ public class MessageReceiver {
 //            return null;
 //        }
 
-        return ResponseWrapper.createRequestResponse(ctx, responseStatus, responseMsg, result,
+        return ServerResponseWrapper.createRequestResponse(ctx, responseStatus, responseMsg, result,
                 CryptoContext.createAESCrypto(ctx.getSession().getBuilder().getPasswordKey().toByteArray()));
 
     }
 
     /**
      * 处理响应消息
-     * @param response
+     * @param channel
+     * @param protocol
      */
-    protected void handleResponse(ResponseWrapper response) {
-        int id = response.getProtocol().getId();
-        GameProtocol protocol = response.getProtocol();
+    protected void handleResponse(Channel channel, GameProtocol protocol) {
 
-        log.error("现在的服务器不会处理从客户端发来的响应信息, id[{}], protocol[{}]", id, protocol);
+        TransferQueue<GameProtocol> requestWaiterQueue = RequestChannelContext.getInstance().getRequest(channel, protocol.getId());
+        if(requestWaiterQueue == null) {
+            try {
+                Thread.sleep(100L);
+            } catch (InterruptedException e) {
+                log.error("", e);
+            }
+            requestWaiterQueue = RequestChannelContext.getInstance().getRequest(channel, protocol.getId());
+        }
+        if(requestWaiterQueue == null) {
+            log.warn("接收到同步响应消息,但是无队列接收该响应消息, protocol[{}]", protocol);
+        }
+        boolean transferResponseToWaitingThreadSuccess = false;
+        try {
+            //尝试将响应结果传给等待线程
+            transferResponseToWaitingThreadSuccess = requestWaiterQueue.tryTransfer(protocol,
+                    1000L, TimeUnit.MILLISECONDS);
+        } catch (InterruptedException e) {
+            log.error("", e);
+        }
+
+        if(!transferResponseToWaitingThreadSuccess)  {
+            log.warn("接收到同步响应消息,但是无线程在等待该响应消息, protocol[{}]", protocol);
+        }
 
         return;
     }

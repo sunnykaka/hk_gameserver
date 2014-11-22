@@ -1,10 +1,10 @@
 package com.origingame.server.context;
 
 import com.origingame.server.dao.DbMediator;
-import com.origingame.server.exception.GameProtocolException;
+import com.origingame.exception.GameProtocolException;
 import com.origingame.server.protocol.GameProtocol;
 import com.origingame.server.protocol.ServerRequestWrapper;
-import com.origingame.server.protocol.ResponseWrapper;
+import com.origingame.server.protocol.ServerResponseWrapper;
 import com.origingame.server.session.GameSession;
 import com.origingame.server.session.LocalGameSessionMgrImpl;
 import io.netty.channel.Channel;
@@ -27,7 +27,7 @@ public class GameContext {
 
     private ServerRequestWrapper request;
 
-    private ResponseWrapper response;
+    private ServerResponseWrapper response;
 
     private DbMediator dbMediator;
 
@@ -53,7 +53,7 @@ public class GameContext {
         this.request = request;
     }
 
-    public void setResponse(ResponseWrapper response) {
+    public void setResponse(ServerResponseWrapper response) {
         this.response = response;
     }
 
@@ -69,7 +69,7 @@ public class GameContext {
         return request;
     }
 
-    public ResponseWrapper getResponse() {
+    public ServerResponseWrapper getResponse() {
         return response;
     }
 

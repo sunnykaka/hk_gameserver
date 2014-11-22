@@ -2,11 +2,16 @@ package com.origingame.business;
 
 import com.google.protobuf.ByteString;
 import com.origingame.BaseNettyTest;
+import com.origingame.client.main.ClientSession;
+import com.origingame.client.protocol.ClientRequestWrapper;
+import com.origingame.client.protocol.ClientResponseWrapper;
+import com.origingame.exception.GameException;
+import com.origingame.message.EchoProtos;
 import com.origingame.message.HandShakeProtos;
 import com.origingame.server.message.MessageDispatcher;
 import com.origingame.server.protocol.GameProtocol;
-import com.origingame.server.protocol.ServerRequestWrapper;
-import com.origingame.server.protocol.ResponseWrapper;
+import com.origingame.server.protocol.ServerResponseWrapper;
+import com.origingame.util.crypto.RSA;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
@@ -15,7 +20,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 
+import static org.hamcrest.MatcherAssert.*;
+import static org.hamcrest.Matchers.*;
+
+
 /**
+ *
+ * 运行之前要先启动服务器
  * User: Liub
  * Date: 2014/11/21
  */
@@ -25,25 +36,27 @@ public class EchoActionTest extends BaseNettyTest {
 
     @Test
     public void test() throws Exception {
-//        initServer();
+        ClientSession clientSession = null;
 
-        Channel channel = initClient();
+        try {
+            clientSession = new ClientSession("localhost", 8080);
+            clientSession.openConnection();
+            clientSession.handShake();
 
-        HandShakeProtos.HandShakeReq.Builder handShakeReq = HandShakeProtos.HandShakeReq.newBuilder();
-        handShakeReq.setPublicKey(ByteString.EMPTY);
-        ServerRequestWrapper requestWrapper = ServerRequestWrapper.fromMessage(handShakeReq.build());
+            EchoProtos.Echo.Builder echo = EchoProtos.Echo.newBuilder();
+            String msg = "你好啊123";
+            echo.setMessage(msg);
+            ClientResponseWrapper echoResponse = clientSession.sendMessage(echo.build());
 
-        ResponseWrapper response = MessageDispatcher.getInstance().request(requestWrapper);
+            EchoProtos.Echo echoResponseMessage = (EchoProtos.Echo) echoResponse.getMessage();
 
-        GameProtocol.Builder handshakeProtocol = GameProtocol.newBuilder();
-        handshakeProtocol.setPhase(GameProtocol.Phase.HAND_SHAKE);
-        ByteBuf byteBuf = Unpooled.buffer();
-        handshakeProtocol.build().encode(byteBuf);
-        channel.write(channel);
-        channel.close();
+            assertThat(echoResponseMessage.getMessage(), is(msg));
 
-
-
+        } finally {
+            if(clientSession != null) {
+                clientSession.destroy();
+            }
+        }
 
 
 

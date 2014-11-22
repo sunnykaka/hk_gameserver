@@ -1,13 +1,11 @@
 package com.origingame.server.dao;
 
-import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.origingame.server.dao.jaxb.ServerPersistence;
-import com.origingame.server.exception.GameException;
+import com.origingame.exception.GameException;
 import org.apache.commons.pool.impl.GenericObjectPool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 
 import javax.xml.bind.JAXBContext;

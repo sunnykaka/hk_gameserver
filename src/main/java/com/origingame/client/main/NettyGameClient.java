@@ -26,9 +26,6 @@ public class NettyGameClient {
 
     private Channel channel;
 
-    BufferedReader input;
-
-
     public NettyGameClient(String host, int port) {
         this.host = host;
         this.port = port;
@@ -66,7 +63,7 @@ public class NettyGameClient {
         return channel;
     }
 
-    public Channel connect(String host, int port, ChannelInitializer<SocketChannel> channelInitializer) throws InterruptedException {
+    private Channel connect(String host, int port, ChannelInitializer<SocketChannel> channelInitializer) throws InterruptedException {
         final EventLoopGroup workerGroup = new NioEventLoopGroup();
 
         Bootstrap b = new Bootstrap();
@@ -81,53 +78,21 @@ public class NettyGameClient {
         return connect(host, port, b);
     }
 
-    public Channel connect(String host, int port) throws InterruptedException {
+    private Channel connect(String host, int port) throws InterruptedException {
         return connect(host, port, new NettyChannelInitializer(new NettyGameProtocolReceiver()));
     }
 
-    public void start() throws IOException, InterruptedException {
-        displayWelcomeInfo();
-        this.channel = connect(host, port);
-        System.out.println(String.format("connect success"));
-        this.input = new BufferedReader(new InputStreamReader(System.in));
-        String command = input.readLine();
-        if("QUIT".equalsIgnoreCase(command)) {
-            exit();
-        }
-        if("CONNECT".equalsIgnoreCase(command)) {
-            tryConnect();
-        } else {
-            System.out.println("unknown command, please input 'connect' or 'quit'");
+    public Channel start() throws IOException, InterruptedException {
+        channel = connect(host, port);
+        return channel;
+    }
+
+    public void stop() throws IOException, InterruptedException {
+        if(channel != null) {
+            channel.close();
         }
     }
 
-    private void tryConnect() throws IOException{
-        System.out.print("username: ");
-        String username = input.readLine();
-        System.out.print("password: ");
-        String password = input.readLine();
-
-    }
-
-    private void exit() {
-        System.out.println("bye");
-        if(bootstrap != null) {
-            bootstrap.group().shutdownGracefully();
-        }
-        if(input != null) {
-            try {
-                input.close();
-            } catch (IOException e) {
-                log.error("", e);
-            }
-        }
-        System.exit(0);
-    }
-
-    private void displayWelcomeInfo() {
-        System.out.println("welcome to the Game!");
-        System.out.println(String.format("connect to %s:%d", host, port));
-    }
 
     public Channel getChannel() {
         return channel;

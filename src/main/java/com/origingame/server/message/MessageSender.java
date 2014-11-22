@@ -1,16 +1,22 @@
 package com.origingame.server.message;
 
+import com.origingame.client.context.RequestChannelContext;
+import com.origingame.client.protocol.ClientRequestWrapper;
+import com.origingame.client.protocol.ClientResponseWrapper;
+import com.origingame.config.GlobalConfig;
+import com.origingame.exception.RequestFailedException;
+import com.origingame.exception.TimeoutException;
 import com.origingame.server.context.GameContext;
 import com.origingame.server.protocol.GameProtocol;
-import com.origingame.server.protocol.ServerRequestWrapper;
-import com.origingame.server.protocol.ResponseWrapper;
+import com.origingame.server.protocol.ServerResponseWrapper;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TransferQueue;
 
 /**
 * 消息发送者
@@ -33,7 +39,7 @@ public class MessageSender {
      * @param ctx
      */
     public void sendResponse(GameContext ctx) {
-        ResponseWrapper response = ctx.getResponse();
+        ServerResponseWrapper response = ctx.getResponse();
         GameProtocol protocol = response.getProtocol();
 //        if(protocol.getId() <= 0) {
 //            //id无效,无需返回结果
@@ -47,12 +53,28 @@ public class MessageSender {
         ctx.getChannel().writeAndFlush(protocol);
     }
 
-    public ResponseWrapper sendRequest(ServerRequestWrapper request) {
-        final int id = requestId.incrementAndGet();
+    public ClientResponseWrapper sendRequest(ClientRequestWrapper request) {
+
         Channel channel = request.getChannel();
+        TransferQueue<GameProtocol> requestWaiterQueue = RequestChannelContext.getInstance().addRequest(channel, request.getRequestId());
+        channel.writeAndFlush(request.getProtocol()).addListener(new ChannelWriteFinishListener(request.getProtocol()));
+        GameProtocol responseProtocol = null;
+        try {
+            responseProtocol = requestWaiterQueue.poll(GlobalConfig.CLIENT_REQUEST_TIMEOUT, TimeUnit.MILLISECONDS);
 
-        channel.writeAndFlush(request.getProtocol()).addListener(new ChannelWriteFinishListener(id));
-
+        } catch (InterruptedException e) {
+            log.error("", e);
+        }
+        if(responseProtocol == null) {
+            //超时
+            throw new TimeoutException();
+        } else if(responseProtocol == GameProtocol.REQUEST_FAILED){
+            //请求失败
+            throw new RequestFailedException();
+        } else {
+            return ClientResponseWrapper.createResponseFromServer(responseProtocol, request.getPasswordKey(),
+                    request.getPhase().equals(GameProtocol.Phase.HAND_SHAKE));
+        }
 
     }
 
@@ -71,7 +93,7 @@ public class MessageSender {
 //        }
 //
 //        //初始化id上下文信息
-//        final IdContext idContext = MessageContext.getInstance().initContext(id, async, request, messageResponseHandler);
+//        final IdContext idContext = RequestChannelContext.getInstance().initContext(id, async, request, messageResponseHandler);
 //
 //        //XXX 如果writeAndFlush的参数是(request.getRequestMsg()),为什么operationComplete方法会直接被调用并且future.isSuccess是false?
 //        //answer:根据AbstractNioByteChannel.doWrite()方法,如果消息类型不是ByteBuffer或FileRegion,都会抛异常,然后框架内部捕获异常设置write结果失败
@@ -83,8 +105,8 @@ public class MessageSender {
 //            try {
 //                if(messageResponseHandler == null) return;
 //                //如果是同步消息,需要等待响应返回
-//                ResponseWrapper response = null;
-//                TransferQueue<ResponseWrapper> requestWaiterQueue = idContext.getRequestWaiterQueue();
+//                ServerResponseWrapper response = null;
+//                TransferQueue<ServerResponseWrapper> requestWaiterQueue = idContext.getRequestWaiterQueue();
 //                long timeoutInMillseconds = request.getProtocol().getTimeout() - Clock.nowInMillisecond();
 //                if(timeoutInMillseconds > 0) {
 //                    try {
@@ -105,7 +127,7 @@ public class MessageSender {
 //                }
 //            } finally {
 //                //同步请求由调用方负责清除数据
-//                MessageContext.getInstance().removeContext(id);
+//                RequestChannelContext.getInstance().removeContext(id);
 //            }
 //
 //
@@ -119,35 +141,23 @@ public class MessageSender {
 
     private static class ChannelWriteFinishListener implements ChannelFutureListener {
 
-        private int id;
+        private GameProtocol protocol;
 
-        private ChannelWriteFinishListener(int id) {
-            this.id = id;
+        private ChannelWriteFinishListener(GameProtocol protocol) {
+            this.protocol = protocol;
         }
 
         @Override
         public void operationComplete(ChannelFuture future) throws Exception {
             if(log.isDebugEnabled()) {
-                log.debug("发送请求结束, id[{}], success[{}]", new Object[]{id, future.isSuccess()});
+                log.debug("发送请求结束, protocol[{}], isSuccess[{}]", new Object[]{protocol, future.isSuccess()});
             }
             if(future.isSuccess()) {
                 return;
             }
-            log.warn("发送请求信息失败, requestId[{}]", id);
-            ResponseWrapper response = createSendRequestFailedResponse(id);
-            MessageReceiver.getInstance().handleResponse(response);
+            MessageReceiver.getInstance().handleResponse(future.channel(), GameProtocol.REQUEST_FAILED);
         }
 
-
-        /**
-         * 创建发送消息失败的响应
-         * @param id
-         * @return
-         */
-        private ResponseWrapper createSendRequestFailedResponse(int id) {
-            return new ResponseWrapper(BlasterConstants.PROTOCOL_VERSION, BlasterProtocol.Phase.PLAINTEXT, id,
-                    BlasterProtocol.Status.REQUEST_FAILED, null, null, null);
-        }
     }
 
 
