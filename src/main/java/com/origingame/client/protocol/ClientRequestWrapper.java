@@ -11,12 +11,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.atomic.AtomicInteger;
-
 /**
  * User: liubin
  * Date: 14-3-4
@@ -26,8 +20,8 @@ public class ClientRequestWrapper {
     private static final Logger log = LoggerFactory.getLogger(ClientRequestWrapper.class);
 
     //key:sessionId, value:id计数器
-    //FIXME 潜在的内存泄漏,只有put没有remove
-    private static ConcurrentMap<Integer, AtomicInteger> requestIdCounterMap = new ConcurrentHashMap<>();
+//    //FIXME 潜在的内存泄漏,只有put没有remove
+//    private static ConcurrentMap<Integer, AtomicInteger> requestIdCounterMap = new ConcurrentHashMap<>();
 
     private GameProtocol protocol;
 
@@ -37,61 +31,65 @@ public class ClientRequestWrapper {
 
     private GameProtocol.Phase phase;
 
+    private String messageType;
+
     private Message message;
 
     private ClientSession clientSession;
 
     private int requestId;
 
-    private boolean handShake;
+    private boolean shakeHand;
 
 
-    private ClientRequestWrapper() {
+    private void init() {
+        this.requestId = clientSession.incrementAndGetRequestId();
+        this.channel = clientSession.getChannel();
+
+        this.requestMsg = BaseMsgProtos.RequestMsg.newBuilder();
+
+        if(shakeHand) {
+            Preconditions.checkNotNull(clientSession.getPrivateKey());
+            Preconditions.checkNotNull(clientSession.getPublicKey());
+            this.phase = GameProtocol.Phase.HAND_SHAKE;
+            this.requestMsg.setMessage(message.toByteString());
+            this.requestMsg.setMessageType(message.getDescriptorForType().getFullName());
+        } else {
+            Preconditions.checkNotNull(clientSession.getAesPasswordKey());
+            Preconditions.checkState(clientSession.getSessionId() > 0);
+
+            this.phase = GameProtocol.Phase.CIPHER_TEXT;
+
+            this.requestMsg.setMessageType(messageType);
+            if(message != null) {
+                this.requestMsg.setMessage(message.toByteString());
+            }
+
+        }
+        if(!StringUtils.isBlank(clientSession.getDeviceId())) {
+            this.requestMsg.setDeviceId(clientSession.getDeviceId());
+        }
+        this.requestMsg.setPlayerId(clientSession.getPlayerId());
     }
 
-    public static ClientRequestWrapper createMessageRequest(Message message, String messageType, ClientSession clientSession, boolean handShake) {
+    public static ClientRequestWrapper createMessageRequest(Message message, String messageType,
+                                                            ClientSession clientSession, boolean shakeHand) {
 
         ClientRequestWrapper request = new ClientRequestWrapper();
 
         request.clientSession = clientSession;
         request.message = message;
-        request.requestId = clientSession.incrementAndGetRequestId();
-        request.handShake = handShake;
-        request.channel = clientSession.getChannel();
+        request.shakeHand = shakeHand;
+        request.messageType = messageType;
 
-        request.requestMsg = BaseMsgProtos.RequestMsg.newBuilder();
-
-        if(handShake) {
-            Preconditions.checkNotNull(clientSession.getPrivateKey());
-            Preconditions.checkNotNull(clientSession.getPublicKey());
-            request.phase = GameProtocol.Phase.HAND_SHAKE;
-            request.requestMsg.setMessage(message.toByteString());
-            request.requestMsg.setMessageType(message.getDescriptorForType().getFullName());
-        } else {
-            Preconditions.checkNotNull(clientSession.getAesPasswordKey());
-            Preconditions.checkState(clientSession.getSessionId() > 0);
-
-            request.phase = GameProtocol.Phase.CIPHER_TEXT;
-
-            request.requestMsg.setMessageType(messageType);
-            if(message != null) {
-                request.requestMsg.setMessage(message.toByteString());
-            }
-
-        }
-        if(!StringUtils.isBlank(clientSession.getDeviceId())) {
-            request.requestMsg.setDeviceId(clientSession.getDeviceId());
-        }
-        request.requestMsg.setPlayerId(clientSession.getPlayerId());
+        request.init();
+        request.buildProtocol();
 
         return request;
 
     }
 
     public GameProtocol getProtocol() {
-        if(protocol == null) {
-            buildProtocol();
-        }
         return protocol;
     }
 
@@ -122,7 +120,7 @@ public class ClientRequestWrapper {
     }
 
     public String getMessageType() {
-        return requestMsg.getMessageType();
+        return messageType;
     }
 
     public int getPlayerId() {
@@ -134,7 +132,7 @@ public class ClientRequestWrapper {
     }
 
     public byte[] getPasswordKey() {
-        if(handShake) {
+        if(shakeHand) {
             return clientSession.getPrivateKey();
         } else {
             return clientSession.getAesPasswordKey();
@@ -148,10 +146,15 @@ public class ClientRequestWrapper {
 
     @Override
     public String toString() {
-        return "RequestWrapper{" +
+        return "ClientRequestWrapper{" +
                 "protocol=" + protocol +
                 ", requestMsg=" + requestMsg +
+                ", channel=" + channel +
+                ", phase=" + phase +
+                ", messageType='" + messageType + '\'' +
                 ", message=" + message +
+                ", requestId=" + requestId +
+                ", shakeHand=" + shakeHand +
                 '}';
     }
 

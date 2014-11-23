@@ -19,13 +19,13 @@ public class RedisTest {
 
 
     @BeforeClass
-    public static void init() {
+    public static void init() throws Exception {
         System.out.println("before");
         World.getInstance().init();
     }
 
     @AfterClass
-    public static void destroy() {
+    public static void destroy() throws Exception {
         System.out.println("after");
         World.getInstance().destroy();
     }

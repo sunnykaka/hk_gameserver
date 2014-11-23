@@ -20,53 +20,6 @@ public class ServerResponseWrapper {
 
     private Message message;
 
-    public ServerResponseWrapper() {}
-
-    public ServerResponseWrapper(GameProtocol protocol) {
-        this.protocol = protocol;
-        Preconditions.checkArgument(GameProtocol.Type.RESPONSE.equals(protocol.getType()));
-        byte[] data = protocol.getData();
-        if(data == null) return;
-        try {
-            this.responseMsg = BaseMsgProtos.ResponseMsg.parseFrom(data);
-        } catch (InvalidProtocolBufferException e) {
-            throw new GameProtocolException(GameProtocol.Status.DATA_CORRUPT, protocol);
-        }
-        if(responseMsg.getMessageType() != null && responseMsg.getMessage() != null) {
-//            this.message = ProtocolUtil.parseMessageFromDataAndType(responseMsg.getMessageType(), responseMsg.getMessage().toByteArray());
-        }
-
-    }
-//
-//    public ResponseWrapper(GameProtocol.Phase phase, int id, GameProtocol.Status status, BaseMsgProtos.ResponseStatus responseStatus,
-//                           String msg, Message message) {
-//        Preconditions.checkNotNull(phase);
-//        Preconditions.checkNotNull(status);
-//
-//        GameProtocol.Builder protocol = GameProtocol.newBuilder();
-//        protocol.setPhase(phase);
-//        protocol.setStatus(status);
-//        protocol.setResponseId(id);
-//
-//        if(GameProtocol.Status.SUCCESS.equals(status)) {
-//            //只有正常解析协议了才设置业务对象
-//            BaseMsgProtos.ResponseMsg.Builder responseMsg = BaseMsgProtos.ResponseMsg.newBuilder();
-//            if(responseStatus != null) {
-//                responseMsg.setStatus(responseStatus);
-//            }
-//            if(msg != null) {
-//                responseMsg.setMsg(msg);
-//            }
-//            if(message != null) {
-//                responseMsg.setMessageType(message.getDescriptorForType().getFullName());
-//                responseMsg.setMessage(message.toByteString());
-//            }
-//            this.responseMsg = responseMsg.build();
-//            protocol.setMessage(this.responseMsg);
-//        }
-//        this.protocol = protocol.build();
-//    }
-
     public static ServerResponseWrapper createHandShakeSuccessResponse(GameContext ctx, Message message, CryptoContext cryptoContext) {
         return new ServerResponseWrapper(ctx, GameProtocol.Status.SUCCESS, BaseMsgProtos.ResponseStatus.SUCCESS, null, message, cryptoContext);
     }
@@ -91,6 +44,7 @@ public class ServerResponseWrapper {
         protocol.setPhase(requestProtocol.getPhase());
         protocol.setStatus(status);
         protocol.setResponseId(requestProtocol.getId());
+        protocol.setSessionId(requestProtocol.getSessionId());
 
         if(GameProtocol.Status.SUCCESS.equals(status)) {
             //只有正常解析协议了才设置业务对象
@@ -106,6 +60,7 @@ public class ServerResponseWrapper {
                 responseMsg.setMessage(message.toByteString());
             }
             this.responseMsg = responseMsg.build();
+            this.message = message;
             protocol.setMessage(this.responseMsg, cryptoContext);
         }
         this.protocol = protocol.build();

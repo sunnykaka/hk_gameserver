@@ -7,6 +7,7 @@ import com.origingame.exception.GameDaoException;
 import com.origingame.server.model.GameSessionProtos;
 import com.origingame.server.util.IdGenerator;
 import com.origingame.server.util.RedisUtil;
+import com.origingame.util.crypto.AES;
 import redis.clients.jedis.Jedis;
 
 /**
@@ -39,8 +40,11 @@ public class GameSession {
     public static GameSession create(GameContext ctx, ByteString publicKey) {
         GameSession gameSession = new GameSession(ctx);
         gameSession.gameSessionBuilder = GameSessionProtos.GameSessionModel.newBuilder();
-        gameSession.getBuilder().setId(IdGenerator.nextSessionId(ctx.getDbMediator().selectCenterDb().getJedis()));
+        gameSession.getBuilder().setId(IdGenerator.nextSessionId(ctx.getDbMediator()));
         gameSession.getBuilder().setPublicKey(publicKey);
+        byte[] passwordKey = AES.initPasswordKey();
+        gameSession.getBuilder().setPasswordKey(ByteString.copyFrom(passwordKey));
+
         return gameSession;
 
     }

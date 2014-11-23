@@ -35,7 +35,7 @@ public class ClientSession {
 
     private byte[] aesPasswordKey;
 
-    private boolean handShakeSuccess;
+    private boolean shakeHandSuccess;
 
     private boolean connected;
 
@@ -80,13 +80,13 @@ public class ClientSession {
         connected = false;
     }
 
-    public void handShake() {
+    public void shakeHand() {
 
         checkConnected();
 
         try {
 
-            log.info("握手请求,当前sessionId[{}], 当前握手状态[{}]", sessionId, handShakeSuccess);
+            log.info("握手请求,当前sessionId[{}], 当前握手状态[{}]", sessionId, shakeHandSuccess);
 
             Object[] keys = RSA.initKey();
             this.publicKey = (byte[])keys[0];
@@ -106,13 +106,13 @@ public class ClientSession {
             aesPasswordKey = handShakeResp.getPasswordKey().toByteArray();
             Preconditions.checkArgument(sessionId > 0);
             Preconditions.checkNotNull(aesPasswordKey);
-            handShakeSuccess = true;
+            shakeHandSuccess = true;
 
             log.info("握手成功, sessionId[{}]", sessionId);
 
         } catch (CryptoException e) {
             log.error("", e);
-            handShakeSuccess = false;
+            shakeHandSuccess = false;
             throw new GameClientException("握手失败", e);
         }
 
@@ -131,7 +131,7 @@ public class ClientSession {
 
     private ClientResponseWrapper sendMessage0(Message message, String messageType) {
         checkConnected();
-        checkHandShaked();
+        checkShakeHanded();
 
         ClientRequestWrapper request = ClientRequestWrapper.createMessageRequest(message, messageType, this, false);
         log.info("发送请求: {}", request);
@@ -144,8 +144,8 @@ public class ClientSession {
 
     }
 
-    private void checkHandShaked() {
-        if(!handShakeSuccess) {
+    private void checkShakeHanded() {
+        if(!shakeHandSuccess) {
             throw new GameClientException("发送数据之前需要先进行握手");
         }
     }
@@ -181,8 +181,8 @@ public class ClientSession {
         return aesPasswordKey;
     }
 
-    public boolean isHandShakeSuccess() {
-        return handShakeSuccess;
+    public boolean isShakeHandSuccess() {
+        return shakeHandSuccess;
     }
 
     public boolean isConnected() {
@@ -211,5 +211,20 @@ public class ClientSession {
 
     public Channel getChannel() {
         return nettyGameClient.getChannel();
+    }
+
+
+    @Override
+    public String toString() {
+        return "ClientSession{" +
+                "sessionId=" + sessionId +
+                ", requestId=" + requestId +
+                ", shakeHandSuccess=" + shakeHandSuccess +
+                ", connected=" + connected +
+                ", host='" + host + '\'' +
+                ", port=" + port +
+                ", playerId=" + playerId +
+                ", deviceId='" + deviceId + '\'' +
+                '}';
     }
 }

@@ -25,8 +25,8 @@ public class RedisUtil {
         StringBuilder sb = new StringBuilder();
         for(String part : parts) {
             sb.append(part).append(GlobalConfig.REDIS_KEY_SEPERATOR);
-            sb.deleteCharAt(sb.length() - 1);
         }
+        sb.deleteCharAt(sb.length() - 1);
 
         return sb.toString();
     }

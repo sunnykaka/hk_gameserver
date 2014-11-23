@@ -33,15 +33,11 @@ public class GameContext {
 
     public GameContext(Channel channel, GameProtocol protocol) {
         this.channel = channel;
-        if(GameProtocol.Type.REQUEST.equals(protocol.getType())) {
-            this.dbMediator = new DbMediator();
-            this.request = ServerRequestWrapper.fromProtocol(channel, protocol);
-            int sessionId = protocol.getSessionId();
-            if(sessionId > 0) {
-                this.session = GameSession.load(this,sessionId);
-            }
-        } else {
-
+        this.dbMediator = new DbMediator();
+        this.request = ServerRequestWrapper.fromProtocol(channel, protocol);
+        int sessionId = protocol.getSessionId();
+        if(sessionId > 0) {
+            this.session = GameSession.load(this,sessionId);
         }
     }
 

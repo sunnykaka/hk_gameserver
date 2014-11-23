@@ -7,6 +7,7 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import javax.xml.bind.DatatypeConverter;
 import java.nio.charset.Charset;
 import java.util.Arrays;
 
@@ -38,6 +39,8 @@ public class GameProtocolTest {
         ByteBuf after = Unpooled.buffer();
         protocol.encode(after);
         assertThat(after.array(), is(before));
+        System.out.println(DatatypeConverter.printHexBinary(before));
+        System.out.println(DatatypeConverter.printHexBinary(after.array()));
     }
 
     private ByteBuf createSuccessfulByteBuf(byte[] data) {

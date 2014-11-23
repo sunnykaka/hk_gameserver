@@ -1,20 +1,9 @@
 package com.origingame.business;
 
-import com.google.protobuf.ByteString;
 import com.origingame.BaseNettyTest;
 import com.origingame.client.main.ClientSession;
-import com.origingame.client.protocol.ClientRequestWrapper;
 import com.origingame.client.protocol.ClientResponseWrapper;
-import com.origingame.exception.GameException;
 import com.origingame.message.EchoProtos;
-import com.origingame.message.HandShakeProtos;
-import com.origingame.server.message.MessageDispatcher;
-import com.origingame.server.protocol.GameProtocol;
-import com.origingame.server.protocol.ServerResponseWrapper;
-import com.origingame.util.crypto.RSA;
-import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
-import io.netty.channel.Channel;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,7 +30,7 @@ public class EchoActionTest extends BaseNettyTest {
         try {
             clientSession = new ClientSession("localhost", 8080);
             clientSession.openConnection();
-            clientSession.handShake();
+            clientSession.shakeHand();
 
             EchoProtos.Echo.Builder echo = EchoProtos.Echo.newBuilder();
             String msg = "你好啊123";

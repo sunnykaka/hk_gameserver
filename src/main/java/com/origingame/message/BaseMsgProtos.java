@@ -14,58 +14,58 @@ public final class BaseMsgProtos {
   public enum ResponseStatus
       implements com.google.protobuf.ProtocolMessageEnum {
     /**
-     * <code>SUCCESS = 0;</code>
+     * <code>SUCCESS = 1;</code>
      */
-    SUCCESS(0, 0),
+    SUCCESS(0, 1),
     /**
-     * <code>UNKNOWN_ERROR = 1;</code>
+     * <code>UNKNOWN_ERROR = 2;</code>
      */
-    UNKNOWN_ERROR(1, 1),
+    UNKNOWN_ERROR(1, 2),
     /**
-     * <code>NO_ACTION_FOR_MESSAGE_TYPE = 2;</code>
+     * <code>NO_ACTION_FOR_MESSAGE_TYPE = 3;</code>
      */
-    NO_ACTION_FOR_MESSAGE_TYPE(2, 2),
+    NO_ACTION_FOR_MESSAGE_TYPE(2, 3),
     /**
-     * <code>USERNAME_NOT_EXIST = 1000;</code>
+     * <code>USERNAME_NOT_EXIST = 1001;</code>
      */
-    USERNAME_NOT_EXIST(3, 1000),
+    USERNAME_NOT_EXIST(3, 1001),
     /**
-     * <code>PASSWORD_INCORRECT = 1001;</code>
+     * <code>PASSWORD_INCORRECT = 1002;</code>
      */
-    PASSWORD_INCORRECT(4, 1001),
+    PASSWORD_INCORRECT(4, 1002),
     ;
 
     /**
-     * <code>SUCCESS = 0;</code>
+     * <code>SUCCESS = 1;</code>
      */
-    public static final int SUCCESS_VALUE = 0;
+    public static final int SUCCESS_VALUE = 1;
     /**
-     * <code>UNKNOWN_ERROR = 1;</code>
+     * <code>UNKNOWN_ERROR = 2;</code>
      */
-    public static final int UNKNOWN_ERROR_VALUE = 1;
+    public static final int UNKNOWN_ERROR_VALUE = 2;
     /**
-     * <code>NO_ACTION_FOR_MESSAGE_TYPE = 2;</code>
+     * <code>NO_ACTION_FOR_MESSAGE_TYPE = 3;</code>
      */
-    public static final int NO_ACTION_FOR_MESSAGE_TYPE_VALUE = 2;
+    public static final int NO_ACTION_FOR_MESSAGE_TYPE_VALUE = 3;
     /**
-     * <code>USERNAME_NOT_EXIST = 1000;</code>
+     * <code>USERNAME_NOT_EXIST = 1001;</code>
      */
-    public static final int USERNAME_NOT_EXIST_VALUE = 1000;
+    public static final int USERNAME_NOT_EXIST_VALUE = 1001;
     /**
-     * <code>PASSWORD_INCORRECT = 1001;</code>
+     * <code>PASSWORD_INCORRECT = 1002;</code>
      */
-    public static final int PASSWORD_INCORRECT_VALUE = 1001;
+    public static final int PASSWORD_INCORRECT_VALUE = 1002;
 
 
     public final int getNumber() { return value; }
 
     public static ResponseStatus valueOf(int value) {
       switch (value) {
-        case 0: return SUCCESS;
-        case 1: return UNKNOWN_ERROR;
-        case 2: return NO_ACTION_FOR_MESSAGE_TYPE;
-        case 1000: return USERNAME_NOT_EXIST;
-        case 1001: return PASSWORD_INCORRECT;
+        case 1: return SUCCESS;
+        case 2: return UNKNOWN_ERROR;
+        case 3: return NO_ACTION_FOR_MESSAGE_TYPE;
+        case 1001: return USERNAME_NOT_EXIST;
+        case 1002: return PASSWORD_INCORRECT;
         default: return null;
       }
     }
@@ -1760,9 +1760,9 @@ public final class BaseMsgProtos {
       "ssage_type\030\001 \001(\t\022\017\n\007message\030\002 \001(\014\0226\n\006sta" +
       "tus\030\003 \002(\0162&.com.origingame.message.Respo" +
       "nseStatus\022\013\n\003msg\030\004 \001(\t*\202\001\n\016ResponseStatu" +
-      "s\022\013\n\007SUCCESS\020\000\022\021\n\rUNKNOWN_ERROR\020\001\022\036\n\032NO_" +
-      "ACTION_FOR_MESSAGE_TYPE\020\002\022\027\n\022USERNAME_NO" +
-      "T_EXIST\020\350\007\022\027\n\022PASSWORD_INCORRECT\020\351\007B\017B\rB",
+      "s\022\013\n\007SUCCESS\020\001\022\021\n\rUNKNOWN_ERROR\020\002\022\036\n\032NO_" +
+      "ACTION_FOR_MESSAGE_TYPE\020\003\022\027\n\022USERNAME_NO" +
+      "T_EXIST\020\351\007\022\027\n\022PASSWORD_INCORRECT\020\352\007B\017B\rB",
       "aseMsgProtos"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =

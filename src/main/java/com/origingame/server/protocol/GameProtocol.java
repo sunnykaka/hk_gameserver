@@ -1,10 +1,13 @@
 package com.origingame.server.protocol;
 
+import com.google.common.base.Preconditions;
 import com.google.common.primitives.UnsignedBytes;
 import com.origingame.message.BaseMsgProtos;
 import com.origingame.exception.GameProtocolException;
 import com.origingame.util.crypto.CryptoContext;
 import io.netty.buffer.ByteBuf;
+
+import java.util.Arrays;
 
 /**
  * User: liubin
@@ -13,8 +16,6 @@ import io.netty.buffer.ByteBuf;
 public class GameProtocol {
 
     public static final int HEAD_LENGTH = 4 + 4 + 4 + 1 + 1 + 1;
-
-    public static final GameProtocol REQUEST_FAILED = new GameProtocol();
 
     private GameProtocol() {}
 
@@ -78,12 +79,20 @@ public class GameProtocol {
         out.writeInt(sessionId);
         out.writeInt(id);
         out.writeByte((byte)phase.value);
-        out.writeByte((byte) type.value);
+        out.writeByte((byte)type.value);
         out.writeByte(status == null ? 0 : (byte)status.value);
         if(dataLength > 0) {
             out.writeBytes(data, 0, dataLength);
         }
     }
+
+    public static final GameProtocol newRequestFailed(int requestId) {
+        GameProtocol gameProtocol = new GameProtocol();
+        gameProtocol.id = requestId;
+        gameProtocol.status = Status.REQUEST_FAILED;
+        return gameProtocol;
+    }
+
 
     public enum Phase {
 
@@ -116,37 +125,40 @@ public class GameProtocol {
     public enum Status {
 
         /** 成功 **/
-        SUCCESS(0),
+        SUCCESS(1),
 
         /** 解密失败 **/
-        DECIPHER_FAILED(1),
+        DECIPHER_FAILED(2),
 
         /** 数据损坏 **/
-        DATA_CORRUPT(2),
+        DATA_CORRUPT(3),
 
         /** 不支持的协议阶段 **/
-        INVALID_PHASE(3),
+        INVALID_PHASE(4),
 
         /** 不支持的消息类型 **/
-        UNKNOWN_MESSAGE_TYPE(4),
+        UNKNOWN_MESSAGE_TYPE(5),
 
         /** 无效的会话,建议客户端重新握手**/
-        INVALID_SESSION_ID(5),
+        INVALID_SESSION_ID(6),
 
         /** 无效的请求序号,建议客户端重新握手 **/
-        INVALID_ID(6),
+        INVALID_ID(7),
 
         /** 握手失败,建议客户端重新握手 **/
-        HANDSHAKE_FAILED(7),
+        HANDSHAKE_FAILED(8),
 
         /** 请求数据为空 **/
-        REQUEST_MESSAGE_EMPTY(8),
+        REQUEST_MESSAGE_EMPTY(9),
 
         /** 重复的请求 **/
-        REPEAT_ID(9),
+        REPEAT_ID(10),
 
         /** session校验失败, 玩家ID与登录时不匹配,建议客户端重新握手 **/
-        INVALID_PLAYER_ID_IN_SESSION(10),
+        INVALID_PLAYER_ID_IN_SESSION(11),
+
+        /** 客户端请求失败 **/
+        REQUEST_FAILED(12),
 
         /** 服务器内部错误 **/
         OTHER_ERROR(0xFF);
@@ -229,6 +241,18 @@ public class GameProtocol {
         return Builder.create();
     }
 
+    @Override
+    public String toString() {
+        return "GameProtocol{" +
+                ", dataLength=" + dataLength +
+                ", sessionId=" + sessionId +
+                ", id=" + id +
+                ", phase=" + phase +
+                ", type=" + type +
+                ", status=" + status +
+                '}';
+    }
+
     public static final class Builder {
         private GameProtocol protocol;
 
@@ -270,45 +294,42 @@ public class GameProtocol {
 
         public Builder setMessage(BaseMsgProtos.RequestMsg requestMsg, CryptoContext cryptoContext) {
             if(protocol.data != null || protocol.dataLength != 0) {
-                throw new GameProtocolException("创建BlasterProtocol失败,为protocol添加message的时候发现内部data或messageType不为空");
+                throw new GameProtocolException("创建Protocol失败,为protocol添加message的时候发现内部data或messageType不为空");
             }
+            Preconditions.checkNotNull(requestMsg);
             protocol.type = Type.REQUEST;
-            if(requestMsg != null) {
-                byte[] data = requestMsg.toByteArray();
-                if(cryptoContext != null) {
-                    data = cryptoContext.encrypt(data);
-                }
-                protocol.data = data;
-                protocol.dataLength = data.length;
+            byte[] data = requestMsg.toByteArray();
+            if(cryptoContext != null) {
+                data = cryptoContext.encrypt(data);
             }
+            protocol.data = data;
+            protocol.dataLength = data.length;
             return this;
         }
 
         public Builder setMessage(BaseMsgProtos.ResponseMsg responseMsg, CryptoContext cryptoContext) {
+            Preconditions.checkNotNull(responseMsg);
             if(protocol.data != null || protocol.dataLength != 0) {
-                throw new GameProtocolException("创建BlasterProtocol失败,为protocol添加message的时候发现内部data或messageType不为空");
+                throw new GameProtocolException("创建Protocol失败,为protocol添加message的时候发现内部data或messageType不为空");
             }
             protocol.type = Type.RESPONSE;
-            if(responseMsg != null) {
-                byte[] data = responseMsg.toByteArray();
-                if(cryptoContext != null) {
-                    data = cryptoContext.encrypt(data);
-                }
-                protocol.data = data;
-                protocol.dataLength = data.length;
+            byte[] data = responseMsg.toByteArray();
+            if(cryptoContext != null) {
+                data = cryptoContext.encrypt(data);
             }
+            protocol.data = data;
+            protocol.dataLength = data.length;
             return this;
         }
 
         public GameProtocol build() {
-            if(Type.REQUEST.equals(protocol.type)) {
-                //TODO 生成消息序号
-//                protocol.id = IdGenerator.getRequestId();
-            } else {
-                if(protocol.id < 1) {
-                    throw new GameProtocolException("创建BlasterProtocol失败,返回消息的id属性不能为空");
-                }
-            }
+//            if(Type.REQUEST.equals(protocol.type)) {
+////                protocol.id = IdGenerator.getRequestId();
+//            } else {
+//                if(protocol.id < 1) {
+//                    throw new GameProtocolException("创建BlasterProtocol失败,返回消息的id属性不能为空");
+//                }
+//            }
             return protocol;
         }
     }

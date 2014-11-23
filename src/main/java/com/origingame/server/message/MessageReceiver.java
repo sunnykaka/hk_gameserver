@@ -66,8 +66,6 @@ public class MessageReceiver {
                     }
                     session = GameSession.create(ctx, publicKey);
                     ctx.setSession(session);
-                    byte[] passwordKey = AES.initPasswordKey();
-                    session.getBuilder().setPasswordKey(ByteString.copyFrom(passwordKey));
                 }
 
                 HandShakeProtos.HandShakeResp.Builder handShakeRespBuilder = HandShakeProtos.HandShakeResp.newBuilder();
@@ -83,12 +81,13 @@ public class MessageReceiver {
                 if(session == null) {
                     throw new GameProtocolException(GameProtocol.Status.INVALID_SESSION_ID, protocol);
                 }
-                //检验session合法性
-                ctx.checkSession(protocol.getId(), request.getRequestMsg().getPlayerId(),
-                        request.getDeviceId());
 
                 byte[] passwordKey = session.getBuilder().getPasswordKey().toByteArray();
                 request.parseCipherMessage(CryptoContext.createAESCrypto(passwordKey));
+
+                //检验session合法性
+                ctx.checkSession(protocol.getId(), request.getRequestMsg().getPlayerId(),
+                        request.getDeviceId());
 
                 //对message的业务处理
                 return executeAction(ctx, request.getMessage());
@@ -155,6 +154,7 @@ public class MessageReceiver {
         }
         if(requestWaiterQueue == null) {
             log.warn("接收到同步响应消息,但是无队列接收该响应消息, protocol[{}]", protocol);
+            return;
         }
         boolean transferResponseToWaitingThreadSuccess = false;
         try {

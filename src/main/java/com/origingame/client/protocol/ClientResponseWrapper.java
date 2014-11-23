@@ -21,25 +21,27 @@ public class ClientResponseWrapper {
 
     private Message message;
 
-    public ClientResponseWrapper() {}
+    private ClientResponseWrapper() {}
 
     private boolean success;
 
-    public static ClientResponseWrapper createResponseFromServer(GameProtocol protocol, byte[] passwordKey, boolean handShake) {
+    private boolean shakeHand;
 
-        ClientResponseWrapper response = new ClientResponseWrapper();
-        response.protocol = protocol;
+    private byte[] passwordKey;
+
+    private void init() {
+
         Preconditions.checkArgument(GameProtocol.Type.RESPONSE.equals(protocol.getType()));
         byte[] data = protocol.getData();
         Preconditions.checkNotNull(data);
-        response.success = GameProtocol.Status.SUCCESS.equals(protocol.getStatus());
+        this.success = GameProtocol.Status.SUCCESS.equals(protocol.getStatus());
 
-        if(response.success) {
+        if(this.success) {
             //协议解析正确才解析内容
             CryptoContext cryptoContext = null;
 
             try {
-                if(handShake) {
+                if(shakeHand) {
                     cryptoContext = CryptoContext.createRSAClientCrypto(passwordKey);
                 } else {
                     cryptoContext = CryptoContext.createAESCrypto(passwordKey);
@@ -50,15 +52,25 @@ public class ClientResponseWrapper {
             }
 
             try {
-                response.responseMsg = BaseMsgProtos.ResponseMsg.parseFrom(data);
-                if(response.responseMsg.getMessageType() != null && response.responseMsg.getMessage() != null) {
-                    response.message = ProtocolUtil.parseMessageFromDataAndType(response.responseMsg.getMessageType(), response.responseMsg.getMessage().toByteArray());
+                this.responseMsg = BaseMsgProtos.ResponseMsg.parseFrom(data);
+                if(this.responseMsg.getMessageType() != null && this.responseMsg.getMessage() != null) {
+                    this.message = ProtocolUtil.parseMessageFromDataAndType(this.responseMsg.getMessageType(), this.responseMsg.getMessage().toByteArray());
                 }
             } catch (InvalidProtocolBufferException e) {
                 throw new GameProtocolException(GameProtocol.Status.DATA_CORRUPT, protocol);
             }
         }
 
+
+    }
+
+    public static ClientResponseWrapper createResponseFromServer(GameProtocol protocol, byte[] passwordKey, boolean shakeHand) {
+
+        ClientResponseWrapper response = new ClientResponseWrapper();
+        response.protocol = protocol;
+        response.passwordKey = passwordKey;
+        response.shakeHand = shakeHand;
+        response.init();
 
         return response;
     }
@@ -88,14 +100,15 @@ public class ClientResponseWrapper {
         return message;
     }
 
+
     @Override
     public String toString() {
         return "ClientResponseWrapper{" +
-                "protocol=" + protocol +
+                "shakeHand=" + shakeHand +
+                ", protocol=" + protocol +
                 ", responseMsg=" + responseMsg +
                 ", message=" + message +
+                ", success=" + success +
                 '}';
     }
-
-
 }

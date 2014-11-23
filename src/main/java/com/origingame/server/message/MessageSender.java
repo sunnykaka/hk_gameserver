@@ -67,76 +67,17 @@ public class MessageSender {
         }
         if(responseProtocol == null) {
             //超时
-            throw new TimeoutException();
-        } else if(responseProtocol == GameProtocol.REQUEST_FAILED){
+            throw new TimeoutException("请求超时,request:" + request);
+        } else if(GameProtocol.Status.REQUEST_FAILED.equals(responseProtocol.getStatus())){
             //请求失败
-            throw new RequestFailedException();
+            System.out.println("response:" + responseProtocol);
+            throw new RequestFailedException("请求失败,request:" + request);
         } else {
             return ClientResponseWrapper.createResponseFromServer(responseProtocol, request.getPasswordKey(),
                     request.getPhase().equals(GameProtocol.Phase.HAND_SHAKE));
         }
 
     }
-
-//    /**
-//     * 发送请求
-//     * @param channel
-//     * @param request
-//     * @param async
-//     * @param messageResponseHandler
-//     */
-//    public void sendRequest(Channel channel, RequestWrapper request, final boolean async, MessageResponseHandler messageResponseHandler) {
-//
-//        final int id = request.getProtocol().getId();
-//        if(log.isDebugEnabled()) {
-//            log.debug("准备发送请求, id[{}], request[{}], async[{}], messageResponseHandler[{}]", new Object[]{id, request, async, messageResponseHandler});
-//        }
-//
-//        //初始化id上下文信息
-//        final IdContext idContext = RequestChannelContext.getInstance().initContext(id, async, request, messageResponseHandler);
-//
-//        //XXX 如果writeAndFlush的参数是(request.getRequestMsg()),为什么operationComplete方法会直接被调用并且future.isSuccess是false?
-//        //answer:根据AbstractNioByteChannel.doWrite()方法,如果消息类型不是ByteBuffer或FileRegion,都会抛异常,然后框架内部捕获异常设置write结果失败
-//        //XXX 为什么在这里用write就发送不了请求,即时设置了TCP_NODELAY也不行?
-//        //answer:因为write方法只是将消息加入了待发送队列,消息没有调用flush是不会发送的
-//        channel.writeAndFlush(request.getProtocol()).addListener(new ChannelWriteFinishListener(id));
-//
-//        if(!async) {
-//            try {
-//                if(messageResponseHandler == null) return;
-//                //如果是同步消息,需要等待响应返回
-//                ServerResponseWrapper response = null;
-//                TransferQueue<ServerResponseWrapper> requestWaiterQueue = idContext.getRequestWaiterQueue();
-//                long timeoutInMillseconds = request.getProtocol().getTimeout() - Clock.nowInMillisecond();
-//                if(timeoutInMillseconds > 0) {
-//                    try {
-//                        log.debug("同步请求开始等待返回结果,id[{}],等待时间[{}ms]", id, timeoutInMillseconds);
-//                        response = requestWaiterQueue.poll(timeoutInMillseconds, TimeUnit.MILLISECONDS);
-//                    } catch (InterruptedException e) {
-//                        log.error("", e);
-//                    }
-//                } else {
-//                    //已超时,直接取结果
-//                    response = requestWaiterQueue.poll();
-//                }
-//
-//                try {
-//                    BlasterSenderUtil.executeResponseHandler(request, response, messageResponseHandler);
-//                } catch (Exception e) {
-//                    log.error("同步发送消息并且进行结果处理的时候发生错误", e);
-//                }
-//            } finally {
-//                //同步请求由调用方负责清除数据
-//                RequestChannelContext.getInstance().removeContext(id);
-//            }
-//
-//
-//        } else {
-//            //发送异步消息
-//            //TODO 需要对异步请求的超时情况处理,将超时的回调函数从map中取出,并执行超时的回调方法
-//        }
-//
-//    }
 
 
     private static class ChannelWriteFinishListener implements ChannelFutureListener {
@@ -155,7 +96,7 @@ public class MessageSender {
             if(future.isSuccess()) {
                 return;
             }
-            MessageReceiver.getInstance().handleResponse(future.channel(), GameProtocol.REQUEST_FAILED);
+            MessageReceiver.getInstance().handleResponse(future.channel(), GameProtocol.newRequestFailed(protocol.getId()));
         }
 
     }

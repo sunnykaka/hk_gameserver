@@ -46,56 +46,53 @@ public class ActionResolver {
     /** readonly messageType set */
     protected Set<String> readonlyActionMethodSet = new HashSet<>();
 
-    public void init(String basePackage) {
+    public void init(String basePackage) throws IOException, ClassNotFoundException, IllegalAccessException, InstantiationException {
         if(!initialized.compareAndSet(false, true)) return;
-        try {
-            log.info("搜寻{}目录下的Action类", basePackage);
-            List<Class> actionClassList = WalkPackageUtil.findTypes(basePackage,
-                    new WalkPackageUtil.CandidateFinder() {
-                        @Override
-                        public Class findCandidate(MetadataReader metadataReader) throws ClassNotFoundException {
-                            Class c = Class.forName(metadataReader.getClassMetadata().getClassName());
-                            if (c.getAnnotation(Action.class) != null) {
-                                log.info("搜寻到Action类: {}", c.getName());
-                                return c;
-                            }
-                            return null;
-                        }
-                    }
-            );
 
-            for(Class actionClass : actionClassList) {
-                Method[] methods = actionClass.getMethods();
-                for(Method method : methods) {
-                    if(!method.isAnnotationPresent(MessageType.class)) {
-                        continue;
-                    }
-                    String[] messageTypes = method.getAnnotation(MessageType.class).value();
-                    if(messageTypes == null || messageTypes.length == 0) {
-                        throw new GameException(String.format("Action[%s],method[%s]对应的messageTypes内容为空",
-                                actionClass.getName(), method.getName()));
-                    }
-                    boolean readonly = method.isAnnotationPresent(Readonly.class);
-                    for(String messageType : messageTypes) {
-                        if(actionMethodMap.put(messageType, method) != null) {
-                            throw new GameException(String.format("Action[%s],method[%s]对应的messageType[%s]重复定义",
-                                    actionClass.getName(), method.getName(), messageType));
+        log.info("搜寻{}目录下的Action类", basePackage);
+        List<Class> actionClassList = WalkPackageUtil.findTypes(basePackage,
+                new WalkPackageUtil.CandidateFinder() {
+                    @Override
+                    public Class findCandidate(MetadataReader metadataReader) throws ClassNotFoundException {
+                        Class c = Class.forName(metadataReader.getClassMetadata().getClassName());
+                        if (c.getAnnotation(Action.class) != null) {
+                            log.info("搜寻到Action类: {}", c.getName());
+                            return c;
                         }
-                        messageTypeActionRelationMap.put(messageType, actionClass.getName());
-                        if(readonly) {
-                            readonlyActionMethodSet.add(messageType);
-                        }
-                        log.info("解析得到messageType[{}]对应Action类[{}] {}", messageType, actionClass.getName(), readonly ? "只读" : "");
+                        return null;
                     }
                 }
-                actionObjectMap.put(actionClass.getName(), actionClass.newInstance());
+        );
+
+        log.info("搜寻得到{}目录下的Action类数量: {}", basePackage, actionClassList.size());
+        for(Class actionClass : actionClassList) {
+            Method[] methods = actionClass.getMethods();
+            for(Method method : methods) {
+                if(!method.isAnnotationPresent(MessageType.class)) {
+                    continue;
+                }
+                String[] messageTypes = method.getAnnotation(MessageType.class).value();
+                if(messageTypes == null || messageTypes.length == 0) {
+                    throw new GameException(String.format("Action[%s],method[%s]对应的messageTypes内容为空",
+                            actionClass.getName(), method.getName()));
+                }
+                boolean readonly = method.isAnnotationPresent(Readonly.class);
+                for(String messageType : messageTypes) {
+                    if(actionMethodMap.put(messageType, method) != null) {
+                        throw new GameException(String.format("Action[%s],method[%s]对应的messageType[%s]重复定义",
+                                actionClass.getName(), method.getName(), messageType));
+                    }
+                    messageTypeActionRelationMap.put(messageType, actionClass.getName());
+                    if(readonly) {
+                        readonlyActionMethodSet.add(messageType);
+                    }
+                    log.info("解析得到messageType[{}]对应Action类[{}] {}", messageType, actionClass.getName(), readonly ? "只读" : "");
+                }
             }
-
-
-        } catch (IOException | ClassNotFoundException | InstantiationException | IllegalAccessException e) {
-            log.error("初始化失败", e);
-            throw new GameException(e);
+            actionObjectMap.put(actionClass.getName(), actionClass.newInstance());
         }
+
+
     }
 
     public Message executeAction0(GameContext ctx, Message message)

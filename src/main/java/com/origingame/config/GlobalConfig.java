@@ -20,6 +20,8 @@ public class GlobalConfig {
 
     public static final String ACTION_BASE_PACKAGE = "com.origingame.business";
 
+    public static final String PROTO_BUF_MESSAGE_BASE_PACKAGE = "com.origingame.message";
+
     public static final String SERVER_PERSISTENCE_FILE_PATH = "server-persistence.xml";
 
     public static final String PROTOBUF_MESSAGE_PACKAGE_NAME = "com.origingame.message.";

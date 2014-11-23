@@ -3,10 +3,17 @@ package com.origingame.server.registry;
 import com.google.protobuf.Descriptors;
 import com.google.protobuf.Message;
 import com.origingame.exception.GameException;
+import com.origingame.server.action.annotation.Action;
+import com.origingame.server.util.WalkPackageUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.core.type.classreading.MetadataReader;
 
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -20,11 +27,13 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 public class DescriptorRegistry {
 
-    private static final DescriptorRegistry instance = new DescriptorRegistry();
+    private static final Logger log = LoggerFactory.getLogger(DescriptorRegistry.class);
+
+    private static final DescriptorRegistry INSTANCE = new DescriptorRegistry();
     private DescriptorRegistry() {
     }
     public static final DescriptorRegistry getInstance() {
-        return instance;
+        return INSTANCE;
     }
 
     private AtomicBoolean initialized = new AtomicBoolean(false);
@@ -32,9 +41,28 @@ public class DescriptorRegistry {
     private Map<String, Class<? extends Message>> pbNameToClassMap = new HashMap<>();
     private Map<String, Method> pbNameToParseMethodMap = new HashMap<>();
 
-    public void init() {
-        if(initialized.compareAndSet(false, true)) {
+    public void init(final String basePackage) throws IOException, ClassNotFoundException {
+        if(!initialized.compareAndSet(false, true)) return;
 //            instance.register(HandShakeProtos.class);
+
+        log.info("搜寻{}目录下的protobuf Message类", basePackage);
+        List<Class> actionClassList = WalkPackageUtil.findTypes(basePackage,
+                new WalkPackageUtil.CandidateFinder() {
+                    @Override
+                    public Class findCandidate(MetadataReader metadataReader) throws ClassNotFoundException {
+                        Class c = Class.forName(metadataReader.getClassMetadata().getClassName());
+                        if (c.getSimpleName().endsWith("Protos")) {
+                            log.info("搜寻到Protobuf类: {}", c.getName());
+                            return c;
+                        }
+                        return null;
+                    }
+                }
+        );
+
+        log.info("搜寻得到{}目录下的protobuf Message类数量: {}", basePackage, actionClassList.size());
+        for (Class c : actionClassList) {
+            register(c);
         }
     }
 
@@ -64,7 +92,7 @@ public class DescriptorRegistry {
             Descriptors.FileDescriptor fileDescriptor = (Descriptors.FileDescriptor)getDescriptorResult;
             for(Descriptors.Descriptor descriptor : fileDescriptor.getMessageTypes()) {
                 //遍历文件中的所有类,进行注册
-                String className = fileDescriptor.getOptions().getJavaPackage() + "." + fileDescriptor.getOptions().getJavaOuterClassname()
+                String className = fileDescriptor.getPackage() + "." + fileDescriptor.getOptions().getJavaOuterClassname()
                         + "$" + descriptor.getName();   //得到java类名
                 Class<? extends Message> messageClass;
                 try {

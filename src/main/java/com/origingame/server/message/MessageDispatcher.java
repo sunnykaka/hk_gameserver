@@ -38,6 +38,12 @@ public class MessageDispatcher {
      */
     public void receive(Channel channel, GameProtocol protocol) {
 
+        if(log.isDebugEnabled()) {
+            log.debug("接收到{}消息, protocol[{}]",
+                    (GameProtocol.Type.REQUEST.equals(protocol.getType()) ? "请求" : "响应"), protocol);
+        }
+
+
         if(GameProtocol.Type.REQUEST.equals(protocol.getType())) {
 
             //接收到的是请求消息,执行对应业务逻辑,如果有需要,返回响应结果
@@ -45,7 +51,7 @@ public class MessageDispatcher {
 
         } else {
 
-            //接收到的是响应消息,查看是否注册了回调函数,有的话进行处理
+            //接收到的是响应消息
             receiveResponse(channel, protocol);
         }
 

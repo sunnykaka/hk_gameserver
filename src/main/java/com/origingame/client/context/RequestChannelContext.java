@@ -1,5 +1,6 @@
 package com.origingame.client.context;
 
+import com.origingame.exception.GameClientException;
 import com.origingame.server.protocol.GameProtocol;
 import io.netty.channel.Channel;
 
@@ -33,7 +34,9 @@ public class RequestChannelContext {
             waiterQueueMap = newWaiterQueueMap == null ? waiterQueueMap : newWaiterQueueMap;
         }
         TransferQueue<GameProtocol> requestWaiterQueue = new LinkedTransferQueue<>();
-        waiterQueueMap.put(id, requestWaiterQueue);
+        if(waiterQueueMap.put(id, requestWaiterQueue) != null) {
+            throw new GameClientException(String.format("在存放requestId对应队列的时候,发现requestId[%d]冲突", id));
+        }
         return requestWaiterQueue;
     }
 

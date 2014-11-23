@@ -27,12 +27,12 @@ public abstract class BaseNettyTest {
     private static int idNumber = 0;
 
     @BeforeClass
-    public static void init() {
+    public static void init() throws Exception {
         World.getInstance().init();
     }
 
     @AfterClass
-    public static void destroy() {
+    public static void destroy() throws Exception {
         World.getInstance().destroy();
     }
 
