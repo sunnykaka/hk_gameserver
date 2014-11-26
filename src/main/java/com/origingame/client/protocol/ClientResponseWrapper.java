@@ -33,7 +33,6 @@ public class ClientResponseWrapper {
 
         Preconditions.checkArgument(GameProtocol.Type.RESPONSE.equals(protocol.getType()));
         byte[] data = protocol.getData();
-        Preconditions.checkNotNull(data);
         this.success = GameProtocol.Status.SUCCESS.equals(protocol.getStatus());
 
         if(this.success) {

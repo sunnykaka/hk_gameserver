@@ -40,11 +40,28 @@ public class RedisUtil {
         }
     }
 
+    public static byte[] buildSingleByteKey(String key) {
+        try {
+            return key.getBytes(GlobalConfig.ENCODING);
+        } catch (UnsupportedEncodingException e) {
+            log.error("", e);
+            return null;
+        }
+    }
+
+
     public static void checkSetResponse(String resp) {
         if(!"OK".equals(resp)) {
             throw new GameDaoException(String.format("请求预期返回[%s],实际返回[%s]", "OK", resp));
         }
     }
+
+    public static void checkHSetResponse(Long resp) {
+        if(!Long.valueOf(1L).equals(resp)) {
+            throw new GameDaoException(String.format("请求预期返回[%s],实际返回[%s]", "1", String.valueOf(resp)));
+        }
+    }
+
 
     public static boolean byteStringEquals(ByteString one, ByteString other) {
         if(one == null || other == null) return false;

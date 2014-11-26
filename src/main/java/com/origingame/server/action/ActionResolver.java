@@ -3,8 +3,8 @@ package com.origingame.server.action;
 import com.google.protobuf.Message;
 import com.origingame.message.BaseMsgProtos;
 import com.origingame.server.action.annotation.Action;
+import com.origingame.server.action.annotation.LockFree;
 import com.origingame.server.action.annotation.MessageType;
-import com.origingame.server.action.annotation.Readonly;
 import com.origingame.server.context.GameContext;
 import com.origingame.exception.GameBusinessException;
 import com.origingame.exception.GameException;
@@ -44,7 +44,7 @@ public class ActionResolver {
     /** key:actionClassName, value:ActionInstance */
     protected Map<String, Object> actionObjectMap = new HashMap<>();
     /** readonly messageType set */
-    protected Set<String> readonlyActionMethodSet = new HashSet<>();
+    protected Set<String> lockFreeActionMethodSet = new HashSet<>();
 
     public void init(String basePackage) throws IOException, ClassNotFoundException, IllegalAccessException, InstantiationException {
         if(!initialized.compareAndSet(false, true)) return;
@@ -76,17 +76,17 @@ public class ActionResolver {
                     throw new GameException(String.format("Action[%s],method[%s]对应的messageTypes内容为空",
                             actionClass.getName(), method.getName()));
                 }
-                boolean readonly = method.isAnnotationPresent(Readonly.class);
+                boolean lockFree = method.isAnnotationPresent(LockFree.class);
                 for(String messageType : messageTypes) {
                     if(actionMethodMap.put(messageType, method) != null) {
                         throw new GameException(String.format("Action[%s],method[%s]对应的messageType[%s]重复定义",
                                 actionClass.getName(), method.getName(), messageType));
                     }
                     messageTypeActionRelationMap.put(messageType, actionClass.getName());
-                    if(readonly) {
-                        readonlyActionMethodSet.add(messageType);
+                    if(lockFree) {
+                        lockFreeActionMethodSet.add(messageType);
                     }
-                    log.info("解析得到messageType[{}]对应Action类[{}] {}", messageType, actionClass.getName(), readonly ? "只读" : "");
+                    log.info("解析得到messageType[{}]对应Action类[{}] {}", messageType, actionClass.getName(), lockFree ? "只读" : "");
                 }
             }
             actionObjectMap.put(actionClass.getName(), actionClass.newInstance());
@@ -113,7 +113,7 @@ public class ActionResolver {
         }
 
         int playerId = request.getPlayerId();
-        boolean needLock = playerId > 0 && !readonlyActionMethodSet.contains(messageType);
+        boolean needLock = playerId > 0 && !lockFreeActionMethodSet.contains(messageType);
         PlayerDbLock lock = null;
 
         try {

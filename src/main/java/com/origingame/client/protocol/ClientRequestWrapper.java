@@ -19,10 +19,6 @@ public class ClientRequestWrapper {
 
     private static final Logger log = LoggerFactory.getLogger(ClientRequestWrapper.class);
 
-    //key:sessionId, value:id计数器
-//    //FIXME 潜在的内存泄漏,只有put没有remove
-//    private static ConcurrentMap<Integer, AtomicInteger> requestIdCounterMap = new ConcurrentHashMap<>();
-
     private GameProtocol protocol;
 
     private BaseMsgProtos.RequestMsg.Builder requestMsg;
@@ -162,16 +158,5 @@ public class ClientRequestWrapper {
         return requestId;
     }
 
-//    public int getRequestId() {
-//        if(requestId <= 0) {
-//            AtomicInteger requestIdCounter = requestIdCounterMap.get(sessionId);
-//            if(requestIdCounter == null) {
-//                requestIdCounter = new AtomicInteger(0);
-//                AtomicInteger newRequestIdCounter = requestIdCounterMap.putIfAbsent(sessionId, requestIdCounter);
-//                requestId = newRequestIdCounter == null ? requestIdCounter.incrementAndGet() : newRequestIdCounter.incrementAndGet();
-//            }
-//        }
-//        return requestId;
-//    }
 
 }

@@ -138,7 +138,7 @@ public class ClientSession {
         ClientResponseWrapper response = MessageDispatcher.getInstance().request(request);
         log.info("接收响应: {}", response);
         if(!response.isSuccess()) {
-            throw new GameClientException("请求失败!, response:" + response);
+            throw new GameClientException("服务器返回失败结果!, response:" + response);
         }
         return response;
 
@@ -226,5 +226,9 @@ public class ClientSession {
                 ", playerId=" + playerId +
                 ", deviceId='" + deviceId + '\'' +
                 '}';
+    }
+
+    public int currentRequestId() {
+        return requestId;
     }
 }

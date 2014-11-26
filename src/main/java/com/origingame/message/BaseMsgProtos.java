@@ -26,13 +26,17 @@ public final class BaseMsgProtos {
      */
     NO_ACTION_FOR_MESSAGE_TYPE(2, 3),
     /**
+     * <code>NO_ENTITY_FOR_ID = 4;</code>
+     */
+    NO_ENTITY_FOR_ID(3, 4),
+    /**
      * <code>USERNAME_NOT_EXIST = 1001;</code>
      */
-    USERNAME_NOT_EXIST(3, 1001),
+    USERNAME_NOT_EXIST(4, 1001),
     /**
      * <code>PASSWORD_INCORRECT = 1002;</code>
      */
-    PASSWORD_INCORRECT(4, 1002),
+    PASSWORD_INCORRECT(5, 1002),
     ;
 
     /**
@@ -47,6 +51,10 @@ public final class BaseMsgProtos {
      * <code>NO_ACTION_FOR_MESSAGE_TYPE = 3;</code>
      */
     public static final int NO_ACTION_FOR_MESSAGE_TYPE_VALUE = 3;
+    /**
+     * <code>NO_ENTITY_FOR_ID = 4;</code>
+     */
+    public static final int NO_ENTITY_FOR_ID_VALUE = 4;
     /**
      * <code>USERNAME_NOT_EXIST = 1001;</code>
      */
@@ -64,6 +72,7 @@ public final class BaseMsgProtos {
         case 1: return SUCCESS;
         case 2: return UNKNOWN_ERROR;
         case 3: return NO_ACTION_FOR_MESSAGE_TYPE;
+        case 4: return NO_ENTITY_FOR_ID;
         case 1001: return USERNAME_NOT_EXIST;
         case 1002: return PASSWORD_INCORRECT;
         default: return null;
@@ -1759,11 +1768,11 @@ public final class BaseMsgProtos {
       "\022\021\n\tdevice_id\030\004 \001(\t\"y\n\013ResponseMsg\022\024\n\014me" +
       "ssage_type\030\001 \001(\t\022\017\n\007message\030\002 \001(\014\0226\n\006sta" +
       "tus\030\003 \002(\0162&.com.origingame.message.Respo" +
-      "nseStatus\022\013\n\003msg\030\004 \001(\t*\202\001\n\016ResponseStatu" +
+      "nseStatus\022\013\n\003msg\030\004 \001(\t*\230\001\n\016ResponseStatu" +
       "s\022\013\n\007SUCCESS\020\001\022\021\n\rUNKNOWN_ERROR\020\002\022\036\n\032NO_" +
-      "ACTION_FOR_MESSAGE_TYPE\020\003\022\027\n\022USERNAME_NO" +
-      "T_EXIST\020\351\007\022\027\n\022PASSWORD_INCORRECT\020\352\007B\017B\rB",
-      "aseMsgProtos"
+      "ACTION_FOR_MESSAGE_TYPE\020\003\022\024\n\020NO_ENTITY_F" +
+      "OR_ID\020\004\022\027\n\022USERNAME_NOT_EXIST\020\351\007\022\027\n\022PASS",
+      "WORD_INCORRECT\020\352\007B\017B\rBaseMsgProtos"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {

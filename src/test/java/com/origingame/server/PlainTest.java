@@ -2,15 +2,23 @@ package com.origingame.server;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.base.Stopwatch;
+import com.origingame.model.PlayerItemProtos;
+import com.origingame.model.PlayerModelProtos;
+import com.origingame.persist.PlayerItemCollectionProtos;
+import org.apache.commons.lang3.reflect.MethodUtils;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Unit test for simple App.
@@ -91,18 +99,41 @@ public class PlainTest {
 
     @Test
     public void test() throws InvocationTargetException, IllegalAccessException {
-        MyBean myBean = new MyBean();
-        myBean.setName("你好");
-        myBean.setAge(18);
+//        MyBean myBean = new MyBean();
+//        myBean.setName("你好");
+//        myBean.setAge(18);
+//
+//        ObjectMapper m = new ObjectMapper();
+//        Map<String,Object> props = m.convertValue(myBean, Map.class);
+//
+//        MyBean myBean2 = m.convertValue(props, MyBean.class);
+//
+//        System.out.println(myBean2.getName());
+//        System.out.println(myBean2.getAge());
 
-        ObjectMapper m = new ObjectMapper();
-        Map<String,Object> props = m.convertValue(myBean, Map.class);
+//        System.out.println(PlayerModelProtos.PlayerModel.class.getSimpleName());
 
-        MyBean myBean2 = m.convertValue(props, MyBean.class);
+        Stopwatch sw = Stopwatch.createStarted();
+        for (int i = 0; i < 100000; i++) {
+            Method m = MethodUtils.getAccessibleMethod(PlayerItemCollectionProtos.PlayerItemCollection.Builder.class, "clearItems", null);
+            System.out.println(m.getName());
+        }
+        sw.stop();
+        String s1 = sw.toString();
 
-        System.out.println(myBean2.getName());
-        System.out.println(myBean2.getAge());
+        Map<String, Method> map = new ConcurrentHashMap<>();
+        Method m = MethodUtils.getAccessibleMethod(PlayerItemCollectionProtos.PlayerItemCollection.Builder.class, "clearItems", null);
+        map.put(PlayerItemCollectionProtos.PlayerItemCollection.Builder.class.getName() + ":" + "clearItems", m);
 
+        sw.reset().start();
+        for (int i = 0; i < 100000; i++) {
+            m = map.get(PlayerItemCollectionProtos.PlayerItemCollection.Builder.class.getName() + ":" + "clearItems");
+            System.out.println(m.getName());
+        }
+        sw.stop();
+
+        String s2 = sw.toString();
+        System.out.println(String.format("========================s1[%s], s2[%s]", s1, s2));
     }
 
     static class MyBean {

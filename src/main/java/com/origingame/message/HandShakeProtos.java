@@ -930,10 +930,10 @@ public final class HandShakeProtos {
   static {
     java.lang.String[] descriptorData = {
       "\n\030message/hand_shake.proto\022\026com.originga" +
-      "me.message\032\026message/base_msg.proto\"\"\n\014Ha" +
-      "ndShakeReq\022\022\n\npublic_key\030\001 \002(\014\"9\n\rHandSh" +
-      "akeResp\022\022\n\nsession_id\030\001 \002(\005\022\024\n\014password_" +
-      "key\030\002 \002(\014B\021B\017HandShakeProtos"
+      "me.message\"\"\n\014HandShakeReq\022\022\n\npublic_key" +
+      "\030\001 \002(\014\"9\n\rHandShakeResp\022\022\n\nsession_id\030\001 " +
+      "\002(\005\022\024\n\014password_key\030\002 \002(\014B\021B\017HandShakePr" +
+      "otos"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -946,7 +946,6 @@ public final class HandShakeProtos {
     com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
         new com.google.protobuf.Descriptors.FileDescriptor[] {
-          com.origingame.message.BaseMsgProtos.getDescriptor(),
         }, assigner);
     internal_static_com_origingame_message_HandShakeReq_descriptor =
       getDescriptor().getMessageTypes().get(0);
@@ -960,7 +959,6 @@ public final class HandShakeProtos {
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_com_origingame_message_HandShakeResp_descriptor,
         new java.lang.String[] { "SessionId", "PasswordKey", });
-    com.origingame.message.BaseMsgProtos.getDescriptor();
   }
 
   // @@protoc_insertion_point(outer_class_scope)

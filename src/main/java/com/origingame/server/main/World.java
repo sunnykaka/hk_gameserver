@@ -8,6 +8,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -25,6 +29,8 @@ public class World {
     }
 
     private AtomicBoolean initialized = new AtomicBoolean(false);
+
+    private static ConcurrentMap<String,Object> beans = new ConcurrentHashMap<>();
 
     public void init() throws Exception {
         if(!initialized.compareAndSet(false, true)) return;
@@ -51,6 +57,31 @@ public class World {
         return new Date();
     }
 
+    /**
+     * 通过这个方法维护的单例对象不能在构造函数内进行初始化的操作.
+     * 因为有可能会被初始化多次
+     * @param cls
+     * @param <T>
+     * @return
+     */
+    @SuppressWarnings("unchecked")
+    public static <T> T getBean(Class<T> cls) {
+        String name = cls.getName();
+        Object obj = beans.get(name);
+        if(obj != null) {
+            return (T)obj;
+        }
+        try {
+            obj = cls.newInstance();
+            Object newObj = beans.putIfAbsent(name, obj);
+            obj = newObj == null ? obj : newObj;
+        } catch (InstantiationException e) {
+            log.error("", e);
+        } catch (IllegalAccessException e) {
+            log.error("", e);
+        }
+        return (T)obj;
+    }
 
 
 

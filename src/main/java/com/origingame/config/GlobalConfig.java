@@ -6,7 +6,7 @@ package com.origingame.config;
  */
 public class GlobalConfig {
 
-    public static final int GAME_SESSION_TIMEOUT = 900;
+    public static final int GAME_SESSION_TIMEOUT_IN_SECONDS = 900;
 
     public static final String REDIS_KEY_SEPERATOR = ":";
 

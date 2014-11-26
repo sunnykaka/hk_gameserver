@@ -6,7 +6,6 @@ import com.origingame.server.protocol.GameProtocol;
 import com.origingame.server.protocol.ServerRequestWrapper;
 import com.origingame.server.protocol.ServerResponseWrapper;
 import com.origingame.server.session.GameSession;
-import com.origingame.server.session.LocalGameSessionMgrImpl;
 import io.netty.channel.Channel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,8 +21,6 @@ public class GameContext {
     private GameSession session;
 
     private Channel channel;
-
-    private LocalGameSessionMgrImpl gameSessionMgr = LocalGameSessionMgrImpl.getInstance();
 
     private ServerRequestWrapper request;
 
@@ -108,7 +105,7 @@ public class GameContext {
 
     }
 
-    public void destroy() {
+    public void releaseResources() {
         dbMediator.close();
     }
 }

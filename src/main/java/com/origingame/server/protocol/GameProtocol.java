@@ -44,7 +44,7 @@ public class GameProtocol {
     /** 类型（0x0F request，0x1F response）1byte **/
     private Type type;
 
-    /** 状态码(0x01-成功, 0x02-解密失败, 0x03-数据损坏, 0x04-未握手请求, 0xFF-其他错误)  1byte [only response] **/
+    /** 状态码(0x01-成功, 0x02-解密失败, 0x03-数据损坏, 0x04-不支持的协议阶段, 0xFF-其他错误)  1byte [only response] **/
     private Status status;
 
     /** 消息 **/
@@ -96,10 +96,19 @@ public class GameProtocol {
 
     public enum Phase {
 
+        /**
+         * 握手
+         */
         HAND_SHAKE(0x0F),
 
+        /**
+         * 明文
+         */
         PLAIN_TEXT(0x1F),
 
+        /**
+         * 密文
+         */
         CIPHER_TEXT(0x2F);
 
         public int value;

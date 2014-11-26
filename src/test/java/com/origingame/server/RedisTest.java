@@ -3,7 +3,7 @@ package com.origingame.server;
 
 import com.google.protobuf.ByteString;
 import com.origingame.server.dao.ServerPersistenceResolver;
-import com.origingame.server.model.GameSessionProtos;
+import com.origingame.persist.GameSessionProtos;
 import com.origingame.server.main.World;
 import org.junit.*;
 import redis.clients.jedis.Jedis;

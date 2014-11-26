@@ -81,19 +81,24 @@ public class MessageDispatcher {
             protocolErrorHappened = true;
         } finally  {
             //TODO ctx, session 的一些提交和清理工作
-            if(!protocolErrorHappened && ctx != null) {
-                GameSession session = ctx.getSession();
-                if(session != null && session.getBuilder() != null) {
-                    session.getBuilder().setLastTime(World.now().getTime());
-                    int id = ctx.getRequest().getProtocol().getId();
-                    if(id > 0) {
-                        session.getBuilder().setLastId(id);
+            try {
+                if (!protocolErrorHappened && ctx != null) {
+                    GameSession session = ctx.getSession();
+                    if (session != null && session.getBuilder() != null) {
+                        session.getBuilder().setLastTime(World.now().getTime());
+                        int id = ctx.getRequest().getProtocol().getId();
+                        if (id > 0) {
+                            session.getBuilder().setLastId(id);
+                        }
+                        session.save();
                     }
-                    session.save();
                 }
-            }
-            if(ctx != null) {
-                ctx.destroy();
+            } catch (Exception e) {
+                log.error("", e);
+            } finally {
+                if(ctx != null) {
+                    ctx.releaseResources();
+                }
             }
         }
 

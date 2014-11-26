@@ -2,9 +2,10 @@ package com.origingame.server.session;
 
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
+import com.origingame.config.GlobalConfig;
 import com.origingame.server.context.GameContext;
 import com.origingame.exception.GameDaoException;
-import com.origingame.server.model.GameSessionProtos;
+import com.origingame.persist.GameSessionProtos;
 import com.origingame.server.util.IdGenerator;
 import com.origingame.server.util.RedisUtil;
 import com.origingame.util.crypto.AES;
@@ -40,7 +41,7 @@ public class GameSession {
     public static GameSession create(GameContext ctx, ByteString publicKey) {
         GameSession gameSession = new GameSession(ctx);
         gameSession.gameSessionBuilder = GameSessionProtos.GameSessionModel.newBuilder();
-        gameSession.getBuilder().setId(IdGenerator.nextSessionId(ctx.getDbMediator()));
+        gameSession.getBuilder().setId(IdGenerator.nextId(ctx.getDbMediator(), GameSessionProtos.GameSessionModel.class));
         gameSession.getBuilder().setPublicKey(publicKey);
         byte[] passwordKey = AES.initPasswordKey();
         gameSession.getBuilder().setPasswordKey(ByteString.copyFrom(passwordKey));
@@ -48,7 +49,6 @@ public class GameSession {
         return gameSession;
 
     }
-
 
     private static byte[] buildStoreKey(int sessionId) {
         return RedisUtil.buildByteKey("session", String.valueOf(sessionId));
@@ -58,12 +58,6 @@ public class GameSession {
         return gameSessionBuilder;
     }
 
-
-    public static void invalid(GameContext ctx, int previousSessionId) {
-        Jedis jedis = ctx.getDbMediator().selectPlayerDb(previousSessionId).getJedis();
-        //直接删除session
-        jedis.del(buildStoreKey(previousSessionId));
-    }
 
     public boolean hasPublicKey(ByteString publicKey) {
         return RedisUtil.byteStringEquals(getBuilder().getPublicKey(), publicKey);
@@ -76,6 +70,8 @@ public class GameSession {
 
     public void save() {
         Jedis jedis = ctx.getDbMediator().selectPlayerDb(gameSessionBuilder.getId()).getJedis();
-        RedisUtil.checkSetResponse(jedis.set(buildStoreKey(gameSessionBuilder.getId()), gameSessionBuilder.build().toByteArray()));
+        byte[] key = buildStoreKey(gameSessionBuilder.getId());
+        RedisUtil.checkSetResponse(jedis.set(key, gameSessionBuilder.build().toByteArray()));
+        jedis.expire(key, GlobalConfig.GAME_SESSION_TIMEOUT_IN_SECONDS);
     }
 }

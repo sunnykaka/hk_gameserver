@@ -13,8 +13,6 @@ import com.origingame.server.protocol.GameProtocol;
 import com.origingame.server.protocol.ServerRequestWrapper;
 import com.origingame.server.protocol.ServerResponseWrapper;
 import com.origingame.server.session.GameSession;
-import com.origingame.server.session.LocalGameSessionMgrImpl;
-import com.origingame.util.crypto.AES;
 import com.origingame.util.crypto.CryptoContext;
 import io.netty.channel.Channel;
 import org.slf4j.Logger;
@@ -38,7 +36,6 @@ public class MessageReceiver {
         return INSTANCE;
     }
 
-    private LocalGameSessionMgrImpl gameSessionMgr = LocalGameSessionMgrImpl.getInstance();
     private ActionResolver actionResolver = ActionResolver.getInstance();
 
 //    private MessageHandlerRegistry messageHandlerRegistry = MessageHandlerRegistry.getInstance();

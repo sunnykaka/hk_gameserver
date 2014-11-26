@@ -21,12 +21,16 @@ public class NettyGameProtocolReceiver extends ChannelInboundHandlerAdapter {
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) {
-        messageDispatcher.receive(ctx.channel(), (GameProtocol) msg);
+        try {
+            messageDispatcher.receive(ctx.channel(), (GameProtocol) msg);
+        } catch (Throwable e) {
+            log.error("", e);
+        }
     }
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
-        cause.printStackTrace();
+        log.error("Netty发生IO异常,关闭与客户端的连接", cause);
         ctx.close();
     }
 

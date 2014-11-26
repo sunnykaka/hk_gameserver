@@ -1,4 +1,4 @@
-package com.origingame.business;
+package com.origingame.business.echo.action;
 
 import com.origingame.config.GlobalConfig;
 import com.origingame.message.EchoProtos;

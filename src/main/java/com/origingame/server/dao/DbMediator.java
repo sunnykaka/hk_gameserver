@@ -1,5 +1,6 @@
 package com.origingame.server.dao;
 
+import com.google.common.base.Preconditions;
 import com.origingame.server.dao.jaxb.ServerPersistence;
 import redis.clients.jedis.Jedis;
 
@@ -19,7 +20,7 @@ public class DbMediator {
     private CenterDb centerDb;
 
     public PlayerDb selectPlayerDb(int playerOrSessionId) {
-
+        Preconditions.checkArgument(playerOrSessionId > 0);
         int index = serverPersistenceResolver.findPlayerDbIndexById(playerOrSessionId);
         PlayerDb playerDb = playerDbMap.get(index);
         if(playerDb == null) {

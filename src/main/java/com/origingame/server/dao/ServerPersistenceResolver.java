@@ -1,9 +1,9 @@
 package com.origingame.server.dao;
 
 import com.google.common.base.Preconditions;
-import com.origingame.server.dao.jaxb.ServerPersistence;
 import com.origingame.exception.GameException;
-import org.apache.commons.pool.impl.GenericObjectPool;
+import com.origingame.server.dao.jaxb.ServerPersistence;
+import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import redis.clients.jedis.JedisPool;
@@ -57,7 +57,7 @@ public class ServerPersistenceResolver {
         Preconditions.checkState(!dbList.getDb().isEmpty());
         log.info("实际物理db数量: {}", dbList.getDb().size());
         for(ServerPersistence.DbList.Db db : dbList.getDb()) {
-            JedisPool jedisPool = new JedisPool(new GenericObjectPool.Config(), db.getIp(), db.getPort(), 2000, db.getPassword(), db.getDb());
+            JedisPool jedisPool = new JedisPool(new GenericObjectPoolConfig(), db.getIp(), db.getPort(), 2000, db.getPassword(), db.getDb());
             realDbMap.put(db.getName(), jedisPool);
         }
 
