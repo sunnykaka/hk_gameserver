@@ -28,6 +28,7 @@ public class GlobalConfig {
 
     public static final long CLIENT_REQUEST_TIMEOUT = 20000L;
 
+    public static final String ITEM_SPEC_FILE_PATH = "item.xml";
 
 
 }

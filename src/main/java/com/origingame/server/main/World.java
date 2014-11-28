@@ -1,6 +1,7 @@
 package com.origingame.server.main;
 
 import com.origingame.config.GlobalConfig;
+import com.origingame.item.resolver.ItemSpecResolver;
 import com.origingame.server.action.ActionResolver;
 import com.origingame.server.dao.ServerPersistenceResolver;
 import com.origingame.server.registry.DescriptorRegistry;
@@ -8,8 +9,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -42,6 +41,10 @@ public class World {
             ServerPersistenceResolver.getInstance().init(GlobalConfig.SERVER_PERSISTENCE_FILE_PATH);
             //注册protobuf生成类
             DescriptorRegistry.getInstance().init(GlobalConfig.PROTO_BUF_MESSAGE_BASE_PACKAGE);
+            //读取item定义文件
+            ItemSpecResolver.getInstance().init(GlobalConfig.ITEM_SPEC_FILE_PATH);
+
+
         } catch (Exception e) {
             log.error("初始化失败", e);
             throw e;
