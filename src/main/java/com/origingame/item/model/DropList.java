@@ -10,17 +10,16 @@ import com.origingame.item.resolver.ItemSpec;
 public class DropList extends ItemSpec {
 
 
-    private DropAttr dropAttr;
+    private DropAttr drops;
 
     private int number;
 
-
-    public DropAttr getDropAttr() {
-        return dropAttr;
+    public DropAttr getDrops() {
+        return drops;
     }
 
-    public void setDropAttr(DropAttr dropAttr) {
-        this.dropAttr = dropAttr;
+    public void setDrops(DropAttr drops) {
+        this.drops = drops;
     }
 
     public int getNumber() {

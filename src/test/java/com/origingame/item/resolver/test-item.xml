@@ -1,0 +1,33 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<item_database>
+    <group id="Box">
+        <item_spec class_name="com.origingame.item.model.Box" id="Box-1" name="混沌宝箱" description="" resource="{gem:1, gold:1, vit:1}"  drop_list_id="DropList-1" usable="true" stack="true" sellable="false" givable="false" icon="HBOX" level="0" />
+        <item_spec class_name="com.origingame.item.model.Box" id="Box-2" name="1级点券箱（绑）" description="打开后获得10宝石" resource="{gem:10, gold:0, vit:0}"  drop_list_id="" usable="true" stack="true" sellable="false" givable="false" icon="ZBOX-3" level="0" />
+    </group>
+    <group id="DropList">
+        <item_spec class_name="com.origingame.item.model.DropList" id="DropList-1" name="新手大礼包（绑）" description="" drops="[['ExpendItem-1','1'],['ExpendItem-2','2','100']]" number="2"/>
+        <item_spec class_name="com.origingame.item.model.DropList" id="DropList-2" name="5级成长礼盒（绑）" description="" drops="[['Box-1','1','30'],['Box-2','1','30'],['ExpendItem-3','2','40']]" number="3"/>
+    </group>
+    <group id="ExpendItem">
+        <item_spec class_name="com.origingame.item.model.ExpendItem" id="ExpendItem-1" name="大喇叭（绑）" resource="{gem:1, gold:2, vit:3}" description="用于在世界频道发言，每次发言自动扣除1个。" usable="false" stack="true" sellable="false" givable="false"  icon="XLB" level="1"/>
+        <item_spec class_name="com.origingame.item.model.ExpendItem" id="ExpendItem-2" name="全屏炸弹" resource="" description="boom!" usable="true" stack="true" sellable="false" givable="false"  icon="XLB" level="1"/>
+        <item_spec class_name="com.origingame.item.model.ExpendItem" id="ExpendItem-3" name="秋刀鱼(小)" resource="{exp:100}" description="食用获得100点经验" usable="true" stack="true" sellable="false" givable="false" icon="XLB" level="1"/>
+    </group>
+    <group id="BuffItem">
+        <item_spec class_name="com.origingame.item.model.BuffItem" id="BuffItem-1" name="积分增加" description="使用后，积分额外增加1.25倍，持续72小时。（叠加使用不额外提升物品效果，只延长效果持续时间。）" type="1" effect_value="125" live_time="259200" percent="true" buff_desc="获得积分增加1.25倍。" usable="true" stack="true" sellable="false" givable="false" icon="ZSJZ" level="0" />
+        <item_spec class_name="com.origingame.item.model.BuffItem" id="BuffItem-2" name="金币增加" description="使用后，金币额外增加1.25倍，持续72小时。（叠加使用不额外提升物品效果，只延长效果持续时间。）" type="2" effect_value="125" live_time="259200" percent="true" buff_desc="获得金币增加1.25倍。" usable="true" stack="true" sellable="false" givable="false" icon="ZSJZ" level="0" />
+    </group>
+    <group id="ExpSet">
+        <item_spec class_name="com.origingame.item.model.ExpSet" id="ExpSet-1-1" name="" description="1" exp="100"/>
+        <item_spec class_name="com.origingame.item.model.ExpSet" id="ExpSet-1-2" name="" description="2" exp="120"/>
+    </group>
+    <group id="Task">
+        <item_spec class_name="com.origingame.item.model.Task" id="Task-1-1" name="任务1" description="描述1。" task_info="任务信息1。" next_tasks="['Task-1-2','Task-1-3']" resource="{gem:1, gold:1, vit:1}" condition="{itemUse:{itemId:1, num:5}}" need_level="0" daily="false" />
+        <item_spec class_name="com.origingame.item.model.Task" id="Task-1-2" name="任务2" description="描述2。" task_info="任务信息2。" next_tasks="['Task-1-4']" resource="{gem:2, gold:2, vit:2}" condition="{mission:10}" drops="[['Box-2','2']]" need_level="0" daily="false" />
+        <item_spec class_name="com.origingame.item.model.Task" id="Task-1-3" name="任务3" description="描述3。" task_info="任务信息3。" next_tasks="" resource="{gem:3, gold:3, vit:3}" condition="{itemOwn:{itemId:1, num:5}}" drops="[['Box-3','3']]" need_level="0" daily="false" />
+        <item_spec class_name="com.origingame.item.model.Task" id="Task-1-4" name="任务4" description="描述4。" task_info="任务信息4。" next_tasks="" resource="{gem:4, gold:4, vit:4}" condition="{pay:100}" drops="[['Box-4','4']]" need_level="0" daily="false" />
+    </group>
+    <group id="DailyTask">
+        <item_spec class_name="com.origingame.item.model.Task" id="Task-2-1" name="日常任务1" description="描述1。" task_info="任务信息1。" next_tasks="" resource="{gem:1, gold:1, vit:1}" condition="login" drops="[['Box-1','1']]" need_level="0" daily="false" />
+    </group>
+</item_database>

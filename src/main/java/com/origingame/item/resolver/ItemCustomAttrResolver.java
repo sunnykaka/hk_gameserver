@@ -1,10 +1,13 @@
 package com.origingame.item.resolver;
 
-import com.google.common.collect.Sets;
+import com.origingame.exception.ItemResolveException;
+import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * User: Liub
@@ -37,17 +40,27 @@ public class ItemCustomAttrResolver {
     }
 
 
-    public void saveCustomAttr(ItemSpec itemSpec, Map<String, String> attributeMap) throws IllegalAccessException, InstantiationException {
+    public void saveCustomAttr(ItemSpec itemSpec, Map<String, String> attributeMap) throws Exception {
         for(Map.Entry<String, Class<? extends ItemAttr>> entry : itemAttrClassMap.entrySet()) {
             String attrName = entry.getKey();
             if(!attributeMap.containsKey(attrName)) continue;
             String attrValue = attributeMap.get(attrName);
-            ItemAttr itemAttr = entry.getValue().newInstance().parseAttrValue(attrValue);
-            //TODO set itemAttr to itemSpec
+            if(!StringUtils.isBlank(attrValue)) {
+                //set itemAttr to itemSpec
+                ItemAttr itemAttr;
+                try {
+                    itemAttr = entry.getValue().newInstance().parseAttrValue(attrValue);
+                } catch (ItemResolveException e) {
+                    throw e;
+                } catch (Exception e) {
+                    log.error("", e);
+                    throw new ItemResolveException(String.format("自定义对象属性解析的时候发生错误, id[%s], attrName[%s], attrValue[%s]", itemSpec.getId(), attrName, attrValue));
+                }
+                String fieldName = ItemSpecManager.toCamelCase(attrName);
+                BeanUtils.setProperty(itemSpec, fieldName, itemAttr);
+            }
+            attributeMap.remove(attrName);
         }
-
     }
-
-
 
 }

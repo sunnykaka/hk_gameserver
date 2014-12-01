@@ -1,7 +1,7 @@
 package com.origingame.server.main;
 
 import com.origingame.config.GlobalConfig;
-import com.origingame.item.resolver.ItemSpecResolver;
+import com.origingame.item.resolver.ItemSpecManager;
 import com.origingame.server.action.ActionResolver;
 import com.origingame.server.dao.ServerPersistenceResolver;
 import com.origingame.server.registry.DescriptorRegistry;
@@ -42,7 +42,7 @@ public class World {
             //注册protobuf生成类
             DescriptorRegistry.getInstance().init(GlobalConfig.PROTO_BUF_MESSAGE_BASE_PACKAGE);
             //读取item定义文件
-            ItemSpecResolver.getInstance().init(GlobalConfig.ITEM_SPEC_FILE_PATH);
+            ItemSpecManager.getInstance().init(GlobalConfig.ITEM_SPEC_FILE_PATH);
 
 
         } catch (Exception e) {

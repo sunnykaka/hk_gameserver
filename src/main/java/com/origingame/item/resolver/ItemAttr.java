@@ -9,5 +9,5 @@ public interface ItemAttr {
     String getAttrName();
 
 
-    ItemAttr parseAttrValue(String attrValue);
+    ItemAttr parseAttrValue(String attrValue) throws Exception;
 }

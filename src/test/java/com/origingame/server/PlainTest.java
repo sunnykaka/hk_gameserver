@@ -3,6 +3,7 @@ package com.origingame.server;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Stopwatch;
+import com.origingame.item.model.BuffItem;
 import com.origingame.model.PlayerItemProtos;
 import com.origingame.model.PlayerModelProtos;
 import com.origingame.persist.PlayerItemCollectionProtos;
@@ -113,27 +114,28 @@ public class PlainTest {
 
 //        System.out.println(PlayerModelProtos.PlayerModel.class.getSimpleName());
 
-        Stopwatch sw = Stopwatch.createStarted();
-        for (int i = 0; i < 100000; i++) {
-            Method m = MethodUtils.getAccessibleMethod(PlayerItemCollectionProtos.PlayerItemCollection.Builder.class, "clearItems", null);
-            System.out.println(m.getName());
-        }
-        sw.stop();
-        String s1 = sw.toString();
+//        Stopwatch sw = Stopwatch.createStarted();
+//        for (int i = 0; i < 100000; i++) {
+//            Method m = MethodUtils.getAccessibleMethod(PlayerItemCollectionProtos.PlayerItemCollection.Builder.class, "clearItems", null);
+//            System.out.println(m.getName());
+//        }
+//        sw.stop();
+//        String s1 = sw.toString();
+//
+//        Map<String, Method> map = new ConcurrentHashMap<>();
+//        Method m = MethodUtils.getAccessibleMethod(PlayerItemCollectionProtos.PlayerItemCollection.Builder.class, "clearItems", null);
+//        map.put(PlayerItemCollectionProtos.PlayerItemCollection.Builder.class.getName() + ":" + "clearItems", m);
+//
+//        sw.reset().start();
+//        for (int i = 0; i < 100000; i++) {
+//            m = map.get(PlayerItemCollectionProtos.PlayerItemCollection.Builder.class.getName() + ":" + "clearItems");
+//            System.out.println(m.getName());
+//        }
+//        sw.stop();
+//
+//        String s2 = sw.toString();
+//        System.out.println(String.format("========================s1[%s], s2[%s]", s1, s2));
 
-        Map<String, Method> map = new ConcurrentHashMap<>();
-        Method m = MethodUtils.getAccessibleMethod(PlayerItemCollectionProtos.PlayerItemCollection.Builder.class, "clearItems", null);
-        map.put(PlayerItemCollectionProtos.PlayerItemCollection.Builder.class.getName() + ":" + "clearItems", m);
-
-        sw.reset().start();
-        for (int i = 0; i < 100000; i++) {
-            m = map.get(PlayerItemCollectionProtos.PlayerItemCollection.Builder.class.getName() + ":" + "clearItems");
-            System.out.println(m.getName());
-        }
-        sw.stop();
-
-        String s2 = sw.toString();
-        System.out.println(String.format("========================s1[%s], s2[%s]", s1, s2));
     }
 
     static class MyBean {
