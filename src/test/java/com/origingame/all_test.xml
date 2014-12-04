@@ -1,0 +1,20 @@
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
+
+<suite name="Suite1" verbose="1" >
+    <test name="Regression1" preserve-order="true" >
+        <parameter name="centerDbIp" value="192.168.131.128"/>
+        <parameter name="playerDbIp1" value="192.168.131.128"/>
+        <parameter name="playerDbIp2" value="192.168.131.128"/>
+        <classes>
+            <class name="com.origingame.server.protocol.GameProtocolTest" />
+
+            <class name="com.origingame.item.resolver.ItemSpecManagerTest" />
+
+            <class name="com.origingame.business.player.dao.PlayerDaoTest" />
+
+            <class name="com.origingame.business.echo.action.EchoActionTest" />
+            <class name="com.origingame.business.player.action.PlayerRegisterActionTest" />
+            <class name="com.origingame.business.player.action.PlayerLoginActionTest" />
+        </classes>
+    </test>
+</suite>

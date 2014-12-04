@@ -3,9 +3,8 @@ package com.origingame.server;
 
 import com.origingame.util.crypto.AES;
 import com.origingame.util.crypto.RSA;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.testng.annotations.BeforeTest;
+import org.testng.annotations.Test;
 
 import java.nio.charset.Charset;
 import java.security.KeyPair;
@@ -24,7 +23,7 @@ public class EncryptionTest {
 
     public static final String KEY_ALGORTHM="RSA";//
 
-    @Before
+    @BeforeTest
     public void init() {
         System.out.println("before");
     }

@@ -1,13 +1,14 @@
 package com.origingame;
 
+import com.origingame.client.main.ClientSession;
 import com.origingame.client.main.NettyGameClient;
 import com.origingame.server.main.NettyGameServer;
 import com.origingame.server.main.World;
 import io.netty.channel.Channel;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.testng.annotations.AfterTest;
+import org.testng.annotations.BeforeTest;
 
 import java.io.IOException;
 
@@ -24,31 +25,38 @@ public abstract class BaseNettyTest {
     protected String host = "localhost";
     protected int port = 8080;
 
-    private static int idNumber = 0;
-
-    @BeforeClass
+    @BeforeTest
     public static void init() throws Exception {
         World.getInstance().init();
     }
 
-    @AfterClass
+    @AfterTest
     public static void destroy() throws Exception {
         World.getInstance().destroy();
     }
 
-    protected Channel initClient() throws InterruptedException, IOException {
-        NettyGameClient client = new NettyGameClient(host, port);
-        Channel channel = client.start();
-        return channel;
+//    protected Channel initClient() throws InterruptedException, IOException {
+//        NettyGameClient client = new NettyGameClient(host, port);
+//        Channel channel = client.start();
+//        return channel;
+//    }
+//
+//    protected void initServer() throws InterruptedException {
+//        NettyGameServer server = new NettyGameServer(port);
+//        server.start();
+//    }
+//
+//    protected static synchronized int generateId() {
+//        return ++idNumber;
+//    }
+
+
+    protected ClientSession initSession() {
+        ClientSession clientSession = new ClientSession(host, port);
+        clientSession.openConnection();
+        clientSession.shakeHand();
+        return clientSession;
     }
 
-    protected void initServer() throws InterruptedException {
-        NettyGameServer server = new NettyGameServer(port);
-        server.start();
-    }
-
-    protected static synchronized int generateId() {
-        return ++idNumber;
-    }
 
 }

@@ -1,38 +1,24 @@
 package com.origingame.server;
 
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.base.Stopwatch;
-import com.origingame.item.model.BuffItem;
-import com.origingame.model.PlayerItemProtos;
-import com.origingame.model.PlayerModelProtos;
-import com.origingame.persist.PlayerItemCollectionProtos;
-import org.apache.commons.lang3.reflect.MethodUtils;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.testng.annotations.BeforeTest;
+import org.testng.annotations.Test;
 
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Unit test for simple App.
  */
 public class PlainTest {
 
-    @Before
+    @BeforeTest
     public void init() {
         System.out.println("before");
     }
 
-    @Test
-    @Ignore
+    @Test(enabled = false)
     public void testApp() {
         print1(13);
     }

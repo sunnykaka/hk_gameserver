@@ -3,6 +3,7 @@ package com.origingame.server.message;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.Message;
 import com.origingame.client.context.RequestChannelContext;
+import com.origingame.exception.GameException;
 import com.origingame.message.BaseMsgProtos;
 import com.origingame.message.HandShakeProtos;
 import com.origingame.server.action.ActionResolver;
@@ -82,10 +83,6 @@ public class MessageReceiver {
                 byte[] passwordKey = session.getBuilder().getPasswordKey().toByteArray();
                 request.parseCipherMessage(CryptoContext.createAESCrypto(passwordKey));
 
-                //检验session合法性
-                ctx.checkSession(protocol.getId(), request.getRequestMsg().getPlayerId(),
-                        request.getDeviceId());
-
                 //对message的业务处理
                 return executeAction(ctx, request.getMessage());
 
@@ -120,7 +117,7 @@ public class MessageReceiver {
             }
             responseMsg = e.getMsg();
         } catch (Exception e) {
-            log.error("", e);
+            throw new GameException(e);
         }
 
 //        if(!exceptionCaught && result == null) {

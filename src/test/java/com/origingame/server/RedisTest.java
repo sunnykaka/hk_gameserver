@@ -5,7 +5,9 @@ import com.google.protobuf.ByteString;
 import com.origingame.server.dao.ServerPersistenceResolver;
 import com.origingame.persist.GameSessionProtos;
 import com.origingame.server.main.World;
-import org.junit.*;
+import org.testng.annotations.AfterTest;
+import org.testng.annotations.BeforeTest;
+import org.testng.annotations.Test;
 import redis.clients.jedis.Jedis;
 
 import static org.hamcrest.MatcherAssert.*;
@@ -18,13 +20,13 @@ import static org.hamcrest.Matchers.*;
 public class RedisTest {
 
 
-    @BeforeClass
+    @BeforeTest
     public static void init() throws Exception {
         System.out.println("before");
         World.getInstance().init();
     }
 
-    @AfterClass
+    @AfterTest
     public static void destroy() throws Exception {
         System.out.println("after");
         World.getInstance().destroy();

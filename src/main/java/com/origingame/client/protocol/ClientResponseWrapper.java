@@ -90,7 +90,6 @@ public class ClientResponseWrapper {
     public boolean isNeedHandShakeAgain() {
         return GameProtocol.Status.HANDSHAKE_FAILED.equals(protocol.getStatus())
                 || GameProtocol.Status.INVALID_ID.equals(protocol.getStatus())
-                || GameProtocol.Status.INVALID_PLAYER_ID_IN_SESSION.equals(protocol.getStatus())
                 || GameProtocol.Status.INVALID_SESSION_ID.equals(protocol.getStatus())
                 ;
     }

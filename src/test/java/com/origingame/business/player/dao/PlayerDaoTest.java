@@ -15,9 +15,9 @@ import com.origingame.persist.PlayerItemCollectionProtos;
 import com.origingame.server.dao.DbMediator;
 import com.origingame.server.main.World;
 import org.apache.commons.lang3.RandomStringUtils;
-import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.testng.annotations.Test;
 
 import java.util.Map;
 import java.util.UUID;
@@ -44,7 +44,7 @@ public class PlayerDaoTest extends BaseNettyTest {
     public void testOwnedItem() throws Exception {
 
         DbMediator dbMediator = new DbMediator();
-        Player player = playerDao.create(dbMediator, RandomStringUtils.randomAlphabetic(8));
+        Player player = playerDao.create(dbMediator, RandomStringUtils.randomAlphabetic(8), RandomStringUtils.randomAlphabetic(8), RandomStringUtils.randomAlphabetic(8));
         int playerId = player.getId();
         assertThat(player.getId(), greaterThan(0));
         OwnedItem<PlayerPropertyProtos.PlayerProperty.Builder> propertyOwnedItem = player.getProperty();
@@ -78,7 +78,7 @@ public class PlayerDaoTest extends BaseNettyTest {
     public void testNormalOwnedItemCollection() throws Exception {
 
         DbMediator dbMediator = new DbMediator();
-        Player player = playerDao.create(dbMediator, RandomStringUtils.randomAlphabetic(8));
+        Player player = playerDao.create(dbMediator, RandomStringUtils.randomAlphabetic(8), RandomStringUtils.randomAlphabetic(8), RandomStringUtils.randomAlphabetic(8));
         int playerId = player.getId();
         assertThat(player.getId(), greaterThan(0));
 
@@ -136,7 +136,7 @@ public class PlayerDaoTest extends BaseNettyTest {
     public void testEmptyOwnedItemCollection() throws Exception {
 
         DbMediator dbMediator = new DbMediator();
-        Player player = playerDao.create(dbMediator, RandomStringUtils.randomAlphabetic(8));
+        Player player = playerDao.create(dbMediator, RandomStringUtils.randomAlphabetic(8), RandomStringUtils.randomAlphabetic(8), RandomStringUtils.randomAlphabetic(8));
         int playerId = player.getId();
         assertThat(player.getId(), greaterThan(0));
 

@@ -14,9 +14,14 @@ public class IdGenerator {
         return dbMediator.selectCenterDb().getJedis().incr(RedisUtil.buildKey("id", "next")).intValue();
     }
 
-    public static int nextId(DbMediator dbMediator, Class<? extends Message> clazz) {
-        return dbMediator.selectCenterDb().getJedis().incr(RedisUtil.buildKey("id", clazz.getSimpleName())).intValue();
+    public static int nextId(DbMediator dbMediator, Class clazz) {
+        return nextId(dbMediator.selectCenterDb().getJedis(), clazz);
     }
+
+    public static int nextId(Jedis jedis, Class clazz) {
+        return jedis.incr(RedisUtil.buildKey("id", clazz.getSimpleName())).intValue();
+    }
+
 
 
 

@@ -8,6 +8,8 @@ import com.origingame.client.protocol.ClientResponseWrapper;
 import com.origingame.exception.CryptoException;
 import com.origingame.exception.GameClientException;
 import com.origingame.message.HandShakeProtos;
+import com.origingame.message.LoginProtos;
+import com.origingame.model.PlayerModelProtos;
 import com.origingame.server.message.MessageDispatcher;
 import com.origingame.util.crypto.RSA;
 import io.netty.channel.Channel;
@@ -42,6 +44,8 @@ public class ClientSession {
     private String host;
 
     private int port;
+
+    private PlayerModelProtos.PlayerModel player;
 
     private int playerId;
 
@@ -144,6 +148,20 @@ public class ClientSession {
 
     }
 
+    public ClientResponseWrapper login(String username, String password) {
+        LoginProtos.LoginReq.Builder loginReq = LoginProtos.LoginReq.newBuilder();
+        loginReq.setUsername(username);
+        loginReq.setPassword(password);
+        ClientResponseWrapper clientResponseWrapper = sendMessage(loginReq.build());
+        LoginProtos.LoginResp loginResp = (LoginProtos.LoginResp) clientResponseWrapper.getMessage();
+        if(loginResp != null) {
+            this.player = loginResp.getPlayer();
+            this.playerId = loginResp.getPlayerId();
+        }
+        return clientResponseWrapper;
+    }
+
+
     private void checkShakeHanded() {
         if(!shakeHandSuccess) {
             throw new GameClientException("发送数据之前需要先进行握手");
@@ -193,16 +211,24 @@ public class ClientSession {
         return ++requestId;
     }
 
-    public void setPlayerId(int playerId) {
-        this.playerId = playerId;
-    }
-
     public void setDeviceId(String deviceId) {
         this.deviceId = deviceId;
     }
 
     public int getPlayerId() {
         return playerId;
+    }
+
+    public PlayerModelProtos.PlayerModel getPlayer() {
+        return player;
+    }
+
+    public void setPlayerId(int playerId) {
+        this.playerId = playerId;
+    }
+
+    public void setPlayer(PlayerModelProtos.PlayerModel player) {
+        this.player = player;
     }
 
     public String getDeviceId() {

@@ -13,11 +13,11 @@ public final class PlayerPropertyProtos {
       com.google.protobuf.MessageOrBuilder {
 
     /**
-     * <code>required int32 id = 1;</code>
+     * <code>optional int32 id = 1;</code>
      */
     boolean hasId();
     /**
-     * <code>required int32 id = 1;</code>
+     * <code>optional int32 id = 1;</code>
      */
     int getId();
 
@@ -95,18 +95,50 @@ public final class PlayerPropertyProtos {
     int getGem();
 
     /**
-     * <code>optional string unique_id = 9;</code>
+     * <code>optional string outer_id = 9;</code>
      */
-    boolean hasUniqueId();
+    boolean hasOuterId();
     /**
-     * <code>optional string unique_id = 9;</code>
+     * <code>optional string outer_id = 9;</code>
      */
-    java.lang.String getUniqueId();
+    java.lang.String getOuterId();
     /**
-     * <code>optional string unique_id = 9;</code>
+     * <code>optional string outer_id = 9;</code>
      */
     com.google.protobuf.ByteString
-        getUniqueIdBytes();
+        getOuterIdBytes();
+
+    /**
+     * <code>optional string password = 10;</code>
+     */
+    boolean hasPassword();
+    /**
+     * <code>optional string password = 10;</code>
+     */
+    java.lang.String getPassword();
+    /**
+     * <code>optional string password = 10;</code>
+     */
+    com.google.protobuf.ByteString
+        getPasswordBytes();
+
+    /**
+     * <code>optional int32 session_id = 11;</code>
+     */
+    boolean hasSessionId();
+    /**
+     * <code>optional int32 session_id = 11;</code>
+     */
+    int getSessionId();
+
+    /**
+     * <code>optional int64 last_login_time = 12;</code>
+     */
+    boolean hasLastLoginTime();
+    /**
+     * <code>optional int64 last_login_time = 12;</code>
+     */
+    long getLastLoginTime();
   }
   /**
    * Protobuf type {@code com.origingame.model.PlayerProperty}
@@ -205,7 +237,23 @@ public final class PlayerPropertyProtos {
             case 74: {
               com.google.protobuf.ByteString bs = input.readBytes();
               bitField0_ |= 0x00000100;
-              uniqueId_ = bs;
+              outerId_ = bs;
+              break;
+            }
+            case 82: {
+              com.google.protobuf.ByteString bs = input.readBytes();
+              bitField0_ |= 0x00000200;
+              password_ = bs;
+              break;
+            }
+            case 88: {
+              bitField0_ |= 0x00000400;
+              sessionId_ = input.readInt32();
+              break;
+            }
+            case 96: {
+              bitField0_ |= 0x00000800;
+              lastLoginTime_ = input.readInt64();
               break;
             }
           }
@@ -251,13 +299,13 @@ public final class PlayerPropertyProtos {
     public static final int ID_FIELD_NUMBER = 1;
     private int id_;
     /**
-     * <code>required int32 id = 1;</code>
+     * <code>optional int32 id = 1;</code>
      */
     public boolean hasId() {
       return ((bitField0_ & 0x00000001) == 0x00000001);
     }
     /**
-     * <code>required int32 id = 1;</code>
+     * <code>optional int32 id = 1;</code>
      */
     public int getId() {
       return id_;
@@ -422,19 +470,19 @@ public final class PlayerPropertyProtos {
       return gem_;
     }
 
-    public static final int UNIQUE_ID_FIELD_NUMBER = 9;
-    private java.lang.Object uniqueId_;
+    public static final int OUTER_ID_FIELD_NUMBER = 9;
+    private java.lang.Object outerId_;
     /**
-     * <code>optional string unique_id = 9;</code>
+     * <code>optional string outer_id = 9;</code>
      */
-    public boolean hasUniqueId() {
+    public boolean hasOuterId() {
       return ((bitField0_ & 0x00000100) == 0x00000100);
     }
     /**
-     * <code>optional string unique_id = 9;</code>
+     * <code>optional string outer_id = 9;</code>
      */
-    public java.lang.String getUniqueId() {
-      java.lang.Object ref = uniqueId_;
+    public java.lang.String getOuterId() {
+      java.lang.Object ref = outerId_;
       if (ref instanceof java.lang.String) {
         return (java.lang.String) ref;
       } else {
@@ -442,26 +490,98 @@ public final class PlayerPropertyProtos {
             (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
         if (bs.isValidUtf8()) {
-          uniqueId_ = s;
+          outerId_ = s;
         }
         return s;
       }
     }
     /**
-     * <code>optional string unique_id = 9;</code>
+     * <code>optional string outer_id = 9;</code>
      */
     public com.google.protobuf.ByteString
-        getUniqueIdBytes() {
-      java.lang.Object ref = uniqueId_;
+        getOuterIdBytes() {
+      java.lang.Object ref = outerId_;
       if (ref instanceof java.lang.String) {
         com.google.protobuf.ByteString b = 
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
-        uniqueId_ = b;
+        outerId_ = b;
         return b;
       } else {
         return (com.google.protobuf.ByteString) ref;
       }
+    }
+
+    public static final int PASSWORD_FIELD_NUMBER = 10;
+    private java.lang.Object password_;
+    /**
+     * <code>optional string password = 10;</code>
+     */
+    public boolean hasPassword() {
+      return ((bitField0_ & 0x00000200) == 0x00000200);
+    }
+    /**
+     * <code>optional string password = 10;</code>
+     */
+    public java.lang.String getPassword() {
+      java.lang.Object ref = password_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        if (bs.isValidUtf8()) {
+          password_ = s;
+        }
+        return s;
+      }
+    }
+    /**
+     * <code>optional string password = 10;</code>
+     */
+    public com.google.protobuf.ByteString
+        getPasswordBytes() {
+      java.lang.Object ref = password_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        password_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    public static final int SESSION_ID_FIELD_NUMBER = 11;
+    private int sessionId_;
+    /**
+     * <code>optional int32 session_id = 11;</code>
+     */
+    public boolean hasSessionId() {
+      return ((bitField0_ & 0x00000400) == 0x00000400);
+    }
+    /**
+     * <code>optional int32 session_id = 11;</code>
+     */
+    public int getSessionId() {
+      return sessionId_;
+    }
+
+    public static final int LAST_LOGIN_TIME_FIELD_NUMBER = 12;
+    private long lastLoginTime_;
+    /**
+     * <code>optional int64 last_login_time = 12;</code>
+     */
+    public boolean hasLastLoginTime() {
+      return ((bitField0_ & 0x00000800) == 0x00000800);
+    }
+    /**
+     * <code>optional int64 last_login_time = 12;</code>
+     */
+    public long getLastLoginTime() {
+      return lastLoginTime_;
     }
 
     private void initFields() {
@@ -473,7 +593,10 @@ public final class PlayerPropertyProtos {
       maxVit_ = 0;
       gold_ = 0;
       gem_ = 0;
-      uniqueId_ = "";
+      outerId_ = "";
+      password_ = "";
+      sessionId_ = 0;
+      lastLoginTime_ = 0L;
     }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
@@ -481,10 +604,6 @@ public final class PlayerPropertyProtos {
       if (isInitialized == 1) return true;
       if (isInitialized == 0) return false;
 
-      if (!hasId()) {
-        memoizedIsInitialized = 0;
-        return false;
-      }
       memoizedIsInitialized = 1;
       return true;
     }
@@ -517,7 +636,16 @@ public final class PlayerPropertyProtos {
         output.writeInt32(8, gem_);
       }
       if (((bitField0_ & 0x00000100) == 0x00000100)) {
-        output.writeBytes(9, getUniqueIdBytes());
+        output.writeBytes(9, getOuterIdBytes());
+      }
+      if (((bitField0_ & 0x00000200) == 0x00000200)) {
+        output.writeBytes(10, getPasswordBytes());
+      }
+      if (((bitField0_ & 0x00000400) == 0x00000400)) {
+        output.writeInt32(11, sessionId_);
+      }
+      if (((bitField0_ & 0x00000800) == 0x00000800)) {
+        output.writeInt64(12, lastLoginTime_);
       }
       getUnknownFields().writeTo(output);
     }
@@ -562,7 +690,19 @@ public final class PlayerPropertyProtos {
       }
       if (((bitField0_ & 0x00000100) == 0x00000100)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeBytesSize(9, getUniqueIdBytes());
+          .computeBytesSize(9, getOuterIdBytes());
+      }
+      if (((bitField0_ & 0x00000200) == 0x00000200)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBytesSize(10, getPasswordBytes());
+      }
+      if (((bitField0_ & 0x00000400) == 0x00000400)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt32Size(11, sessionId_);
+      }
+      if (((bitField0_ & 0x00000800) == 0x00000800)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt64Size(12, lastLoginTime_);
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
@@ -697,8 +837,14 @@ public final class PlayerPropertyProtos {
         bitField0_ = (bitField0_ & ~0x00000040);
         gem_ = 0;
         bitField0_ = (bitField0_ & ~0x00000080);
-        uniqueId_ = "";
+        outerId_ = "";
         bitField0_ = (bitField0_ & ~0x00000100);
+        password_ = "";
+        bitField0_ = (bitField0_ & ~0x00000200);
+        sessionId_ = 0;
+        bitField0_ = (bitField0_ & ~0x00000400);
+        lastLoginTime_ = 0L;
+        bitField0_ = (bitField0_ & ~0x00000800);
         return this;
       }
 
@@ -762,7 +908,19 @@ public final class PlayerPropertyProtos {
         if (((from_bitField0_ & 0x00000100) == 0x00000100)) {
           to_bitField0_ |= 0x00000100;
         }
-        result.uniqueId_ = uniqueId_;
+        result.outerId_ = outerId_;
+        if (((from_bitField0_ & 0x00000200) == 0x00000200)) {
+          to_bitField0_ |= 0x00000200;
+        }
+        result.password_ = password_;
+        if (((from_bitField0_ & 0x00000400) == 0x00000400)) {
+          to_bitField0_ |= 0x00000400;
+        }
+        result.sessionId_ = sessionId_;
+        if (((from_bitField0_ & 0x00000800) == 0x00000800)) {
+          to_bitField0_ |= 0x00000800;
+        }
+        result.lastLoginTime_ = lastLoginTime_;
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
@@ -807,20 +965,27 @@ public final class PlayerPropertyProtos {
         if (other.hasGem()) {
           setGem(other.getGem());
         }
-        if (other.hasUniqueId()) {
+        if (other.hasOuterId()) {
           bitField0_ |= 0x00000100;
-          uniqueId_ = other.uniqueId_;
+          outerId_ = other.outerId_;
           onChanged();
+        }
+        if (other.hasPassword()) {
+          bitField0_ |= 0x00000200;
+          password_ = other.password_;
+          onChanged();
+        }
+        if (other.hasSessionId()) {
+          setSessionId(other.getSessionId());
+        }
+        if (other.hasLastLoginTime()) {
+          setLastLoginTime(other.getLastLoginTime());
         }
         this.mergeUnknownFields(other.getUnknownFields());
         return this;
       }
 
       public final boolean isInitialized() {
-        if (!hasId()) {
-          
-          return false;
-        }
         return true;
       }
 
@@ -845,19 +1010,19 @@ public final class PlayerPropertyProtos {
 
       private int id_ ;
       /**
-       * <code>required int32 id = 1;</code>
+       * <code>optional int32 id = 1;</code>
        */
       public boolean hasId() {
         return ((bitField0_ & 0x00000001) == 0x00000001);
       }
       /**
-       * <code>required int32 id = 1;</code>
+       * <code>optional int32 id = 1;</code>
        */
       public int getId() {
         return id_;
       }
       /**
-       * <code>required int32 id = 1;</code>
+       * <code>optional int32 id = 1;</code>
        */
       public Builder setId(int value) {
         bitField0_ |= 0x00000001;
@@ -866,7 +1031,7 @@ public final class PlayerPropertyProtos {
         return this;
       }
       /**
-       * <code>required int32 id = 1;</code>
+       * <code>optional int32 id = 1;</code>
        */
       public Builder clearId() {
         bitField0_ = (bitField0_ & ~0x00000001);
@@ -1187,24 +1352,24 @@ public final class PlayerPropertyProtos {
         return this;
       }
 
-      private java.lang.Object uniqueId_ = "";
+      private java.lang.Object outerId_ = "";
       /**
-       * <code>optional string unique_id = 9;</code>
+       * <code>optional string outer_id = 9;</code>
        */
-      public boolean hasUniqueId() {
+      public boolean hasOuterId() {
         return ((bitField0_ & 0x00000100) == 0x00000100);
       }
       /**
-       * <code>optional string unique_id = 9;</code>
+       * <code>optional string outer_id = 9;</code>
        */
-      public java.lang.String getUniqueId() {
-        java.lang.Object ref = uniqueId_;
+      public java.lang.String getOuterId() {
+        java.lang.Object ref = outerId_;
         if (!(ref instanceof java.lang.String)) {
           com.google.protobuf.ByteString bs =
               (com.google.protobuf.ByteString) ref;
           java.lang.String s = bs.toStringUtf8();
           if (bs.isValidUtf8()) {
-            uniqueId_ = s;
+            outerId_ = s;
           }
           return s;
         } else {
@@ -1212,53 +1377,193 @@ public final class PlayerPropertyProtos {
         }
       }
       /**
-       * <code>optional string unique_id = 9;</code>
+       * <code>optional string outer_id = 9;</code>
        */
       public com.google.protobuf.ByteString
-          getUniqueIdBytes() {
-        java.lang.Object ref = uniqueId_;
+          getOuterIdBytes() {
+        java.lang.Object ref = outerId_;
         if (ref instanceof String) {
           com.google.protobuf.ByteString b = 
               com.google.protobuf.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
-          uniqueId_ = b;
+          outerId_ = b;
           return b;
         } else {
           return (com.google.protobuf.ByteString) ref;
         }
       }
       /**
-       * <code>optional string unique_id = 9;</code>
+       * <code>optional string outer_id = 9;</code>
        */
-      public Builder setUniqueId(
+      public Builder setOuterId(
           java.lang.String value) {
         if (value == null) {
     throw new NullPointerException();
   }
   bitField0_ |= 0x00000100;
-        uniqueId_ = value;
+        outerId_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>optional string unique_id = 9;</code>
+       * <code>optional string outer_id = 9;</code>
        */
-      public Builder clearUniqueId() {
+      public Builder clearOuterId() {
         bitField0_ = (bitField0_ & ~0x00000100);
-        uniqueId_ = getDefaultInstance().getUniqueId();
+        outerId_ = getDefaultInstance().getOuterId();
         onChanged();
         return this;
       }
       /**
-       * <code>optional string unique_id = 9;</code>
+       * <code>optional string outer_id = 9;</code>
        */
-      public Builder setUniqueIdBytes(
+      public Builder setOuterIdBytes(
           com.google.protobuf.ByteString value) {
         if (value == null) {
     throw new NullPointerException();
   }
   bitField0_ |= 0x00000100;
-        uniqueId_ = value;
+        outerId_ = value;
+        onChanged();
+        return this;
+      }
+
+      private java.lang.Object password_ = "";
+      /**
+       * <code>optional string password = 10;</code>
+       */
+      public boolean hasPassword() {
+        return ((bitField0_ & 0x00000200) == 0x00000200);
+      }
+      /**
+       * <code>optional string password = 10;</code>
+       */
+      public java.lang.String getPassword() {
+        java.lang.Object ref = password_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          if (bs.isValidUtf8()) {
+            password_ = s;
+          }
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>optional string password = 10;</code>
+       */
+      public com.google.protobuf.ByteString
+          getPasswordBytes() {
+        java.lang.Object ref = password_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          password_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>optional string password = 10;</code>
+       */
+      public Builder setPassword(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000200;
+        password_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional string password = 10;</code>
+       */
+      public Builder clearPassword() {
+        bitField0_ = (bitField0_ & ~0x00000200);
+        password_ = getDefaultInstance().getPassword();
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional string password = 10;</code>
+       */
+      public Builder setPasswordBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000200;
+        password_ = value;
+        onChanged();
+        return this;
+      }
+
+      private int sessionId_ ;
+      /**
+       * <code>optional int32 session_id = 11;</code>
+       */
+      public boolean hasSessionId() {
+        return ((bitField0_ & 0x00000400) == 0x00000400);
+      }
+      /**
+       * <code>optional int32 session_id = 11;</code>
+       */
+      public int getSessionId() {
+        return sessionId_;
+      }
+      /**
+       * <code>optional int32 session_id = 11;</code>
+       */
+      public Builder setSessionId(int value) {
+        bitField0_ |= 0x00000400;
+        sessionId_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional int32 session_id = 11;</code>
+       */
+      public Builder clearSessionId() {
+        bitField0_ = (bitField0_ & ~0x00000400);
+        sessionId_ = 0;
+        onChanged();
+        return this;
+      }
+
+      private long lastLoginTime_ ;
+      /**
+       * <code>optional int64 last_login_time = 12;</code>
+       */
+      public boolean hasLastLoginTime() {
+        return ((bitField0_ & 0x00000800) == 0x00000800);
+      }
+      /**
+       * <code>optional int64 last_login_time = 12;</code>
+       */
+      public long getLastLoginTime() {
+        return lastLoginTime_;
+      }
+      /**
+       * <code>optional int64 last_login_time = 12;</code>
+       */
+      public Builder setLastLoginTime(long value) {
+        bitField0_ |= 0x00000800;
+        lastLoginTime_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional int64 last_login_time = 12;</code>
+       */
+      public Builder clearLastLoginTime() {
+        bitField0_ = (bitField0_ & ~0x00000800);
+        lastLoginTime_ = 0L;
         onChanged();
         return this;
       }
@@ -1289,11 +1594,13 @@ public final class PlayerPropertyProtos {
   static {
     java.lang.String[] descriptorData = {
       "\n\033model/player_property.proto\022\024com.origi" +
-      "ngame.model\"\233\001\n\016PlayerProperty\022\n\n\002id\030\001 \002" +
+      "ngame.model\"\331\001\n\016PlayerProperty\022\n\n\002id\030\001 \001" +
       "(\005\022\020\n\010username\030\002 \001(\t\022\020\n\010nickname\030\003 \001(\t\022\r" +
       "\n\005level\030\004 \001(\005\022\013\n\003vit\030\005 \001(\005\022\017\n\007max_vit\030\006 " +
-      "\001(\005\022\014\n\004gold\030\007 \001(\005\022\013\n\003gem\030\010 \001(\005\022\021\n\tunique" +
-      "_id\030\t \001(\tB\026B\024PlayerPropertyProtos"
+      "\001(\005\022\014\n\004gold\030\007 \001(\005\022\013\n\003gem\030\010 \001(\005\022\020\n\010outer_" +
+      "id\030\t \001(\t\022\020\n\010password\030\n \001(\t\022\022\n\nsession_id" +
+      "\030\013 \001(\005\022\027\n\017last_login_time\030\014 \001(\003B\026B\024Playe" +
+      "rPropertyProtos"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -1312,7 +1619,7 @@ public final class PlayerPropertyProtos {
     internal_static_com_origingame_model_PlayerProperty_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_com_origingame_model_PlayerProperty_descriptor,
-        new java.lang.String[] { "Id", "Username", "Nickname", "Level", "Vit", "MaxVit", "Gold", "Gem", "UniqueId", });
+        new java.lang.String[] { "Id", "Username", "Nickname", "Level", "Vit", "MaxVit", "Gold", "Gem", "OuterId", "Password", "SessionId", "LastLoginTime", });
   }
 
   // @@protoc_insertion_point(outer_class_scope)

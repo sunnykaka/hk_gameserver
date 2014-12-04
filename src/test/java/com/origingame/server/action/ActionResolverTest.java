@@ -2,9 +2,9 @@ package com.origingame.server.action;
 
 
 import com.google.common.collect.Sets;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.testng.annotations.AfterTest;
+import org.testng.annotations.BeforeTest;
+import org.testng.annotations.Test;
 
 import java.lang.reflect.Method;
 import java.util.Map;
@@ -20,11 +20,11 @@ import static org.hamcrest.Matchers.*;
 public class ActionResolverTest {
 
 
-    @BeforeClass
+    @BeforeTest
     public static void init() {
     }
 
-    @AfterClass
+    @AfterTest
     public static void destroy() {
     }
 
@@ -35,7 +35,6 @@ public class ActionResolverTest {
         Map<String, Method> actionMethodMap = ActionResolver.getInstance().actionMethodMap;
         Map<String, Object> actionObjectMap = ActionResolver.getInstance().actionObjectMap;
         Map<String, String> messageTypeActionRelationMap = ActionResolver.getInstance().messageTypeActionRelationMap;
-        Set<String> readonlyActionMethodSet = ActionResolver.getInstance().lockFreeActionMethodSet;
 
         assertThat(actionMethodMap.keySet(), is((Set<String>) Sets.newHashSet("type1", "type2", "type3")));
 
@@ -47,7 +46,6 @@ public class ActionResolverTest {
             assertThat(className, is(TestAction.class.getName()));
         }
 
-        assertThat(readonlyActionMethodSet, is((Set<String>)Sets.newHashSet("type2", "type3")));
 
     }
 

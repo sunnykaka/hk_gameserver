@@ -182,12 +182,6 @@ public final class PlayerItemCollectionProtos {
       if (isInitialized == 1) return true;
       if (isInitialized == 0) return false;
 
-      for (int i = 0; i < getItemsCount(); i++) {
-        if (!getItems(i).isInitialized()) {
-          memoizedIsInitialized = 0;
-          return false;
-        }
-      }
       memoizedIsInitialized = 1;
       return true;
     }
@@ -417,12 +411,6 @@ public final class PlayerItemCollectionProtos {
       }
 
       public final boolean isInitialized() {
-        for (int i = 0; i < getItemsCount(); i++) {
-          if (!getItems(i).isInitialized()) {
-            
-            return false;
-          }
-        }
         return true;
       }
 

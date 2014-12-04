@@ -1,7 +1,6 @@
 package com.origingame.server.action;
 
 import com.origingame.server.action.annotation.Action;
-import com.origingame.server.action.annotation.LockFree;
 import com.origingame.server.action.annotation.MessageType;
 
 /**
@@ -15,11 +14,9 @@ public class TestAction {
     public void method1() {}
 
     @MessageType("type2")
-    @LockFree
     public void method2() {}
 
     @MessageType("type3")
-    @LockFree
     public void method3() {}
 
     public void method4() {}

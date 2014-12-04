@@ -1,7 +1,14 @@
 package com.origingame.server.context;
 
+import com.origingame.business.player.dao.PlayerDao;
+import com.origingame.business.player.manager.PlayerManager;
+import com.origingame.business.player.model.Player;
+import com.origingame.exception.GameBusinessException;
+import com.origingame.message.BaseMsgProtos;
+import com.origingame.server.action.annotation.CheckPlayer;
 import com.origingame.server.dao.DbMediator;
 import com.origingame.exception.GameProtocolException;
+import com.origingame.server.main.World;
 import com.origingame.server.protocol.GameProtocol;
 import com.origingame.server.protocol.ServerRequestWrapper;
 import com.origingame.server.protocol.ServerResponseWrapper;
@@ -18,6 +25,8 @@ public class GameContext {
 
     private static final Logger log = LoggerFactory.getLogger(GameContext.class);
 
+    private PlayerDao playerDao = World.getBean(PlayerDao.class);
+
     private GameSession session;
 
     private Channel channel;
@@ -27,6 +36,8 @@ public class GameContext {
     private ServerResponseWrapper response;
 
     private DbMediator dbMediator;
+
+    private Player player;
 
     public GameContext(Channel channel, GameProtocol protocol) {
         this.channel = channel;
@@ -70,42 +81,91 @@ public class GameContext {
         return dbMediator;
     }
 
-    public void checkSession(int id, int playerId, String deviceId) {
-
+    /**
+     *
+     * @param checkPlayer
+     */
+    public void checkSession(CheckPlayer checkPlayer) {
         GameProtocol protocol = request.getProtocol();
-        if(!protocol.getPhase().equals(GameProtocol.Phase.HAND_SHAKE)) {
-            if(session == null) {
-                throw new GameProtocolException(GameProtocol.Status.INVALID_SESSION_ID, protocol);
+
+        if(log.isDebugEnabled()) {
+            log.debug("校验session: protocolId[{}], sessionLastId[{}], sessionPlayerId[{}], sessionId[{}], playerSessionId[{}]",
+                    protocol.getId(),
+                    session == null ? 0 : session.getBuilder().getLastId(),
+                    session == null ? 0 : session.getBuilder().getPlayerId(),
+                    session == null ? 0 : session.getBuilder().getId(),
+                    player == null ? 0 : player.getProperty().get().getSessionId()
+                    );
+        }
+
+        if(session == null) {
+            throw new GameProtocolException(GameProtocol.Status.INVALID_SESSION_ID, protocol);
+        }
+        if(protocol.getId() <= 0) {
+            throw new GameProtocolException(GameProtocol.Status.INVALID_ID, protocol);
+        }
+        if(protocol.getId() <= session.getBuilder().getLastId()) {
+            throw new GameProtocolException(GameProtocol.Status.REPEAT_ID, protocol);
+        }
+
+        if(checkPlayer != null) {
+            initPlayer(request.getPlayerId());
+
+            if(session.getBuilder().getPlayerId() <= 0) {
+                throw new GameBusinessException(BaseMsgProtos.ResponseStatus.SESSION_NOT_BIND_TO_PLAYER_YET);
             }
-            if(id <= 0) {
-                throw new GameProtocolException(GameProtocol.Status.INVALID_ID, protocol);
+            //校验请求的玩家id要与session绑定的玩家id相同
+            if(request.getPlayerId() != session.getBuilder().getPlayerId()) {
+                throw new GameBusinessException(BaseMsgProtos.ResponseStatus.MULTI_PLAYER_WITH_SESSION);
+            }
+            //校验玩家id没有对应其他session
+            int previousSessionId = player.getProperty().get().getSessionId();
+            if(previousSessionId > 0 && previousSessionId != session.getBuilder().getId()) {
+                throw new GameBusinessException(BaseMsgProtos.ResponseStatus.MULTI_SESSION_WITH_PLAYER);
             }
         }
 
-        if(session != null && id > 0) {
-            //如果session为null或者id等于0,则为握手请求,可以不校验
-            if(id <= session.getBuilder().getLastId()) {
-                throw new GameProtocolException(GameProtocol.Status.REPEAT_ID, protocol);
-            }
-            if(session.getBuilder().getPlayerId() > 0) {
-                if(playerId != session.getBuilder().getPlayerId()) {
-                    throw new GameProtocolException(GameProtocol.Status.INVALID_PLAYER_ID_IN_SESSION, protocol);
-                }
-//                //校验玩家id没有对应其他session
-//                int previousSessionId = gameSessionMgr.getSessionIdByPlayerId(this, session.getModel().getPlayerId());
-//                if(previousSessionId > 0) {
-//                    //使原session失效
-//                    GameSession.invalid(this, previousSessionId);
+//        if(session != null && protocol.getId() > 0) {
+//            //如果session为null或者id等于0,则为握手请求,可以不校验
+//            if(protocol.getId() <= session.getBuilder().getLastId()) {
+//                throw new GameProtocolException(GameProtocol.Status.REPEAT_ID, protocol);
+//            }
+//
+//            //校验请求的玩家id要与session绑定的玩家id相同
+//            if(session.getBuilder().getPlayerId() > 0) {
+//                if(request.getPlayerId() != session.getBuilder().getPlayerId()) {
+//                    throw new GameBusinessException(BaseMsgProtos.ResponseStatus.INVALID_PLAYER_IN_SESSION);
 //                }
-            }
-
-
-        }
-
-
+//            }
+//            //校验玩家id没有对应其他session
+//            if(player != null) {
+//                int previousSessionId = player.getProperty().get().getSessionId();
+//                if(previousSessionId > 0 && previousSessionId != session.getBuilder().getId()) {
+//                    throw new GameBusinessException(BaseMsgProtos.ResponseStatus.INVALID_SESSION_IN_PLAYER);
+//                }
+//            }
+//        }
     }
 
     public void releaseResources() {
         dbMediator.close();
+    }
+
+    public void initPlayer(int playerId) {
+        if(playerId <= 0) {
+            throw new GameBusinessException(BaseMsgProtos.ResponseStatus.PLAYER_ID_INVALID);
+        }
+        this.player = playerDao.load(dbMediator, playerId);
+    }
+
+    public Player getPlayer() {
+        return player;
+    }
+
+    public void savePlayerAfterRequest() {
+        if(player == null) return;
+        player.getProperty().get().setLastLoginTime(World.now().getTime());
+        player.getProperty().markUpdated();
+        playerDao.save(dbMediator, player);
     }
 }

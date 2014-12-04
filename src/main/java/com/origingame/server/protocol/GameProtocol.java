@@ -163,11 +163,8 @@ public class GameProtocol {
         /** 重复的请求 **/
         REPEAT_ID(10),
 
-        /** session校验失败, 玩家ID与登录时不匹配,建议客户端重新握手 **/
-        INVALID_PLAYER_ID_IN_SESSION(11),
-
         /** 客户端请求失败 **/
-        REQUEST_FAILED(12),
+        REQUEST_FAILED(11),
 
         /** 服务器内部错误 **/
         OTHER_ERROR(0xFF);

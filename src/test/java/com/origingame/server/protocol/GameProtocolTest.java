@@ -3,9 +3,9 @@ package com.origingame.server.protocol;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.testng.annotations.AfterTest;
+import org.testng.annotations.BeforeTest;
+import org.testng.annotations.Test;
 
 import javax.xml.bind.DatatypeConverter;
 import java.nio.charset.Charset;
@@ -21,11 +21,11 @@ import static org.hamcrest.Matchers.*;
 public class GameProtocolTest {
 
 
-    @BeforeClass
+    @BeforeTest
     public static void init() {
     }
 
-    @AfterClass
+    @AfterTest
     public static void destroy() {
     }
 

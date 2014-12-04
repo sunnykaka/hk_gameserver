@@ -3,7 +3,7 @@ package com.origingame.server.action;
 import com.google.protobuf.Message;
 import com.origingame.message.BaseMsgProtos;
 import com.origingame.server.action.annotation.Action;
-import com.origingame.server.action.annotation.LockFree;
+import com.origingame.server.action.annotation.CheckPlayer;
 import com.origingame.server.action.annotation.MessageType;
 import com.origingame.server.context.GameContext;
 import com.origingame.exception.GameBusinessException;
@@ -44,7 +44,10 @@ public class ActionResolver {
     /** key:actionClassName, value:ActionInstance */
     protected Map<String, Object> actionObjectMap = new HashMap<>();
     /** readonly messageType set */
-    protected Set<String> lockFreeActionMethodSet = new HashSet<>();
+//    protected Set<String> lockFreeActionMethodSet = new HashSet<>();
+//    /** readonly messageType set */
+//    protected Set<String> noCheckPlayerActionMethodSet = new HashSet<>();
+    protected Map<String, CheckPlayer> checkPlayerAnnotationMap = new HashMap<>();
 
     public void init(String basePackage) throws IOException, ClassNotFoundException, IllegalAccessException, InstantiationException {
         if(!initialized.compareAndSet(false, true)) return;
@@ -76,17 +79,22 @@ public class ActionResolver {
                     throw new GameException(String.format("Action[%s],method[%s]对应的messageTypes内容为空",
                             actionClass.getName(), method.getName()));
                 }
-                boolean lockFree = method.isAnnotationPresent(LockFree.class);
+//                boolean lockFree = method.isAnnotationPresent(LockFree.class);
+//                boolean checkPlayer = method.isAnnotationPresent(CheckPlayer.class);
+                CheckPlayer checkPlayer = method.getAnnotation(CheckPlayer.class);
                 for(String messageType : messageTypes) {
                     if(actionMethodMap.put(messageType, method) != null) {
                         throw new GameException(String.format("Action[%s],method[%s]对应的messageType[%s]重复定义",
                                 actionClass.getName(), method.getName(), messageType));
                     }
                     messageTypeActionRelationMap.put(messageType, actionClass.getName());
-                    if(lockFree) {
-                        lockFreeActionMethodSet.add(messageType);
+//                    if(lockFree) {
+//                        lockFreeActionMethodSet.add(messageType);
+//                    }
+                    if(checkPlayer != null) {
+                        checkPlayerAnnotationMap.put(messageType, checkPlayer);
                     }
-                    log.info("解析得到messageType[{}]对应Action类[{}] {}", messageType, actionClass.getName(), lockFree ? "只读" : "");
+                    log.info("解析得到messageType[{}]对应Action类[{}],checkPlayer[{}]", messageType, actionClass.getName(), checkPlayerToString(checkPlayer));
                 }
             }
             actionObjectMap.put(actionClass.getName(), actionClass.newInstance());
@@ -95,36 +103,63 @@ public class ActionResolver {
 
     }
 
+    private String checkPlayerToString(CheckPlayer checkPlayer) {
+        String result = "";
+        if(checkPlayer != null) {
+            result = "check=true, lock=" + checkPlayer.lock();
+        }
+        return result;
+    }
+
     public Message executeAction0(GameContext ctx, Message message)
             throws InvocationTargetException, IllegalAccessException {
 
         ServerRequestWrapper request = ctx.getRequest();
         String messageType = request.getMessageType();
         Method actionMethod = actionMethodMap.get(messageType);
-        if(actionMethod == null) {
+        if (actionMethod == null) {
             throw new GameBusinessException(BaseMsgProtos.ResponseStatus.NO_ACTION_FOR_MESSAGE_TYPE);
         }
         String actionClassName = messageTypeActionRelationMap.get(messageType);
         Object actionObject = actionObjectMap.get(actionClassName);
 
-        if(log.isDebugEnabled()) {
+        if (log.isDebugEnabled()) {
             log.debug("执行action方法,actionClassName[{}], methodName[{}], message",
                     actionClassName, actionMethod.getName(), message);
         }
 
         int playerId = request.getPlayerId();
-        boolean needLock = playerId > 0 && !lockFreeActionMethodSet.contains(messageType);
+        CheckPlayer checkPlayer = checkPlayerAnnotationMap.get(messageType);
+//        boolean needLock = lockFreeActionMethodSet.contains(messageType);
+//        boolean noCheckPlayer = lockFreeActionMethodSet.contains(messageType);
+        boolean needLock = checkPlayer != null && checkPlayer.lock();
+        if(checkPlayer != null && playerId <= 0) {
+            throw new GameBusinessException(BaseMsgProtos.ResponseStatus.PLAYER_ID_INVALID);
+        }
+
         PlayerDbLock lock = null;
 
         try {
-            if(needLock) {
+            if (needLock) {
                 //对playerId加互斥锁
                 lock = PlayerDbLock.newLock(ctx.getDbMediator().selectPlayerDb(playerId).getJedis(), "player", String.valueOf(playerId));
                 lock.lock();
             }
+            //检验session合法性
+            ctx.checkSession(checkPlayer);
+
             //执行方法
-            Message result = (Message)actionMethod.invoke(actionObject, ctx, message);
+            Message result = (Message) actionMethod.invoke(actionObject, ctx, message);
+
+            //保存player数据
+            ctx.savePlayerAfterRequest();
             return result;
+        } catch (InvocationTargetException e) {
+            if(GameBusinessException.class.isAssignableFrom(e.getTargetException().getClass())) {
+                throw (GameBusinessException)e.getTargetException();
+            } else {
+                throw e;
+            }
         } finally {
             if(lock != null) {
                 lock.release();

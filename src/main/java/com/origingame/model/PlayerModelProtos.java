@@ -13,24 +13,24 @@ public final class PlayerModelProtos {
       com.google.protobuf.MessageOrBuilder {
 
     /**
-     * <code>required int32 id = 1;</code>
+     * <code>optional int32 id = 1;</code>
      */
     boolean hasId();
     /**
-     * <code>required int32 id = 1;</code>
+     * <code>optional int32 id = 1;</code>
      */
     int getId();
 
     /**
-     * <code>required .com.origingame.model.PlayerProperty property = 2;</code>
+     * <code>optional .com.origingame.model.PlayerProperty property = 2;</code>
      */
     boolean hasProperty();
     /**
-     * <code>required .com.origingame.model.PlayerProperty property = 2;</code>
+     * <code>optional .com.origingame.model.PlayerProperty property = 2;</code>
      */
     com.origingame.model.PlayerPropertyProtos.PlayerProperty getProperty();
     /**
-     * <code>required .com.origingame.model.PlayerProperty property = 2;</code>
+     * <code>optional .com.origingame.model.PlayerProperty property = 2;</code>
      */
     com.origingame.model.PlayerPropertyProtos.PlayerPropertyOrBuilder getPropertyOrBuilder();
 
@@ -182,13 +182,13 @@ public final class PlayerModelProtos {
     public static final int ID_FIELD_NUMBER = 1;
     private int id_;
     /**
-     * <code>required int32 id = 1;</code>
+     * <code>optional int32 id = 1;</code>
      */
     public boolean hasId() {
       return ((bitField0_ & 0x00000001) == 0x00000001);
     }
     /**
-     * <code>required int32 id = 1;</code>
+     * <code>optional int32 id = 1;</code>
      */
     public int getId() {
       return id_;
@@ -197,19 +197,19 @@ public final class PlayerModelProtos {
     public static final int PROPERTY_FIELD_NUMBER = 2;
     private com.origingame.model.PlayerPropertyProtos.PlayerProperty property_;
     /**
-     * <code>required .com.origingame.model.PlayerProperty property = 2;</code>
+     * <code>optional .com.origingame.model.PlayerProperty property = 2;</code>
      */
     public boolean hasProperty() {
       return ((bitField0_ & 0x00000002) == 0x00000002);
     }
     /**
-     * <code>required .com.origingame.model.PlayerProperty property = 2;</code>
+     * <code>optional .com.origingame.model.PlayerProperty property = 2;</code>
      */
     public com.origingame.model.PlayerPropertyProtos.PlayerProperty getProperty() {
       return property_;
     }
     /**
-     * <code>required .com.origingame.model.PlayerProperty property = 2;</code>
+     * <code>optional .com.origingame.model.PlayerProperty property = 2;</code>
      */
     public com.origingame.model.PlayerPropertyProtos.PlayerPropertyOrBuilder getPropertyOrBuilder() {
       return property_;
@@ -261,24 +261,6 @@ public final class PlayerModelProtos {
       if (isInitialized == 1) return true;
       if (isInitialized == 0) return false;
 
-      if (!hasId()) {
-        memoizedIsInitialized = 0;
-        return false;
-      }
-      if (!hasProperty()) {
-        memoizedIsInitialized = 0;
-        return false;
-      }
-      if (!getProperty().isInitialized()) {
-        memoizedIsInitialized = 0;
-        return false;
-      }
-      for (int i = 0; i < getItemsCount(); i++) {
-        if (!getItems(i).isInitialized()) {
-          memoizedIsInitialized = 0;
-          return false;
-        }
-      }
       memoizedIsInitialized = 1;
       return true;
     }
@@ -551,24 +533,6 @@ public final class PlayerModelProtos {
       }
 
       public final boolean isInitialized() {
-        if (!hasId()) {
-          
-          return false;
-        }
-        if (!hasProperty()) {
-          
-          return false;
-        }
-        if (!getProperty().isInitialized()) {
-          
-          return false;
-        }
-        for (int i = 0; i < getItemsCount(); i++) {
-          if (!getItems(i).isInitialized()) {
-            
-            return false;
-          }
-        }
         return true;
       }
 
@@ -593,19 +557,19 @@ public final class PlayerModelProtos {
 
       private int id_ ;
       /**
-       * <code>required int32 id = 1;</code>
+       * <code>optional int32 id = 1;</code>
        */
       public boolean hasId() {
         return ((bitField0_ & 0x00000001) == 0x00000001);
       }
       /**
-       * <code>required int32 id = 1;</code>
+       * <code>optional int32 id = 1;</code>
        */
       public int getId() {
         return id_;
       }
       /**
-       * <code>required int32 id = 1;</code>
+       * <code>optional int32 id = 1;</code>
        */
       public Builder setId(int value) {
         bitField0_ |= 0x00000001;
@@ -614,7 +578,7 @@ public final class PlayerModelProtos {
         return this;
       }
       /**
-       * <code>required int32 id = 1;</code>
+       * <code>optional int32 id = 1;</code>
        */
       public Builder clearId() {
         bitField0_ = (bitField0_ & ~0x00000001);
@@ -627,13 +591,13 @@ public final class PlayerModelProtos {
       private com.google.protobuf.SingleFieldBuilder<
           com.origingame.model.PlayerPropertyProtos.PlayerProperty, com.origingame.model.PlayerPropertyProtos.PlayerProperty.Builder, com.origingame.model.PlayerPropertyProtos.PlayerPropertyOrBuilder> propertyBuilder_;
       /**
-       * <code>required .com.origingame.model.PlayerProperty property = 2;</code>
+       * <code>optional .com.origingame.model.PlayerProperty property = 2;</code>
        */
       public boolean hasProperty() {
         return ((bitField0_ & 0x00000002) == 0x00000002);
       }
       /**
-       * <code>required .com.origingame.model.PlayerProperty property = 2;</code>
+       * <code>optional .com.origingame.model.PlayerProperty property = 2;</code>
        */
       public com.origingame.model.PlayerPropertyProtos.PlayerProperty getProperty() {
         if (propertyBuilder_ == null) {
@@ -643,7 +607,7 @@ public final class PlayerModelProtos {
         }
       }
       /**
-       * <code>required .com.origingame.model.PlayerProperty property = 2;</code>
+       * <code>optional .com.origingame.model.PlayerProperty property = 2;</code>
        */
       public Builder setProperty(com.origingame.model.PlayerPropertyProtos.PlayerProperty value) {
         if (propertyBuilder_ == null) {
@@ -659,7 +623,7 @@ public final class PlayerModelProtos {
         return this;
       }
       /**
-       * <code>required .com.origingame.model.PlayerProperty property = 2;</code>
+       * <code>optional .com.origingame.model.PlayerProperty property = 2;</code>
        */
       public Builder setProperty(
           com.origingame.model.PlayerPropertyProtos.PlayerProperty.Builder builderForValue) {
@@ -673,7 +637,7 @@ public final class PlayerModelProtos {
         return this;
       }
       /**
-       * <code>required .com.origingame.model.PlayerProperty property = 2;</code>
+       * <code>optional .com.origingame.model.PlayerProperty property = 2;</code>
        */
       public Builder mergeProperty(com.origingame.model.PlayerPropertyProtos.PlayerProperty value) {
         if (propertyBuilder_ == null) {
@@ -692,7 +656,7 @@ public final class PlayerModelProtos {
         return this;
       }
       /**
-       * <code>required .com.origingame.model.PlayerProperty property = 2;</code>
+       * <code>optional .com.origingame.model.PlayerProperty property = 2;</code>
        */
       public Builder clearProperty() {
         if (propertyBuilder_ == null) {
@@ -705,7 +669,7 @@ public final class PlayerModelProtos {
         return this;
       }
       /**
-       * <code>required .com.origingame.model.PlayerProperty property = 2;</code>
+       * <code>optional .com.origingame.model.PlayerProperty property = 2;</code>
        */
       public com.origingame.model.PlayerPropertyProtos.PlayerProperty.Builder getPropertyBuilder() {
         bitField0_ |= 0x00000002;
@@ -713,7 +677,7 @@ public final class PlayerModelProtos {
         return getPropertyFieldBuilder().getBuilder();
       }
       /**
-       * <code>required .com.origingame.model.PlayerProperty property = 2;</code>
+       * <code>optional .com.origingame.model.PlayerProperty property = 2;</code>
        */
       public com.origingame.model.PlayerPropertyProtos.PlayerPropertyOrBuilder getPropertyOrBuilder() {
         if (propertyBuilder_ != null) {
@@ -723,7 +687,7 @@ public final class PlayerModelProtos {
         }
       }
       /**
-       * <code>required .com.origingame.model.PlayerProperty property = 2;</code>
+       * <code>optional .com.origingame.model.PlayerProperty property = 2;</code>
        */
       private com.google.protobuf.SingleFieldBuilder<
           com.origingame.model.PlayerPropertyProtos.PlayerProperty, com.origingame.model.PlayerPropertyProtos.PlayerProperty.Builder, com.origingame.model.PlayerPropertyProtos.PlayerPropertyOrBuilder> 
@@ -1007,7 +971,7 @@ public final class PlayerModelProtos {
       "\n\030model/player_model.proto\022\024com.originga" +
       "me.model\032\033model/player_property.proto\032\027m" +
       "odel/player_item.proto\"\202\001\n\013PlayerModel\022\n" +
-      "\n\002id\030\001 \002(\005\0226\n\010property\030\002 \002(\0132$.com.origi" +
+      "\n\002id\030\001 \001(\005\0226\n\010property\030\002 \001(\0132$.com.origi" +
       "ngame.model.PlayerProperty\022/\n\005items\030\025 \003(" +
       "\0132 .com.origingame.model.PlayerItemB\023B\021P" +
       "layerModelProtos"

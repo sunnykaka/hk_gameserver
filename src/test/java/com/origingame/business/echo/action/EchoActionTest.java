@@ -4,9 +4,9 @@ import com.origingame.BaseNettyTest;
 import com.origingame.client.main.ClientSession;
 import com.origingame.client.protocol.ClientResponseWrapper;
 import com.origingame.message.EchoProtos;
-import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.testng.annotations.Test;
 
 
 import static org.hamcrest.MatcherAssert.*;
@@ -32,9 +32,7 @@ public class EchoActionTest extends BaseNettyTest {
         ClientSession clientSession = null;
 
         try {
-            clientSession = new ClientSession("localhost", 8080);
-            clientSession.openConnection();
-            clientSession.shakeHand();
+            clientSession = initSession();
 
             //请求10次
             for (int i = 0; i < 10; i++) {
@@ -58,9 +56,8 @@ public class EchoActionTest extends BaseNettyTest {
         ClientSession clientSession = null;
 
         try {
-            clientSession = new ClientSession("localhost", 8080);
-            clientSession.openConnection();
-            clientSession.shakeHand();
+            clientSession = initSession();
+
             int sessionId = clientSession.getSessionId();
             int requestId = clientSession.currentRequestId();
 
@@ -91,9 +88,8 @@ public class EchoActionTest extends BaseNettyTest {
         ClientSession clientSession = null;
 
         try {
-            clientSession = new ClientSession("localhost", 8080);
-            clientSession.openConnection();
-            clientSession.shakeHand();
+            clientSession = initSession();
+
             int sessionId = clientSession.getSessionId();
 
             checkConnectionWork(clientSession);

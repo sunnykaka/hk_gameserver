@@ -30,13 +30,33 @@ public final class BaseMsgProtos {
      */
     NO_ENTITY_FOR_ID(3, 4),
     /**
-     * <code>USERNAME_NOT_EXIST = 1001;</code>
+     * <code>FAILED = 5;</code>
      */
-    USERNAME_NOT_EXIST(4, 1001),
+    FAILED(4, 5),
     /**
-     * <code>PASSWORD_INCORRECT = 1002;</code>
+     * <code>MULTI_SESSION_WITH_PLAYER = 6;</code>
      */
-    PASSWORD_INCORRECT(5, 1002),
+    MULTI_SESSION_WITH_PLAYER(5, 6),
+    /**
+     * <code>MULTI_PLAYER_WITH_SESSION = 7;</code>
+     */
+    MULTI_PLAYER_WITH_SESSION(6, 7),
+    /**
+     * <code>PLAYER_ID_INVALID = 8;</code>
+     */
+    PLAYER_ID_INVALID(7, 8),
+    /**
+     * <code>SESSION_NOT_BIND_TO_PLAYER_YET = 9;</code>
+     */
+    SESSION_NOT_BIND_TO_PLAYER_YET(8, 9),
+    /**
+     * <code>USERNAME_OR_PASSWORD_INCORRECT = 1001;</code>
+     */
+    USERNAME_OR_PASSWORD_INCORRECT(9, 1001),
+    /**
+     * <code>USERNAME_EXIST = 1002;</code>
+     */
+    USERNAME_EXIST(10, 1002),
     ;
 
     /**
@@ -56,13 +76,33 @@ public final class BaseMsgProtos {
      */
     public static final int NO_ENTITY_FOR_ID_VALUE = 4;
     /**
-     * <code>USERNAME_NOT_EXIST = 1001;</code>
+     * <code>FAILED = 5;</code>
      */
-    public static final int USERNAME_NOT_EXIST_VALUE = 1001;
+    public static final int FAILED_VALUE = 5;
     /**
-     * <code>PASSWORD_INCORRECT = 1002;</code>
+     * <code>MULTI_SESSION_WITH_PLAYER = 6;</code>
      */
-    public static final int PASSWORD_INCORRECT_VALUE = 1002;
+    public static final int MULTI_SESSION_WITH_PLAYER_VALUE = 6;
+    /**
+     * <code>MULTI_PLAYER_WITH_SESSION = 7;</code>
+     */
+    public static final int MULTI_PLAYER_WITH_SESSION_VALUE = 7;
+    /**
+     * <code>PLAYER_ID_INVALID = 8;</code>
+     */
+    public static final int PLAYER_ID_INVALID_VALUE = 8;
+    /**
+     * <code>SESSION_NOT_BIND_TO_PLAYER_YET = 9;</code>
+     */
+    public static final int SESSION_NOT_BIND_TO_PLAYER_YET_VALUE = 9;
+    /**
+     * <code>USERNAME_OR_PASSWORD_INCORRECT = 1001;</code>
+     */
+    public static final int USERNAME_OR_PASSWORD_INCORRECT_VALUE = 1001;
+    /**
+     * <code>USERNAME_EXIST = 1002;</code>
+     */
+    public static final int USERNAME_EXIST_VALUE = 1002;
 
 
     public final int getNumber() { return value; }
@@ -73,8 +113,13 @@ public final class BaseMsgProtos {
         case 2: return UNKNOWN_ERROR;
         case 3: return NO_ACTION_FOR_MESSAGE_TYPE;
         case 4: return NO_ENTITY_FOR_ID;
-        case 1001: return USERNAME_NOT_EXIST;
-        case 1002: return PASSWORD_INCORRECT;
+        case 5: return FAILED;
+        case 6: return MULTI_SESSION_WITH_PLAYER;
+        case 7: return MULTI_PLAYER_WITH_SESSION;
+        case 8: return PLAYER_ID_INVALID;
+        case 9: return SESSION_NOT_BIND_TO_PLAYER_YET;
+        case 1001: return USERNAME_OR_PASSWORD_INCORRECT;
+        case 1002: return USERNAME_EXIST;
         default: return null;
       }
     }
@@ -1768,11 +1813,15 @@ public final class BaseMsgProtos {
       "\022\021\n\tdevice_id\030\004 \001(\t\"y\n\013ResponseMsg\022\024\n\014me" +
       "ssage_type\030\001 \001(\t\022\017\n\007message\030\002 \001(\014\0226\n\006sta" +
       "tus\030\003 \002(\0162&.com.origingame.message.Respo" +
-      "nseStatus\022\013\n\003msg\030\004 \001(\t*\230\001\n\016ResponseStatu" +
+      "nseStatus\022\013\n\003msg\030\004 \001(\t*\245\002\n\016ResponseStatu" +
       "s\022\013\n\007SUCCESS\020\001\022\021\n\rUNKNOWN_ERROR\020\002\022\036\n\032NO_" +
       "ACTION_FOR_MESSAGE_TYPE\020\003\022\024\n\020NO_ENTITY_F" +
-      "OR_ID\020\004\022\027\n\022USERNAME_NOT_EXIST\020\351\007\022\027\n\022PASS",
-      "WORD_INCORRECT\020\352\007B\017B\rBaseMsgProtos"
+      "OR_ID\020\004\022\n\n\006FAILED\020\005\022\035\n\031MULTI_SESSION_WIT",
+      "H_PLAYER\020\006\022\035\n\031MULTI_PLAYER_WITH_SESSION\020" +
+      "\007\022\025\n\021PLAYER_ID_INVALID\020\010\022\"\n\036SESSION_NOT_" +
+      "BIND_TO_PLAYER_YET\020\t\022#\n\036USERNAME_OR_PASS" +
+      "WORD_INCORRECT\020\351\007\022\023\n\016USERNAME_EXIST\020\352\007B\017" +
+      "B\rBaseMsgProtos"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {

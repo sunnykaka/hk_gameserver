@@ -56,6 +56,13 @@ public class RedisUtil {
         }
     }
 
+    public static void checkHmsetResponse(String resp) {
+        if(!"OK".equals(resp)) {
+            throw new GameDaoException(String.format("请求预期返回[%s],实际返回[%s]", "OK", resp));
+        }
+    }
+
+
     public static void checkHSetResponse(Long resp) {
         if(!Long.valueOf(1L).equals(resp)) {
             throw new GameDaoException(String.format("请求预期返回[%s],实际返回[%s]", "1", String.valueOf(resp)));

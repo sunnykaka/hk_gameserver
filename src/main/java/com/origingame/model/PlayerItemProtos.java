@@ -13,11 +13,11 @@ public final class PlayerItemProtos {
       com.google.protobuf.MessageOrBuilder {
 
     /**
-     * <code>required int32 id = 1;</code>
+     * <code>optional int32 id = 1;</code>
      */
     boolean hasId();
     /**
-     * <code>required int32 id = 1;</code>
+     * <code>optional int32 id = 1;</code>
      */
     int getId();
 
@@ -155,13 +155,13 @@ public final class PlayerItemProtos {
     public static final int ID_FIELD_NUMBER = 1;
     private int id_;
     /**
-     * <code>required int32 id = 1;</code>
+     * <code>optional int32 id = 1;</code>
      */
     public boolean hasId() {
       return ((bitField0_ & 0x00000001) == 0x00000001);
     }
     /**
-     * <code>required int32 id = 1;</code>
+     * <code>optional int32 id = 1;</code>
      */
     public int getId() {
       return id_;
@@ -235,10 +235,6 @@ public final class PlayerItemProtos {
       if (isInitialized == 1) return true;
       if (isInitialized == 0) return false;
 
-      if (!hasId()) {
-        memoizedIsInitialized = 0;
-        return false;
-      }
       memoizedIsInitialized = 1;
       return true;
     }
@@ -471,10 +467,6 @@ public final class PlayerItemProtos {
       }
 
       public final boolean isInitialized() {
-        if (!hasId()) {
-          
-          return false;
-        }
         return true;
       }
 
@@ -499,19 +491,19 @@ public final class PlayerItemProtos {
 
       private int id_ ;
       /**
-       * <code>required int32 id = 1;</code>
+       * <code>optional int32 id = 1;</code>
        */
       public boolean hasId() {
         return ((bitField0_ & 0x00000001) == 0x00000001);
       }
       /**
-       * <code>required int32 id = 1;</code>
+       * <code>optional int32 id = 1;</code>
        */
       public int getId() {
         return id_;
       }
       /**
-       * <code>required int32 id = 1;</code>
+       * <code>optional int32 id = 1;</code>
        */
       public Builder setId(int value) {
         bitField0_ |= 0x00000001;
@@ -520,7 +512,7 @@ public final class PlayerItemProtos {
         return this;
       }
       /**
-       * <code>required int32 id = 1;</code>
+       * <code>optional int32 id = 1;</code>
        */
       public Builder clearId() {
         bitField0_ = (bitField0_ & ~0x00000001);
@@ -663,7 +655,7 @@ public final class PlayerItemProtos {
   static {
     java.lang.String[] descriptorData = {
       "\n\027model/player_item.proto\022\024com.origingam" +
-      "e.model\"9\n\nPlayerItem\022\n\n\002id\030\001 \002(\005\022\017\n\007ite" +
+      "e.model\"9\n\nPlayerItem\022\n\n\002id\030\001 \001(\005\022\017\n\007ite" +
       "m_id\030\002 \001(\t\022\016\n\006number\030\003 \001(\005B\022B\020PlayerItem" +
       "Protos"
     };

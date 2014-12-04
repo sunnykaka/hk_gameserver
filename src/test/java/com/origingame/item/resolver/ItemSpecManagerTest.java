@@ -7,9 +7,9 @@ import com.origingame.item.model.Task;
 import com.origingame.server.dao.CenterDb;
 import com.origingame.server.dao.PlayerDb;
 import com.origingame.server.dao.ServerPersistenceResolver;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.testng.annotations.AfterTest;
+import org.testng.annotations.BeforeTest;
+import org.testng.annotations.Test;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 
@@ -27,11 +27,11 @@ public class ItemSpecManagerTest {
     private ItemSpecManager itemSpecManager = ItemSpecManager.getInstance();
 
 
-    @BeforeClass
+    @BeforeTest
     public static void init() {
     }
 
-    @AfterClass
+    @AfterTest
     public static void destroy() {
     }
 

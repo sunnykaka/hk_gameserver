@@ -4,9 +4,8 @@ package com.origingame.server.dao;
 import com.google.common.collect.Sets;
 import com.origingame.server.action.ActionResolver;
 import com.origingame.server.action.TestAction;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.apache.commons.lang3.StringUtils;
+import org.testng.annotations.*;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 
@@ -26,19 +25,29 @@ import static org.hamcrest.Matchers.*;
 public class ServerPersistenceResolverTest {
 
 
-    @BeforeClass
+    @BeforeTest
     public static void init() {
     }
 
-    @AfterClass
+    @AfterTest
     public static void destroy() {
     }
 
     @Test
-    public void test() throws Exception{
+    @Parameters({"centerDbIp", "playerDbIp1", "playerDbIp2"})
+    public void test(@Optional String centerDbIp, @Optional String playerDbIp1, @Optional String playerDbIp2) throws Exception{
+
+        if(centerDbIp == null) {
+            centerDbIp = "192.168.131.128";
+        }
+        if(playerDbIp1 == null) {
+            playerDbIp1 = "192.168.131.128";
+        }
+        if(playerDbIp2 == null) {
+            playerDbIp2 = "192.168.131.128";
+        }
 
         ServerPersistenceResolver.getInstance().init(this.getClass().getPackage().getName().replaceAll("\\.", "/") + "/test-server-persistence.xml");
-//        ServerPersistenceResolver.getInstance().init("test-server-persistence.xml");
 
         assertThat(ServerPersistenceResolver.getInstance().playerRoundStep, is(100));
         assertThat(ServerPersistenceResolver.getInstance().playerShardSize, is(32));
@@ -59,13 +68,13 @@ public class ServerPersistenceResolverTest {
 
         centerDb.getJedis().set(key, value);
 
-        Jedis centerJedis = new Jedis("192.168.131.128", 6379);
+        Jedis centerJedis = new Jedis(centerDbIp, 6379);
         centerJedis.select(1);
 
         assertThat(centerJedis.get(key), is(value));
 
-        Jedis playerJedis1 = new Jedis("192.168.131.128", 6380);
-        Jedis playerJedis2 = new Jedis("192.168.131.128", 6381);
+        Jedis playerJedis1 = new Jedis(playerDbIp1, 6380);
+        Jedis playerJedis2 = new Jedis(playerDbIp2, 6381);
         playerJedis1.select(1);
         playerJedis2.select(1);
 
