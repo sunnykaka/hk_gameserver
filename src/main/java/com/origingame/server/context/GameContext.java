@@ -1,7 +1,6 @@
 package com.origingame.server.context;
 
 import com.origingame.business.player.dao.PlayerDao;
-import com.origingame.business.player.manager.PlayerManager;
 import com.origingame.business.player.model.Player;
 import com.origingame.exception.GameBusinessException;
 import com.origingame.message.BaseMsgProtos;
@@ -39,13 +38,16 @@ public class GameContext {
 
     private Player player;
 
-    public GameContext(Channel channel, GameProtocol protocol) {
-        this.channel = channel;
+    public GameContext() {
         this.dbMediator = new DbMediator();
+    }
+
+    public void init(Channel channel, GameProtocol protocol) {
+        this.channel = channel;
         this.request = ServerRequestWrapper.fromProtocol(channel, protocol);
         int sessionId = protocol.getSessionId();
         if(sessionId > 0) {
-            this.session = GameSession.load(this,sessionId);
+            this.session = GameSession.load(this, sessionId);
         }
     }
 
@@ -147,15 +149,15 @@ public class GameContext {
 //        }
     }
 
-    public void releaseResources() {
-        dbMediator.close();
+    public void destroy() {
+            dbMediator.close();
     }
 
     public void initPlayer(int playerId) {
         if(playerId <= 0) {
             throw new GameBusinessException(BaseMsgProtos.ResponseStatus.PLAYER_ID_INVALID);
         }
-        this.player = playerDao.load(dbMediator, playerId);
+        this.player = playerDao.load(playerId);
     }
 
     public Player getPlayer() {
@@ -166,6 +168,6 @@ public class GameContext {
         if(player == null) return;
         player.getProperty().get().setLastLoginTime(World.now().getTime());
         player.getProperty().markUpdated();
-        playerDao.save(dbMediator, player);
+        playerDao.save(player);
     }
 }

@@ -3,15 +3,12 @@ package com.origingame.business.player.action;
 import com.origingame.business.player.manager.PlayerManager;
 import com.origingame.business.player.model.Player;
 import com.origingame.config.GlobalConfig;
-import com.origingame.message.EchoProtos;
 import com.origingame.message.LoginProtos;
 import com.origingame.message.RegisterProtos;
-import com.origingame.persist.GameSessionProtos;
 import com.origingame.server.action.annotation.Action;
 import com.origingame.server.action.annotation.MessageType;
 import com.origingame.server.context.GameContext;
 import com.origingame.server.main.World;
-import com.origingame.server.session.GameSession;
 
 /**
  * User: Liub
@@ -29,9 +26,9 @@ public class PlayerAction {
      * @return
      */
     @MessageType(GlobalConfig.PROTOBUF_MESSAGE_PACKAGE_NAME + "RegisterReq")
-    public RegisterProtos.RegisterResp register(GameContext ctx, RegisterProtos.RegisterReq message) {
+    public RegisterProtos.RegisterResp register(RegisterProtos.RegisterReq message) {
 
-        Player player = playerManager.register(ctx, message);
+        Player player = playerManager.register(message);
 
         RegisterProtos.RegisterResp.Builder registerResp = RegisterProtos.RegisterResp.newBuilder();
         registerResp.setPlayerId(player.getId());
@@ -52,11 +49,11 @@ public class PlayerAction {
      * @return
      */
     @MessageType(GlobalConfig.PROTOBUF_MESSAGE_PACKAGE_NAME + "LoginReq")
-    public LoginProtos.LoginResp login(GameContext ctx, LoginProtos.LoginReq message) {
+    public LoginProtos.LoginResp login(LoginProtos.LoginReq message) {
         String username = message.getUsername();
         String password = message.getPassword();
 
-        Player player = playerManager.login(ctx, username, password);
+        Player player = playerManager.login(username, password);
 
         LoginProtos.LoginResp.Builder loginResp = LoginProtos.LoginResp.newBuilder();
         loginResp.setPlayerId(player.getId());

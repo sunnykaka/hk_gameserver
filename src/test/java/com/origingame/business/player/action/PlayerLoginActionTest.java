@@ -207,7 +207,7 @@ public class PlayerLoginActionTest extends BaseNettyTest {
     }
 
 
-    private void checkLoginResp(ClientSession clientSession, String username, String password, ClientResponseWrapper clientResponseWrapper) {
+    protected void checkLoginResp(ClientSession clientSession, String username, String password, ClientResponseWrapper clientResponseWrapper) {
         LoginProtos.LoginResp loginResp = (LoginProtos.LoginResp)clientResponseWrapper.getMessage();
         PlayerModelProtos.PlayerModel player = loginResp.getPlayer();
         assertThat(player, notNullValue());
@@ -217,7 +217,7 @@ public class PlayerLoginActionTest extends BaseNettyTest {
         assertThat(player.getProperty().getOuterId(), notNullValue());
     }
 
-    private void sendAndCheckPlayerEcho(ClientSession clientSession) {
+    protected PlayerEchoProtos.PlayerEchoResp sendAndCheckPlayerEcho(ClientSession clientSession) {
         String msg = "你好啊123";
         ClientResponseWrapper clientResponseWrapper = sendPlayerEcho(clientSession, msg);
         PlayerEchoProtos.PlayerEchoResp playerEchoResp = (PlayerEchoProtos.PlayerEchoResp) clientResponseWrapper.getMessage();
@@ -226,9 +226,11 @@ public class PlayerLoginActionTest extends BaseNettyTest {
         assertThat(playerEchoResp.getPlayerId(), is(clientSession.getPlayerId()));
         assertThat(playerEchoResp.getUsername(), is(clientSession.getPlayer().getProperty().getUsername()));
         assertThat(playerEchoResp.getPassword(), is(clientSession.getPlayer().getProperty().getPassword()));
+
+        return playerEchoResp;
     }
 
-    private ClientResponseWrapper sendPlayerEcho(ClientSession clientSession, String msg) {
+    protected ClientResponseWrapper sendPlayerEcho(ClientSession clientSession, String msg) {
         PlayerEchoProtos.PlayerEchoReq.Builder playerEchoReq = PlayerEchoProtos.PlayerEchoReq.newBuilder();
         playerEchoReq.setMessage(msg);
         return  clientSession.sendMessage(playerEchoReq.build());
@@ -236,7 +238,7 @@ public class PlayerLoginActionTest extends BaseNettyTest {
 
 
 
-    private ClientResponseWrapper register(ClientSession clientSession, String username, String password) {
+    protected ClientResponseWrapper register(ClientSession clientSession, String username, String password) {
         RegisterProtos.RegisterReq.Builder registerReq = RegisterProtos.RegisterReq.newBuilder();
         registerReq.setUsername(username);
         registerReq.setPassword(password);

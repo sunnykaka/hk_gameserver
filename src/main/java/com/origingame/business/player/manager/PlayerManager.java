@@ -8,6 +8,7 @@ import com.origingame.exception.GameBusinessException;
 import com.origingame.message.BaseMsgProtos;
 import com.origingame.message.RegisterProtos;
 import com.origingame.server.context.GameContext;
+import com.origingame.server.context.GameContextHolder;
 import com.origingame.server.main.World;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,36 +25,37 @@ public class PlayerManager {
 
     private PlayerDao playerDao = World.getBean(PlayerDao.class);
 
-    public Player register(GameContext ctx, RegisterProtos.RegisterReq message) {
+    public Player register(RegisterProtos.RegisterReq message) {
 
         boolean trial = message.getTrial();
         CenterPlayer centerPlayer;
         if(trial) {
-            centerPlayer = playerCenterMock.registerTrailPlayer(ctx);
+            centerPlayer = playerCenterMock.registerTrailPlayer();
         } else {
-            centerPlayer = playerCenterMock.registerPlayer(ctx, message.getUsername(), message.getPassword());
+            centerPlayer = playerCenterMock.registerPlayer(message.getUsername(), message.getPassword());
         }
 
         if(centerPlayer == null) {
             throw new GameBusinessException(BaseMsgProtos.ResponseStatus.FAILED);
         }
 
-        return createPlayer(ctx, centerPlayer);
+        return createPlayer(centerPlayer);
 
     }
 
-    private Player createPlayer(GameContext ctx, CenterPlayer centerPlayer) {
-        Player player = playerDao.createByCenterPlayer(ctx.getDbMediator(), centerPlayer);
-        playerDao.save(ctx.getDbMediator(), player);
+    private Player createPlayer(CenterPlayer centerPlayer) {
+        Player player = playerDao.createByCenterPlayer(centerPlayer);
+        playerDao.save(player);
         return player;
 
     }
 
-    public Player login(GameContext ctx, String username, String password) {
+    public Player login( String username, String password) {
 
-        CenterPlayer centerPlayer = playerCenterMock.login(ctx, username, password);
+        GameContext ctx = GameContextHolder.get();
+        CenterPlayer centerPlayer = playerCenterMock.login(username, password);
 
-        Player player = playerDao.getByOuterId(ctx.getDbMediator(), centerPlayer.getCenterPlayerId());
+        Player player = playerDao.getByOuterId(centerPlayer.getCenterPlayerId());
         if(player == null) {
             log.error("根据outerId[%s]没有找到player", centerPlayer.getCenterPlayerId());
             throw new GameBusinessException(BaseMsgProtos.ResponseStatus.FAILED);
@@ -64,7 +66,7 @@ public class PlayerManager {
         player.getProperty().get().setLastLoginTime(World.now().getTime());
         player.getProperty().markUpdated();
         ctx.getSession().bindPlayer(player.getId());
-        playerDao.save(ctx.getDbMediator(), player);
+        playerDao.save(player);
 
         return player;
 

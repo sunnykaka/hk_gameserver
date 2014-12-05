@@ -7,6 +7,9 @@ import org.testng.annotations.Test;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Unit test for simple App.
@@ -121,6 +124,23 @@ public class PlainTest {
 //
 //        String s2 = sw.toString();
 //        System.out.println(String.format("========================s1[%s], s2[%s]", s1, s2));
+
+        ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(32,
+                32,
+                0L,
+                TimeUnit.SECONDS,
+                new LinkedBlockingQueue<Runnable>(),
+                new ThreadPoolExecutor.CallerRunsPolicy()
+        );
+        threadPoolExecutor.execute(new Runnable() {
+            @Override
+            public void run() {
+                throw new RuntimeException("bad");
+            }
+        });
+
+        System.out.println("here");
+
 
     }
 

@@ -1,6 +1,5 @@
 package com.origingame.server.util;
 
-import com.google.protobuf.Message;
 import com.origingame.server.dao.DbMediator;
 import redis.clients.jedis.Jedis;
 
@@ -10,9 +9,6 @@ import redis.clients.jedis.Jedis;
  */
 public class IdGenerator {
 
-    public static int nextSessionId(DbMediator dbMediator) {
-        return dbMediator.selectCenterDb().getJedis().incr(RedisUtil.buildKey("id", "next")).intValue();
-    }
 
     public static int nextId(DbMediator dbMediator, Class clazz) {
         return nextId(dbMediator.selectCenterDb().getJedis(), clazz);

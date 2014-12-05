@@ -4,7 +4,6 @@ import com.origingame.model.PlayerItemProtos;
 import com.origingame.model.PlayerModelProtos;
 import com.origingame.model.PlayerPropertyProtos;
 import com.origingame.persist.PlayerItemCollectionProtos;
-import com.origingame.server.dao.DbMediator;
 
 /**
  * User: Liub
@@ -14,8 +13,6 @@ public class Player {
 
     private int id;
 
-    private DbMediator dbMediator;
-
     private boolean created = false;
 
     private OwnedItem<PlayerPropertyProtos.PlayerProperty.Builder> property;
@@ -23,9 +20,8 @@ public class Player {
     private OwnedItemCollection<PlayerItemProtos.PlayerItem, PlayerItemProtos.PlayerItem.Builder, PlayerItemCollectionProtos.PlayerItemCollection.Builder> itemCol;
 
     @SuppressWarnings("unchecked")
-    public Player(DbMediator dbMediator, int id, boolean created) {
+    public Player(int id, boolean created) {
         this.id = id;
-        this.dbMediator = dbMediator;
         this.created = created;
 
         property = new OwnedItem<>(this, "property", PlayerPropertyProtos.PlayerProperty.newBuilder());
@@ -50,10 +46,6 @@ public class Player {
 
     public boolean isCreated() {
         return created;
-    }
-
-    public DbMediator getDbMediator() {
-        return dbMediator;
     }
 
     public PlayerModelProtos.PlayerModel toModel() {

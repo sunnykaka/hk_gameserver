@@ -4,6 +4,7 @@ import com.origingame.exception.GameBusinessException;
 import com.origingame.message.BaseMsgProtos;
 import com.origingame.server.util.IdGenerator;
 import com.origingame.server.util.RedisUtil;
+import com.origingame.server.util.SimpleRedisAccess;
 import io.netty.util.internal.StringUtil;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -52,8 +53,8 @@ public class CenterPlayer {
             username = "U" + centerPlayerId;
             password = RandomStringUtils.randomAlphanumeric(6);
         } else {
-            String usernameIndexKey = RedisUtil.buildKey("i", CenterPlayer.class.getSimpleName(), "username");
-            boolean usernameExist = !StringUtils.isBlank(jedis.hget(usernameIndexKey, username));
+            String usernameIndexValue = SimpleRedisAccess.getIndexValue(CenterPlayer.class, "username", username);
+            boolean usernameExist = !StringUtils.isBlank(usernameIndexValue);
             if(usernameExist) {
                 //用户名重复
                 throw new GameBusinessException(BaseMsgProtos.ResponseStatus.USERNAME_EXIST);
@@ -71,11 +72,17 @@ public class CenterPlayer {
 
     private boolean create(Jedis jedis) {
         //key为username,value为centerPlayerId的index
-        String usernameIndexKey = RedisUtil.buildKey("i", CenterPlayer.class.getSimpleName(), "username");
-        if(!Long.valueOf(1).equals(jedis.hsetnx(usernameIndexKey, username, centerPlayerId))) {
+//        String usernameIndexKey = RedisUtil.buildKey("i", CenterPlayer.class.getSimpleName(), "username");
+//        if(!Long.valueOf(1).equals(jedis.hsetnx(usernameIndexKey, username, centerPlayerId))) {
+//            //创建失败,用户名已被占用
+//            throw new GameBusinessException(BaseMsgProtos.ResponseStatus.USERNAME_EXIST);
+//        }
+
+        if(!SimpleRedisAccess.createIndexNX(CenterPlayer.class, "username", username, centerPlayerId)) {
             //创建失败,用户名已被占用
             throw new GameBusinessException(BaseMsgProtos.ResponseStatus.USERNAME_EXIST);
         }
+
 
         String centerPlayerKey = RedisUtil.buildKey(CenterPlayer.class.getSimpleName(), centerPlayerId);
         Map<String, String> map = new HashMap<>();
@@ -88,8 +95,8 @@ public class CenterPlayer {
     }
 
     public static CenterPlayer load(Jedis jedis, String username, String password) {
-        String usernameIndexKey = RedisUtil.buildKey("i", CenterPlayer.class.getSimpleName(), "username");
-        String centerPlayerId = jedis.hget(usernameIndexKey, username);
+
+        String centerPlayerId = SimpleRedisAccess.getIndexValue(CenterPlayer.class, "username", username);
         if(StringUtils.isBlank(centerPlayerId)) {
             throw new GameBusinessException(BaseMsgProtos.ResponseStatus.USERNAME_OR_PASSWORD_INCORRECT);
         }

@@ -69,7 +69,7 @@ public class MessageReceiver {
                 HandShakeProtos.HandShakeResp.Builder handShakeRespBuilder = HandShakeProtos.HandShakeResp.newBuilder();
                 handShakeRespBuilder.setSessionId(session.getBuilder().getId());
                 handShakeRespBuilder.setPasswordKey(session.getBuilder().getPasswordKey());
-                return ServerResponseWrapper.createHandShakeSuccessResponse(ctx, handShakeRespBuilder.build(), CryptoContext.createRSAServerCrypto(publicKey.toByteArray()));
+                return ServerResponseWrapper.createHandShakeSuccessResponse(protocol, handShakeRespBuilder.build(), CryptoContext.createRSAServerCrypto(publicKey.toByteArray()));
 
             }
             case PLAIN_TEXT: {
@@ -125,7 +125,7 @@ public class MessageReceiver {
 //            return null;
 //        }
 
-        return ServerResponseWrapper.createRequestResponse(ctx, responseStatus, responseMsg, result,
+        return ServerResponseWrapper.createRequestResponse(request.getProtocol(), responseStatus, responseMsg, result,
                 CryptoContext.createAESCrypto(ctx.getSession().getBuilder().getPasswordKey().toByteArray()));
 
     }

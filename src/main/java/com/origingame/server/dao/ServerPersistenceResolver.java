@@ -57,7 +57,10 @@ public class ServerPersistenceResolver {
         Preconditions.checkState(!dbList.getDb().isEmpty());
         log.info("实际物理db数量: {}", dbList.getDb().size());
         for(ServerPersistence.DbList.Db db : dbList.getDb()) {
-            JedisPool jedisPool = new JedisPool(new GenericObjectPoolConfig(), db.getIp(), db.getPort(), 2000, db.getPassword(), db.getDb());
+            GenericObjectPoolConfig genericObjectPoolConfig = new GenericObjectPoolConfig();
+            genericObjectPoolConfig.setMaxTotal(100);
+            genericObjectPoolConfig.setMaxIdle(100);
+            JedisPool jedisPool = new JedisPool(genericObjectPoolConfig, db.getIp(), db.getPort(), 5000, db.getPassword(), db.getDb());
             realDbMap.put(db.getName(), jedisPool);
         }
 

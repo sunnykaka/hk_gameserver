@@ -1,18 +1,15 @@
 package com.origingame.business.player.dao;
 
-import com.google.protobuf.Message;
 import com.origingame.BaseNettyTest;
 import com.origingame.business.player.model.OwnedItem;
 import com.origingame.business.player.model.OwnedItemCollection;
 import com.origingame.business.player.model.Player;
 import com.origingame.business.player.util.OwnedItemCollectionUtil;
-import com.origingame.client.main.ClientSession;
-import com.origingame.client.protocol.ClientResponseWrapper;
-import com.origingame.message.EchoProtos;
 import com.origingame.model.PlayerItemProtos;
 import com.origingame.model.PlayerPropertyProtos;
 import com.origingame.persist.PlayerItemCollectionProtos;
-import com.origingame.server.dao.DbMediator;
+import com.origingame.server.context.GameContext;
+import com.origingame.server.context.GameContextHolder;
 import com.origingame.server.main.World;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.slf4j.Logger;
@@ -20,12 +17,9 @@ import org.slf4j.LoggerFactory;
 import org.testng.annotations.Test;
 
 import java.util.Map;
-import java.util.UUID;
 
 import static org.hamcrest.MatcherAssert.*;
-import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
-import static org.hamcrest.Matchers.is;
 
 
 /**
@@ -43,8 +37,7 @@ public class PlayerDaoTest extends BaseNettyTest {
     @Test
     public void testOwnedItem() throws Exception {
 
-        DbMediator dbMediator = new DbMediator();
-        Player player = playerDao.create(dbMediator, RandomStringUtils.randomAlphabetic(8), RandomStringUtils.randomAlphabetic(8), RandomStringUtils.randomAlphabetic(8));
+        Player player = playerDao.create(RandomStringUtils.randomAlphabetic(8), RandomStringUtils.randomAlphabetic(8), RandomStringUtils.randomAlphabetic(8));
         int playerId = player.getId();
         assertThat(player.getId(), greaterThan(0));
         OwnedItem<PlayerPropertyProtos.PlayerProperty.Builder> propertyOwnedItem = player.getProperty();
@@ -57,9 +50,9 @@ public class PlayerDaoTest extends BaseNettyTest {
         property.setNickname(nickname);
         propertyOwnedItem.markUpdated();
         PlayerPropertyProtos.PlayerProperty propertyMessage = property.build();
-        playerDao.save(dbMediator, player);
+        playerDao.save(player);
 
-        Player loadedPlayer = playerDao.load(dbMediator, playerId);
+        Player loadedPlayer = playerDao.load(playerId);
         PlayerPropertyProtos.PlayerProperty.Builder loadedProperty = loadedPlayer.getProperty().get();
         PlayerPropertyProtos.PlayerProperty loadedPropertyMessage = loadedProperty.build();
 
@@ -77,8 +70,7 @@ public class PlayerDaoTest extends BaseNettyTest {
     @Test
     public void testNormalOwnedItemCollection() throws Exception {
 
-        DbMediator dbMediator = new DbMediator();
-        Player player = playerDao.create(dbMediator, RandomStringUtils.randomAlphabetic(8), RandomStringUtils.randomAlphabetic(8), RandomStringUtils.randomAlphabetic(8));
+        Player player = playerDao.create(RandomStringUtils.randomAlphabetic(8), RandomStringUtils.randomAlphabetic(8), RandomStringUtils.randomAlphabetic(8));
         int playerId = player.getId();
         assertThat(player.getId(), greaterThan(0));
 
@@ -92,22 +84,22 @@ public class PlayerDaoTest extends BaseNettyTest {
         String itemId3 = "item3-33";
         int number3 = 278;
 
-        PlayerItemProtos.PlayerItem.Builder playerItem1 = OwnedItemCollectionUtil.createPlayerItem(dbMediator);
+        PlayerItemProtos.PlayerItem.Builder playerItem1 = OwnedItemCollectionUtil.createPlayerItem(GameContextHolder.getDbMediator());
         playerItem1.setItemId(itemId1).setNumber(number1);
 
-        PlayerItemProtos.PlayerItem.Builder playerItem2 = OwnedItemCollectionUtil.createPlayerItem(dbMediator);
+        PlayerItemProtos.PlayerItem.Builder playerItem2 = OwnedItemCollectionUtil.createPlayerItem(GameContextHolder.getDbMediator());
         playerItem2.setItemId(itemId2).setNumber(number2);
 
-        PlayerItemProtos.PlayerItem.Builder playerItem3 = OwnedItemCollectionUtil.createPlayerItem(dbMediator);
+        PlayerItemProtos.PlayerItem.Builder playerItem3 = OwnedItemCollectionUtil.createPlayerItem(GameContextHolder.getDbMediator());
         playerItem3.setItemId(itemId3).setNumber(number3);
 
         itemCol.addItem(playerItem1.getId(), playerItem1);
         itemCol.addItem(playerItem2.getId(), playerItem2);
 
-        playerDao.save(dbMediator, player);
+        playerDao.save(player);
 
 
-        Player loadedPlayer = playerDao.load(dbMediator, playerId);
+        Player loadedPlayer = playerDao.load(playerId);
         OwnedItemCollection<PlayerItemProtos.PlayerItem, PlayerItemProtos.PlayerItem.Builder, PlayerItemCollectionProtos.PlayerItemCollection.Builder> loadedItemCol = loadedPlayer.getItemCol();
 
         assertPlayerItemEquals(player, loadedPlayer);
@@ -121,10 +113,10 @@ public class PlayerDaoTest extends BaseNettyTest {
 
         loadedItemCol.addItem(playerItem3.getId(), playerItem3);
 
-        playerDao.save(dbMediator, loadedPlayer);
+        playerDao.save(loadedPlayer);
 
         player = loadedPlayer;
-        loadedPlayer = playerDao.load(dbMediator, playerId);
+        loadedPlayer = playerDao.load(playerId);
 
         assertPlayerItemEquals(player, loadedPlayer);
         assertThat(loadedPlayer.getItemCol().getItemMap().size(), is(2));
@@ -135,49 +127,48 @@ public class PlayerDaoTest extends BaseNettyTest {
     @Test
     public void testEmptyOwnedItemCollection() throws Exception {
 
-        DbMediator dbMediator = new DbMediator();
-        Player player = playerDao.create(dbMediator, RandomStringUtils.randomAlphabetic(8), RandomStringUtils.randomAlphabetic(8), RandomStringUtils.randomAlphabetic(8));
+        Player player = playerDao.create(RandomStringUtils.randomAlphabetic(8), RandomStringUtils.randomAlphabetic(8), RandomStringUtils.randomAlphabetic(8));
         int playerId = player.getId();
         assertThat(player.getId(), greaterThan(0));
 
         //playerItem一开始是空的
-        playerDao.save(dbMediator, player);
+        playerDao.save(player);
 
-        Player loadedPlayer = playerDao.load(dbMediator, playerId);
+        Player loadedPlayer = playerDao.load(playerId);
         OwnedItemCollection<PlayerItemProtos.PlayerItem, PlayerItemProtos.PlayerItem.Builder, PlayerItemCollectionProtos.PlayerItemCollection.Builder> loadedItemCol = loadedPlayer.getItemCol();
         assertPlayerItemEquals(player, loadedPlayer);
         assertThat(loadedPlayer.getItemCol().getItemMap().size(), is(0));
 
         //添加一个playerItem
-        PlayerItemProtos.PlayerItem.Builder playerItem1 = OwnedItemCollectionUtil.createPlayerItem(dbMediator);
+        PlayerItemProtos.PlayerItem.Builder playerItem1 = OwnedItemCollectionUtil.createPlayerItem(GameContextHolder.getDbMediator());
         playerItem1.setItemId("item-12312dd").setNumber(89);
         loadedItemCol.addItem(playerItem1.getId(), playerItem1);
-        playerDao.save(dbMediator, loadedPlayer);
+        playerDao.save(loadedPlayer);
 
         player = loadedPlayer;
-        loadedPlayer = playerDao.load(dbMediator, playerId);
+        loadedPlayer = playerDao.load(playerId);
         loadedItemCol = loadedPlayer.getItemCol();
         assertPlayerItemEquals(player, loadedPlayer);
         assertThat(loadedPlayer.getItemCol().getItemMap().size(), is(1));
 
         //删除一个playerItem,使OwnedItemCollection为空
         loadedItemCol.deleteItem(playerItem1.getId());
-        playerDao.save(dbMediator, loadedPlayer);
+        playerDao.save(loadedPlayer);
 
         player = loadedPlayer;
-        loadedPlayer = playerDao.load(dbMediator, playerId);
+        loadedPlayer = playerDao.load(playerId);
         loadedItemCol = loadedPlayer.getItemCol();
         assertPlayerItemEquals(player, loadedPlayer);
         assertThat(loadedPlayer.getItemCol().getItemMap().size(), is(0));
 
         //又加一个playerItem
-        PlayerItemProtos.PlayerItem.Builder playerItem2 = OwnedItemCollectionUtil.createPlayerItem(dbMediator);
+        PlayerItemProtos.PlayerItem.Builder playerItem2 = OwnedItemCollectionUtil.createPlayerItem(GameContextHolder.getDbMediator());
         playerItem2.setItemId("item-122ffsdd").setNumber(998);
         loadedItemCol.addItem(playerItem2.getId(), playerItem2);
-        playerDao.save(dbMediator, loadedPlayer);
+        playerDao.save(loadedPlayer);
 
         player = loadedPlayer;
-        loadedPlayer = playerDao.load(dbMediator, playerId);
+        loadedPlayer = playerDao.load(playerId);
         assertPlayerItemEquals(player, loadedPlayer);
         assertThat(loadedPlayer.getItemCol().getItemMap().size(), is(1));
     }

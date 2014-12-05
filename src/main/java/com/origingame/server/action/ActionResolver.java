@@ -142,14 +142,14 @@ public class ActionResolver {
         try {
             if (needLock) {
                 //对playerId加互斥锁
-                lock = PlayerDbLock.newLock(ctx.getDbMediator().selectPlayerDb(playerId).getJedis(), "player", String.valueOf(playerId));
+                lock = PlayerDbLock.newLock(ctx.getDbMediator().selectShardDb(playerId).getJedis(), "player", String.valueOf(playerId));
                 lock.lock();
             }
             //检验session合法性
             ctx.checkSession(checkPlayer);
 
             //执行方法
-            Message result = (Message) actionMethod.invoke(actionObject, ctx, message);
+            Message result = (Message) actionMethod.invoke(actionObject, message);
 
             //保存player数据
             ctx.savePlayerAfterRequest();

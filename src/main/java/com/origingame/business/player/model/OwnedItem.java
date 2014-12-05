@@ -5,7 +5,6 @@ import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.protobuf.Message;
 import com.origingame.business.player.dao.PlayerDao;
 import com.origingame.exception.GameDaoException;
-import com.origingame.server.dao.DbMediator;
 import com.origingame.server.main.World;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,8 +18,6 @@ public class OwnedItem<B extends Message.Builder> {
     private static final Logger log = LoggerFactory.getLogger(OwnedItem.class);
 
     private PlayerDao playerDao = World.getBean(PlayerDao.class);
-
-    private DbMediator dbMediator;
 
     private boolean initialized = false;
 
@@ -38,7 +35,6 @@ public class OwnedItem<B extends Message.Builder> {
 
     public OwnedItem(Player player, String key, B target) {
 //        this.player = player;
-        this.dbMediator = player.getDbMediator();
         this.id = player.getId();
         this.key = key;
         this.target = target;
@@ -63,7 +59,7 @@ public class OwnedItem<B extends Message.Builder> {
     public byte[] load() {
         if(initialized) return targetBytes;
 
-        this.targetBytes = playerDao.loadField(dbMediator, id, key);
+        this.targetBytes = playerDao.loadField(id, key);
         if(targetBytes != null) {
             try {
                 target.mergeFrom(targetBytes);

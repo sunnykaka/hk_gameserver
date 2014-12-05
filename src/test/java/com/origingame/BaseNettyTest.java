@@ -2,6 +2,7 @@ package com.origingame;
 
 import com.origingame.client.main.ClientSession;
 import com.origingame.client.main.NettyGameClient;
+import com.origingame.server.context.GameContextHolder;
 import com.origingame.server.main.NettyGameServer;
 import com.origingame.server.main.World;
 import io.netty.channel.Channel;
@@ -28,11 +29,13 @@ public abstract class BaseNettyTest {
     @BeforeTest
     public static void init() throws Exception {
         World.getInstance().init();
+        GameContextHolder.init();
     }
 
     @AfterTest
     public static void destroy() throws Exception {
         World.getInstance().destroy();
+        GameContextHolder.destroy();
     }
 
 //    protected Channel initClient() throws InterruptedException, IOException {

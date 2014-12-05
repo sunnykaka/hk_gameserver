@@ -1,6 +1,5 @@
 package com.origingame.business.player.util;
 
-import com.google.protobuf.Message;
 import com.origingame.model.PlayerItemProtos;
 import com.origingame.server.dao.DbMediator;
 import com.origingame.server.util.IdGenerator;

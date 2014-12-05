@@ -546,6 +546,15 @@ public final class PlayerEchoProtos {
      */
     com.google.protobuf.ByteString
         getPasswordBytes();
+
+    /**
+     * <code>optional int32 count = 5;</code>
+     */
+    boolean hasCount();
+    /**
+     * <code>optional int32 count = 5;</code>
+     */
+    int getCount();
   }
   /**
    * Protobuf type {@code com.origingame.message.PlayerEchoResp}
@@ -620,6 +629,11 @@ public final class PlayerEchoProtos {
               com.google.protobuf.ByteString bs = input.readBytes();
               bitField0_ |= 0x00000008;
               password_ = bs;
+              break;
+            }
+            case 40: {
+              bitField0_ |= 0x00000010;
+              count_ = input.readInt32();
               break;
             }
           }
@@ -803,11 +817,27 @@ public final class PlayerEchoProtos {
       }
     }
 
+    public static final int COUNT_FIELD_NUMBER = 5;
+    private int count_;
+    /**
+     * <code>optional int32 count = 5;</code>
+     */
+    public boolean hasCount() {
+      return ((bitField0_ & 0x00000010) == 0x00000010);
+    }
+    /**
+     * <code>optional int32 count = 5;</code>
+     */
+    public int getCount() {
+      return count_;
+    }
+
     private void initFields() {
       message_ = "";
       playerId_ = 0;
       username_ = "";
       password_ = "";
+      count_ = 0;
     }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
@@ -850,6 +880,9 @@ public final class PlayerEchoProtos {
       if (((bitField0_ & 0x00000008) == 0x00000008)) {
         output.writeBytes(4, getPasswordBytes());
       }
+      if (((bitField0_ & 0x00000010) == 0x00000010)) {
+        output.writeInt32(5, count_);
+      }
       getUnknownFields().writeTo(output);
     }
 
@@ -874,6 +907,10 @@ public final class PlayerEchoProtos {
       if (((bitField0_ & 0x00000008) == 0x00000008)) {
         size += com.google.protobuf.CodedOutputStream
           .computeBytesSize(4, getPasswordBytes());
+      }
+      if (((bitField0_ & 0x00000010) == 0x00000010)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt32Size(5, count_);
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
@@ -1000,6 +1037,8 @@ public final class PlayerEchoProtos {
         bitField0_ = (bitField0_ & ~0x00000004);
         password_ = "";
         bitField0_ = (bitField0_ & ~0x00000008);
+        count_ = 0;
+        bitField0_ = (bitField0_ & ~0x00000010);
         return this;
       }
 
@@ -1044,6 +1083,10 @@ public final class PlayerEchoProtos {
           to_bitField0_ |= 0x00000008;
         }
         result.password_ = password_;
+        if (((from_bitField0_ & 0x00000010) == 0x00000010)) {
+          to_bitField0_ |= 0x00000010;
+        }
+        result.count_ = count_;
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
@@ -1077,6 +1120,9 @@ public final class PlayerEchoProtos {
           bitField0_ |= 0x00000008;
           password_ = other.password_;
           onChanged();
+        }
+        if (other.hasCount()) {
+          setCount(other.getCount());
         }
         this.mergeUnknownFields(other.getUnknownFields());
         return this;
@@ -1381,6 +1427,38 @@ public final class PlayerEchoProtos {
         return this;
       }
 
+      private int count_ ;
+      /**
+       * <code>optional int32 count = 5;</code>
+       */
+      public boolean hasCount() {
+        return ((bitField0_ & 0x00000010) == 0x00000010);
+      }
+      /**
+       * <code>optional int32 count = 5;</code>
+       */
+      public int getCount() {
+        return count_;
+      }
+      /**
+       * <code>optional int32 count = 5;</code>
+       */
+      public Builder setCount(int value) {
+        bitField0_ |= 0x00000010;
+        count_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional int32 count = 5;</code>
+       */
+      public Builder clearCount() {
+        bitField0_ = (bitField0_ & ~0x00000010);
+        count_ = 0;
+        onChanged();
+        return this;
+      }
+
       // @@protoc_insertion_point(builder_scope:com.origingame.message.PlayerEchoResp)
     }
 
@@ -1413,9 +1491,10 @@ public final class PlayerEchoProtos {
     java.lang.String[] descriptorData = {
       "\n\031message/player_echo.proto\022\026com.origing" +
       "ame.message\" \n\rPlayerEchoReq\022\017\n\007message\030" +
-      "\001 \002(\t\"X\n\016PlayerEchoResp\022\017\n\007message\030\001 \002(\t" +
+      "\001 \002(\t\"g\n\016PlayerEchoResp\022\017\n\007message\030\001 \002(\t" +
       "\022\021\n\tplayer_id\030\002 \002(\005\022\020\n\010username\030\003 \002(\t\022\020\n" +
-      "\010password\030\004 \002(\tB\022B\020PlayerEchoProtos"
+      "\010password\030\004 \002(\t\022\r\n\005count\030\005 \001(\005B\022B\020Player" +
+      "EchoProtos"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -1440,7 +1519,7 @@ public final class PlayerEchoProtos {
     internal_static_com_origingame_message_PlayerEchoResp_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_com_origingame_message_PlayerEchoResp_descriptor,
-        new java.lang.String[] { "Message", "PlayerId", "Username", "Password", });
+        new java.lang.String[] { "Message", "PlayerId", "Username", "Password", "Count", });
   }
 
   // @@protoc_insertion_point(outer_class_scope)

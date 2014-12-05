@@ -19,12 +19,12 @@ public class DbMediator {
 
     private CenterDb centerDb;
 
-    public PlayerDb selectPlayerDb(int playerOrSessionId) {
-        Preconditions.checkArgument(playerOrSessionId > 0);
-        int index = serverPersistenceResolver.findPlayerDbIndexById(playerOrSessionId);
+    public PlayerDb selectShardDb(int entityId) {
+        Preconditions.checkArgument(entityId > 0);
+        int index = serverPersistenceResolver.findPlayerDbIndexById(entityId);
         PlayerDb playerDb = playerDbMap.get(index);
         if(playerDb == null) {
-            playerDb = serverPersistenceResolver.selectPlayerDb(playerOrSessionId);
+            playerDb = serverPersistenceResolver.selectPlayerDb(entityId);
             playerDbMap.put(index, playerDb);
         }
         return playerDb;

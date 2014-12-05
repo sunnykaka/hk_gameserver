@@ -20,25 +20,23 @@ public class ServerResponseWrapper {
 
     private Message message;
 
-    public static ServerResponseWrapper createHandShakeSuccessResponse(GameContext ctx, Message message, CryptoContext cryptoContext) {
-        return new ServerResponseWrapper(ctx, GameProtocol.Status.SUCCESS, BaseMsgProtos.ResponseStatus.SUCCESS, null, message, cryptoContext);
+    public static ServerResponseWrapper createHandShakeSuccessResponse(GameProtocol requestProtocol, Message message, CryptoContext cryptoContext) {
+        return new ServerResponseWrapper(requestProtocol, GameProtocol.Status.SUCCESS, BaseMsgProtos.ResponseStatus.SUCCESS, null, message, cryptoContext);
     }
 
-    public static ServerResponseWrapper createProtocolErrorResponse(GameContext ctx, GameProtocol.Status status) {
-        return new ServerResponseWrapper(ctx, status, null, null, null, null);
+    public static ServerResponseWrapper createProtocolErrorResponse(GameProtocol requestProtocol, GameProtocol.Status status) {
+        return new ServerResponseWrapper(requestProtocol, status, null, null, null, null);
     }
 
-    public static ServerResponseWrapper createRequestResponse(GameContext ctx, BaseMsgProtos.ResponseStatus responseStatus, String responseMsg, Message result, CryptoContext cryptoContext) {
+    public static ServerResponseWrapper createRequestResponse(GameProtocol requestProtocol, BaseMsgProtos.ResponseStatus responseStatus, String responseMsg, Message result, CryptoContext cryptoContext) {
 
-        return new ServerResponseWrapper(ctx, GameProtocol.Status.SUCCESS, responseStatus, responseMsg, result, cryptoContext);
+        return new ServerResponseWrapper(requestProtocol, GameProtocol.Status.SUCCESS, responseStatus, responseMsg, result, cryptoContext);
     }
 
 
-    private ServerResponseWrapper(GameContext ctx, GameProtocol.Status status, BaseMsgProtos.ResponseStatus responseStatus,
+    private ServerResponseWrapper(GameProtocol requestProtocol, GameProtocol.Status status, BaseMsgProtos.ResponseStatus responseStatus,
                                   String msg, Message message, CryptoContext cryptoContext) {
         Preconditions.checkNotNull(status);
-
-        GameProtocol requestProtocol = ctx.getRequest().getProtocol();
 
         GameProtocol.Builder protocol = GameProtocol.newBuilder();
         protocol.setPhase(requestProtocol.getPhase());
