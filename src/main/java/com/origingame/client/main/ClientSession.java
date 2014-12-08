@@ -72,7 +72,7 @@ public class ClientSession {
         }
     }
 
-    public void closeConnection() {
+    private void closeConnection() {
         if(nettyGameClient != null) {
             try {
                 nettyGameClient.stop();
